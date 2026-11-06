@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#B0472F">
+  <meta name="description" content="Profissionais em Petrolina. Encontre o serviço e converse diretamente pelo WhatsApp.">
+  <title>Ajuda em Casa · Profissionais em Petrolina</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icone.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icone-192.png">
+  <link rel="stylesheet" href="styles.css?v=98736c3d20a4">
+  <script type="module" src="bootstrap.mjs?v=98736c3d20a4"></script>
+</head>
+<body class="compact-home">
+  <a class="skip-link" href="#profissionais">Pular para os contatos</a>
+  <header class="site-header container">
+    <a class="brand" href="index.html"><img src="icone.svg" width="36" height="36" alt=""><span>Ajuda em Casa<small>PETROLINA · PE</small></span></a>
+    <a class="google-entry google-button" href="#entrar" aria-label="Entrar ou cadastrar com Google"><img src="assets/google-g.svg" width="20" height="20" alt=""><span>Entrar com Google</span></a>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-controls="side-menu" aria-expanded="false"><span aria-hidden="true">☰</span> Menu</button>
+  </header>
+  <p id="startup-status" class="container notice" role="alert" hidden></p>
+  <button id="menu-backdrop" class="menu-backdrop" type="button" aria-label="Fechar menu principal" tabindex="-1" hidden></button>
+  <div class="app-shell">
+    <aside id="side-menu" class="side-menu" aria-labelledby="side-menu-title">
+      <div class="side-menu-heading"><h2 id="side-menu-title">O que você precisa?</h2><button id="menu-close" class="menu-close" type="button" aria-label="Fechar menu principal">×</button></div>
+      <nav aria-label="Menu principal">
+        <a data-nav-role="contractor" href="#contratar">Contrate um serviço</a>
+        <a data-nav-role="worker" href="#ser-contratado">Seja contratado</a>
+        <a data-nav-role="agency" href="#agenciar">Agencie empregos</a>
+        <a href="#planos">Torne-se PRO</a>
+        <a href="#conta">Meu perfil / Entrar</a>
+      </nav>
+    </aside>
+    <div class="page-content">
+      <main>
+        <section class="directory-section" id="profissionais" aria-labelledby="directory-title">
+          <div class="container">
+            <h1 id="directory-title">Profissionais em Petrolina</h1>
+            <p id="commercial-notice" class="directory-intro">Encontre e converse gratuitamente.</p>
+            <div class="search-toolbar">
+            <div class="directory-search"><label for="query">Qual serviço você procura?</label><input id="query" type="search" placeholder="Busque por serviço ou nome" autocomplete="off"></div>
+            <details id="directory-filters" class="directory-filters">
+              <summary>Filtrar</summary>
+              <div class="filter-panel">
+                <div class="directory-mode"><div><label for="directory-mode">Quero encontrar</label><select id="directory-mode"><option value="professionals">Profissionais para contratar</option><option value="jobseekers">Pessoas procurando emprego</option><option value="jobs">Vagas de emprego</option><option value="agencies">Oportunidades de agenciadores</option></select></div><div><label for="sort">Ordenar por</label><select id="sort"><option value="recommended">Recomendados · destaques primeiro</option><option value="distance">Mais próximos</option></select></div></div>
+                <div class="filters"><div><label for="category">Serviço</label><select id="category"><option value="">Todos os serviços</option></select></div><div><label for="neighborhood">Bairro ou condomínio</label><input id="neighborhood" list="locality-options" maxlength="100" placeholder="Informe a região"></div><button id="clear" class="btn secondary" type="button">Limpar filtros</button></div>
+                <button class="emergency-filter" id="emergency" type="button" aria-pressed="false">Plantão / Emergência 24h</button>
+                <p id="locality-count" class="micro"></p>
+                <details class="search-location-panel"><summary>Usar minha região para ver distâncias</summary><div id="search-location"></div></details>
+                <p id="location-help" class="micro"></p><p id="sort-note" class="micro"></p><button type="button" class="btn primary" data-close-filters>Concluir filtros</button>
+              </div>
+            </details>
+            </div>
+            <datalist id="locality-options"></datalist>
+            <div class="results-bar"><p id="result-count" role="status">Carregando contatos…</p><div class="results-layout" role="group" aria-label="Visualização dos resultados"><button type="button" data-results-layout="cards" aria-pressed="true" aria-controls="results">Cartões</button><button type="button" data-results-layout="list" aria-pressed="false" aria-controls="results">Lista</button></div></div>
+            <p id="demo-notice" class="demo-notice" hidden>Contatos de demonstração, sem telefone real.</p>
+            <div id="results" class="result-grid" data-layout="cards" role="region" aria-label="Contatos encontrados" tabindex="0" aria-describedby="cards-help"></div>
+            <div class="results-navigation" role="group" aria-label="Navegar pelos contatos" hidden><button id="cards-prev" type="button" aria-label="Ver contatos anteriores" aria-controls="results">← Anterior</button><span id="cards-help" class="micro">Deslize para o lado ou escolha Lista.</span><button id="cards-next" type="button" aria-label="Ver próximos contatos" aria-controls="results">Próximo →</button></div>
+            <div class="load-more-wrap"><button class="btn secondary" id="load-more" type="button" hidden>Mostrar mais 4</button></div>
+          </div>
+        </section>
+      </main>
+      <footer class="site-footer container"><p>Petrolina · PE · © <span id="year">2026</span></p><nav aria-label="Informações"><a href="#termos">Como funciona</a><a href="#privacidade">Privacidade</a><a href="#patrocinio">Anunciar loja</a><a href="#modelos">Modelos PRO</a><a href="#destaque">Meu destaque</a><button id="install" type="button" hidden>Instalar aplicativo</button></nav></footer>
+    </div>
+  </div>
+  <dialog id="dialog" aria-labelledby="dialog-title"><button class="dialog-close" type="button" aria-label="Fechar janela">×</button><div id="dialog-content"></div></dialog>
+  <dialog id="info-dialog" aria-labelledby="info-dialog-title"><button class="info-dialog-close" type="button" data-close-info aria-label="Voltar ao formulário">×</button><div id="info-dialog-content"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p class="container">Ative o JavaScript para consultar os contatos e usar os formulários.</p></noscript>
+</body>
+</html>

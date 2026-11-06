@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0-CODEX",
+  "webhookUrl": "https://sternplatypus-n8n.cloudfy.live/webhook/ajuda-em-casa-codex",
+  "pixKey": "06089311448",
+  "pixType": "CPF",
+  "paymentUrl": "",
+  "commercialStage": "launch",
+  "proTrialMonths": 6,
+  "paymentProvider": "asaas",
+  "paymentStatus": "not_configured",
+  "paidBoostPrice": 99.9,
+  "listingPageSize": 4,
+  "auth": {
+    "provider": "firebase",
+    "firebase": {
+      "apiKey": "",
+      "authDomain": "",
+      "projectId": "",
+      "appId": ""
+    }
+  },
+  "proPriceMonthly": 19.9,
+  "sponsorPriceMonthly": 49.9,
+  "showDemoProfiles": false,
+  "mapTileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "requestTimeoutMs": 25000
+}

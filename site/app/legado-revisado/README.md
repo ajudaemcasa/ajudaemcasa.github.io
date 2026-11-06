@@ -1,0 +1,14 @@
+# Ajuda em Casa: protótipo
+
+Protótipo navegável do Ajuda em Casa, um app que aproxima quem procura trabalho
+doméstico ou de reparos e quem precisa contratar, em Petrolina/PE.
+
+**Site:** https://aquinogr.github.io/ajuda-em-casa-prototipo/
+
+No celular, dá para adicionar o site à tela inicial, e ele abre como um
+aplicativo. As pessoas e os números são de exemplo, e nada é salvo. No topo das telas, o
+seletor "Modo" mostra como o app fica no modo gratuito e no pago. Todas as
+telas estão em [telas.html](https://aquinogr.github.io/ajuda-em-casa-prototipo/telas.html).
+
+Este site é gerado a partir das telas do Claude Design pelo script
+`ferramentas/prototipo/gerar.js`, que está na pasta do projeto. O gerador original não está neste repositório. Esta revisão altera os arquivos exportados diretamente. Antes de gerar novamente pelo Claude Design, incorporar esta revisão ao projeto-fonte; uma nova exportação pode sobrescrever as melhorias.

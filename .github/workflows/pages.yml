@@ -1,0 +1,42 @@
+name: Publicar app no GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Conferir arquivos publicados
+        shell: bash
+        run: |
+          test -f site/index.html
+          test -f site/app/index.html
+          test -f site/.nojekyll
+          test -f site/app/manifest.webmanifest
+          if find site -type l -print -quit | grep -q .; then
+            echo 'Links simbólicos não são permitidos no pacote público.'; exit 1
+          fi
+          if find site -type f | grep -E '(^|/)(automation|operacao-local|dados|node_modules|testes)(/|$)|(^|/)\.env(\.|$)|\.(vcf|csv|zip|pem|key)$'; then
+            echo 'Arquivo privado ou arquivo-fonte inesperado na publicação.'; exit 1
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,27 @@
+// Serviços presentes na agenda local. Não contém nomes nem telefones.
+export const EXTRA_CATEGORIES = [
+  ['adestrador','Adestrador'], ['assistencia-tecnica','Assistência técnica'],
+  ['automacao-seguranca','Automação e segurança eletrônica'], ['borracharia','Borracharia'],
+  ['chaveiro','Chaveiro'], ['confeitaria','Confeitaria'], ['cortinas-persianas','Cortinas e persianas'],
+  ['dedetizacao','Dedetização'], ['desentupidora','Desentupidora'], ['design-interiores','Design de interiores'],
+  ['doula','Doula'], ['engenheiro','Engenheiro'], ['instalador-energia-solar','Instalador de energia solar'],
+  ['esquadrias','Esquadrias'], ['serralheria','Serralheria'], ['estofador','Estofador'],
+  ['fotografo','Fotógrafo'], ['frete-mudancas','Fretes e mudanças'], ['gas-agua','Entrega de gás e água'],
+  ['garcom','Garçom'], ['gesseiro','Gesseiro'], ['grafica','Gráfica'],
+  ['higienizacao-estofados','Higienização de estofados'], ['impermeabilizacao','Impermeabilização'],
+  ['paisagismo','Paisagismo'], ['grama-sintetica','Grama sintética'], ['lava-jato','Lava-jato'],
+  ['lavanderia','Lavanderia'], ['lavanderia-cortinas','Lavanderia de cortinas'],
+  ['limpeza-pos-obra','Limpeza pós-obra'], ['limpeza-vidros','Limpeza de vidros'],
+  ['marceneiro','Marceneiro'], ['marmoraria','Marmoraria'], ['montador-moveis','Montador de móveis'],
+  ['mototaxi','Mototáxi'], ['papel-parede','Instalação de papel de parede'],
+  ['peliculas','Instalação de películas'], ['personal-trainer','Personal trainer'],
+  ['banho-tosa','Banho e tosa'], ['pet-sitter','Cuidador de pets'],
+  ['aquecedor-piscina','Manutenção de aquecedor de piscina'], ['professor','Professor'],
+  ['professor-natacao','Professor de natação'], ['redes-protecao','Redes de proteção'],
+  ['telas-mosquiteiro','Telas mosquiteiro'], ['toldos','Toldos e coberturas'],
+  ['veterinario','Veterinário'], ['vidracaria','Vidraçaria'], ['baterias','Baterias automotivas'],
+  ['uniformes','Uniformes e fardamentos'], ['decoracao-costura','Decoração e costura'],
+  ['redes-descanso','Redes de descanso'], ['chef-em-casa','Chef em casa'],
+  ['locacao-equipamentos','Locação de equipamentos'], ['videomaker','Videomaker'],
+  ['tecnico-informatica','Técnico de informática'], ['irrigacao','Irrigação']
+].map(([id,name])=>({id,name,short:name,icon:'tool'}));
