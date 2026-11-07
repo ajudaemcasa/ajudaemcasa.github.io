@@ -1,6 +1,6 @@
-import {AD_KINDS,adPresentation} from './anuncios.mjs?v=e71086cfe89e';
-import {intermediationMarkup,previewIntermediation} from './intermediacao-ui.mjs?v=e71086cfe89e';
-import {intermediationSplit} from './intermediacao.mjs?v=e71086cfe89e';
+import {AD_KINDS,adPresentation} from './anuncios.mjs?v=dae75b201aa5';
+import {intermediationMarkup,previewIntermediation} from './intermediacao-ui.mjs?v=dae75b201aa5';
+import {intermediationSplit} from './intermediacao.mjs?v=dae75b201aa5';
 const adEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function adHeader(ad) {
   return `<div class="ad-topline"><span class="ad-purpose"><span aria-hidden="true">${ad.symbol}</span> ${adEsc(ad.title)}</span><span class="ad-access">${adEsc(ad.accessLabel)}</span></div>`;

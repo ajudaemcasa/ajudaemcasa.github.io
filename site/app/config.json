@@ -17,7 +17,8 @@
       "authDomain": "ajuda-em-casa-pnz.firebaseapp.com",
       "projectId": "ajuda-em-casa-pnz",
       "appId": "1:326621706228:web:ec488d2ccab2b82aefeba1"
-    }
+    },
+    "flow": "redirect"
   },
   "proPriceMonthly": 19.9,
   "sponsorPriceMonthly": 49.9,

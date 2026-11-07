@@ -1,7 +1,7 @@
-import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=e71086cfe89e';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=e71086cfe89e';
-import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=e71086cfe89e';
-import {CATEGORIES,categoryName} from './domain.mjs?v=e71086cfe89e';
+import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=dae75b201aa5';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=dae75b201aa5';
+import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=dae75b201aa5';
+import {CATEGORIES,categoryName} from './domain.mjs?v=dae75b201aa5';
 
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const labels={active:'Ativo',suspended:'Suspenso',pending:'Pendente',in_progress:'Em atendimento',rejected:'Recusado',resolved:'Concluído',published:'Publicado'};

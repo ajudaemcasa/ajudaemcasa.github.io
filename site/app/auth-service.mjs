@@ -129,7 +129,7 @@ function waitForInitialState(sdk, auth) {
 }
 
 /** loadSdk() retorna os exports planos app/auth; loadedSdk também aceita o objeto diretamente. */
-export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk } = {}) {
+export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk, navigation = globalThis.window } = {}) {
   const settings = publicSettings(config);
   const listeners = new Set();
   let sdk;
@@ -137,6 +137,19 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
   let initialized = false;
   let readyPromise;
   let unsubscribeAuth;
+  const redirectMode=config?.auth?.flow==='redirect';
+  const accessOrigin=settings?'https://'+settings.authDomain:'';
+  const googleProvider=()=>{
+    const provider=new sdk.GoogleAuthProvider();
+    provider.addScope('profile');provider.addScope('email');
+    provider.setCustomParameters?.({prompt:'select_account'});
+    return provider;
+  };
+  const redirectGoogle=async()=>{
+    await sdk.signInWithRedirect(auth,googleProvider());
+    // O documento está saindo. A UI não deve interpretar navegação como login concluído.
+    return new Promise(()=>{});
+  };
 
   const getUser = () => initialized ? sanitizeUser(auth.currentUser) : null;
   const notify = listener => {
@@ -174,6 +187,15 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
         await sdk.setPersistence(auth, sdk.browserSessionPersistence);
         auth.languageCode = 'pt-BR';
         await waitForInitialState(sdk, auth);
+        if(redirectMode && navigation?.location?.origin===accessOrigin) {
+          await sdk.getRedirectResult(auth);
+          const url=new URL(navigation.location.href);
+          if(url.searchParams.get('entrarGoogle')==='1' && !auth.currentUser) {
+            url.searchParams.delete('entrarGoogle');
+            navigation.history.replaceState(null,'',url.href);
+            await redirectGoogle();
+          }
+        }
         initialized = true;
         watch();
         publish();
@@ -204,9 +226,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
   };
   const afterSignIn = () => { publish(); return getUser(); };
   const popup = () => {
-    const provider = new sdk.GoogleAuthProvider();
-    provider.addScope('profile');
-    provider.addScope('email');
+    const provider = googleProvider();
     // Não acessar credenciais/tokens de UserCredential; somente auth.currentUser.
     return sdk.signInWithPopup(auth, provider).then(afterSignIn);
   };
@@ -221,6 +241,19 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
       });
     },
     signInGoogle() {
+      if(redirectMode && navigation?.location) {
+        return operation(async()=>{
+          if(navigation.location.origin!==accessOrigin) {
+            const url=new URL(navigation.location.href);
+            // O destino deriva do authDomain validado; nenhum token acompanha a URL.
+            const target=new URL('/app/'+(url.pathname.endsWith('/painel.html')?'painel.html':'index.html'),accessOrigin);
+            target.hash=url.hash||'#entrar';target.searchParams.set('entrarGoogle','1');
+            navigation.location.assign(target.href);
+            return new Promise(()=>{});
+          }
+          await ready();return redirectGoogle();
+        });
+      }
       // Sem await/then antes do SDK quando ready() já terminou: preserva o gesto do clique.
       return operation(() => initialized ? popup() : ready().then(popup));
     },

@@ -1,6 +1,6 @@
-import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=e71086cfe89e';
-import { authConfigured, authErrorMessage } from './auth-service.mjs?v=e71086cfe89e';
-import { commercialOffer } from './comercial.mjs?v=e71086cfe89e';
+import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=dae75b201aa5';
+import { authConfigured, authErrorMessage } from './auth-service.mjs?v=dae75b201aa5';
+import { commercialOffer } from './comercial.mjs?v=dae75b201aa5';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const roles={
