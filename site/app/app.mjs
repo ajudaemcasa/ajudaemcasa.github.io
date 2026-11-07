@@ -1,18 +1,18 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=dae75b201aa5';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=dae75b201aa5';
-import { createN8nService } from './n8n-service.mjs?v=dae75b201aa5';
-import { commercialOffer } from './comercial.mjs?v=dae75b201aa5';
-import { proPaymentMarkup } from './comercial-ui.mjs?v=dae75b201aa5';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=dae75b201aa5';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=dae75b201aa5';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=dae75b201aa5';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=dae75b201aa5';
-import { createAuthService } from './auth-service.mjs?v=dae75b201aa5';
-import { createAccountStore } from './conta.mjs?v=dae75b201aa5';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=dae75b201aa5';
-import {profileHeading} from './perfil.mjs?v=dae75b201aa5';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=dae75b201aa5';
-import {createRequestService} from './request-service.mjs?v=dae75b201aa5';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=4b7fdc914fc1';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=4b7fdc914fc1';
+import { createN8nService } from './n8n-service.mjs?v=4b7fdc914fc1';
+import { commercialOffer } from './comercial.mjs?v=4b7fdc914fc1';
+import { proPaymentMarkup } from './comercial-ui.mjs?v=4b7fdc914fc1';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=4b7fdc914fc1';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=4b7fdc914fc1';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=4b7fdc914fc1';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=4b7fdc914fc1';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=4b7fdc914fc1';
+import { createAccountStore } from './conta.mjs?v=4b7fdc914fc1';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=4b7fdc914fc1';
+import {profileHeading} from './perfil.mjs?v=4b7fdc914fc1';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=4b7fdc914fc1';
+import {createRequestService} from './request-service.mjs?v=4b7fdc914fc1';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -55,7 +55,7 @@ function refreshCardsLayout() {
 }
 const filters = { category: '', neighborhood: '', query: '', emergency: false, sort:'recommended', origin:null, mode:'professionals' };
 const mediaBlobs = new Set();
-const availableProfiles=()=>catalog.profiles.filter(p=>!p.demo || config.showDemoProfiles===true);
+const availableProfiles=()=>catalog.profiles.filter(p=>(!p.demo || config.showDemoProfiles===true) && (p.demo || !!phoneDigits(p.phone)));
 const distanceMarkup=p=>Object.hasOwn(p,'distanceKm')?`<p class="distance-label">⌖ ${esc(distanceLabel(p.distanceKm))}</p>`:'';
 function resolveLocality(value) {
   const text=String(value||'').trim();
@@ -68,7 +68,7 @@ function registrationLocation() {
 function vacancyCard(job) {
   const number=phoneDigits(job.phone);
   const agency=job.ad.kind==='agency';
-  const message=agency?'Olá! Vi a oportunidade '+job.title+' no Ajuda em Casa Petrolina e quero falar diretamente com o agenciador.':'Olá! Vi a vaga '+job.title+' no Ajuda em Casa Petrolina e tenho interesse em conversar sobre o trabalho.';
+  const message=agency?'Olá! Vi a oportunidade '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e quero falar diretamente com o agenciador.':'Olá! Vi a vaga '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e tenho interesse em conversar sobre o trabalho.';
   const href=number?'https://wa.me/'+number+'?text='+encodeURIComponent(message):null;
   const ad=job.ad;
   return `<article class="person-card basic-card job-card ad-poster ad-tone-${ad.tone}" data-job="${esc(job.id)}" data-plan="${ad.premium?'pro':'free'}">${job.promotion?.paidBoostDays?`<div class="feature-badge">🔥 Destaque avulso · restam ${job.promotion.paidBoostDays} dias</div>`:job.promotion?.agencyTrialDays?`<div class="feature-badge">Agenciador em destaque · período inicial de 6 meses · restam ${job.promotion.agencyTrialDays} dias</div>`:''}${adHeader(ad)}<p class="ad-model-name">${ad.premium?esc(ad.name):'Oportunidade · básico'}</p><h3>${esc(job.title)}</h3><p class="ad-byline">Divulgado por ${esc(job.publicName)}</p>${distanceMarkup(job)}<p>${esc(job.neighborhood)}</p><p>${esc(job.description)}</p>${ad.premium?adDetailsMarkup(ad,job.neighborhood):`<p>${esc(job.schedule)}</p>`}${intermediationMarkup(job.intermediation)}${href?`<a class="btn whatsapp" target="_blank" rel="noopener noreferrer" href="${esc(href)}">${agency?'Falar com o agenciador':'Tenho interesse na vaga'} ↗</a>`:''}<p class="micro">Confirme disponibilidade e condições. Endereço exato e referências só na conversa privada.</p></article>`;
@@ -516,7 +516,16 @@ async function start() {
     if(dataClient.enabled)await refreshLiveCatalog();
     let accountStorage;
     try {accountStorage=window.sessionStorage;} catch { /* Rascunho funciona em memória se o armazenamento estiver bloqueado. */ }
-    accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onProfileSave:preferences=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve()});
+    accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onAdminAccess:()=>dataClient.hasAdminAccess(),onProfileSave:preferences=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve()});
+    auth.subscribe(user=>{
+      const entry=$('.google-entry');
+      entry.href=user?'#conta':'#entrar';
+      entry.querySelector('img').hidden=!!user;
+      entry.querySelector('span').textContent=user?'Meu perfil':'Entrar com Google';
+      entry.setAttribute('aria-label',user?'Abrir meu perfil':'Entrar ou cadastrar com Google');
+    });
+    // Restaura a sessao para apresentar o perfil depois do retorno do Google.
+    if(authConfigured(config))auth.ready().catch(()=>{});
     setMenuOpen(false);
     matchMedia('(max-width: 1050px)').addEventListener('change',()=>setMenuOpen(false));
     $('#results').addEventListener('scroll',updateCardsNavigation,{passive:true});

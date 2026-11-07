@@ -1,14 +1,14 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=dae75b201aa5';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=dae75b201aa5';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=dae75b201aa5';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=4b7fdc914fc1';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=4b7fdc914fc1';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=4b7fdc914fc1';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { ratingSummary } from './avaliacoes.mjs?v=dae75b201aa5';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=dae75b201aa5';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=dae75b201aa5';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=dae75b201aa5';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=dae75b201aa5';
-import {paidBoostDays} from './promocoes.mjs?v=dae75b201aa5';
+import { ratingSummary } from './avaliacoes.mjs?v=4b7fdc914fc1';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=4b7fdc914fc1';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=4b7fdc914fc1';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=4b7fdc914fc1';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=4b7fdc914fc1';
+import {paidBoostDays} from './promocoes.mjs?v=4b7fdc914fc1';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },
@@ -78,6 +78,7 @@ export function visibleProfile(profile, now = Date.now()) {
 }
 export function searchProfiles(profiles, filters = {}, now = Date.now()) {
   return profiles.filter(p => ['approved','unverified'].includes(p.status))
+    .filter(p=>p.demo || !!phoneDigits(p.phone))
     .filter(p=>!filters.adType || (p.adType||'service')===filters.adType)
     .filter(p => !filters.category || p.category === filters.category)
     .filter(p => !filters.neighborhood || (p.neighborhoods || []).some(n=>fold(n).includes(fold(filters.neighborhood))) || fold(p.neighborhood).includes(fold(filters.neighborhood)))
@@ -101,7 +102,7 @@ export function safeMediaUrl(value) {
 export function whatsappUrl(profile) {
   const phone = phoneDigits(profile.phone);
   if (!phone || profile.demo) return null;
-  const message = `Olá, ${profile.name}! Vi seu perfil no app Ajuda em Casa Petrolina e gostaria de um orçamento para ${categoryName(profile.category)}.`;
+  const message = `Olá, ${profile.name}! Encontrei seu cadastro no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e gostaria de um orçamento para ${categoryName(profile.category)}.`;
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 export function validateEvent(event) {

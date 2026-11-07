@@ -4,7 +4,7 @@ if('serviceWorker' in navigator && location.protocol!=='file:') {
   navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{/* A vitrine funciona sem worker e offline usa o cache já instalado. */});
 }
 try {
-  await import('./app.mjs?v=dae75b201aa5');
+  await import('./app.mjs?v=4b7fdc914fc1');
 } catch {
   const notice=document.getElementById('startup-status');
   if(notice) {

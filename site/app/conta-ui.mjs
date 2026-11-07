@@ -1,6 +1,6 @@
-import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=dae75b201aa5';
-import { authConfigured, authErrorMessage } from './auth-service.mjs?v=dae75b201aa5';
-import { commercialOffer } from './comercial.mjs?v=dae75b201aa5';
+import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=4b7fdc914fc1';
+import { authConfigured, authErrorMessage } from './auth-service.mjs?v=4b7fdc914fc1';
+import { commercialOffer } from './comercial.mjs?v=4b7fdc914fc1';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const roles={
@@ -42,11 +42,21 @@ function roleFields(selected='',goal='service') {
 }
 const consentField=()=>'<label class="check full"><input type="checkbox" name="consent" required><span>Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a>. Concordo com o uso dos dados para criar meu perfil. Isso não autoriza publicação do meu contato nem cobrança.</span></label>';
 
-export function createAccountUI({config,auth,store,openDialog,toast,onProfileSave=async()=>{}}) {
+export function createAccountUI({config,auth,store,openDialog,toast,onProfileSave=async()=>{},onAdminAccess=async()=>false}) {
   const configured=authConfigured(config);
   let intentRole='',intentGoal='service',busy=false,ready=false,pendingAction;
   const persistedProfiles=new Set();
   const area=()=>document.querySelector('[data-account-view]');
+  const adminActionMarkup=()=>'<div class="account-actions" data-admin-action data-access="pending" hidden><a class="btn primary" href="painel.html">Painel do Administrador</a></div>';
+  async function refreshAdminAction() {
+    const el=area()?.querySelector('[data-admin-action]'),user=auth.getUser();
+    if(!el || !user?.emailVerified)return;
+    try {
+      const allowed=await onAdminAccess();
+      if(el.isConnected && auth.getUser()?.uid===user.uid) {el.hidden=allowed!==true;el.dataset.access=allowed===true?'allowed':'denied';}
+    } catch { if(el.isConnected)el.dataset.access='unavailable'; /* O painel também confere no servidor. */ }
+  }
+  auth.subscribe(()=>{const el=area()?.querySelector('[data-admin-action]');if(el)el.hidden=true;refreshAdminAction();});
   const status=message=>{const el=area()?.querySelector('.account-status');if(el)el.textContent=message;};
   const googleStatus=message=>{const el=area()?.querySelector('[data-google-feedback]');if(el)el.textContent=message;};
   function setBusy(value) {
@@ -78,7 +88,8 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileSav
   }
   function showRoleForm() {
     const user=auth.getUser(),pref=store.readPreferences(user?.uid);
-    openDialog(`<section data-account-view="role"><span class="eyebrow">CONTA CONECTADA</span><h2 id="dialog-title">Qual é seu objetivo agora?</h2><p class="dialog-intro">Olá, ${esc(user?.name||user?.email)}. Escolha como quer usar o app. Você pode trocar de objetivo depois; isso não altera a titularidade dos anúncios.</p><form class="form-grid account-form" data-account-form="role">${roleFields(intentRole||pref?.role||'',intentRole?intentGoal:pref?.workerGoal||'service')}${consentField()}<p class="account-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">Salvar objetivo e ver meu perfil</button></form><button type="button" class="btn secondary" data-account-signout>Sair da conta</button></section>`);
+    openDialog(`<section data-account-view="role"><span class="eyebrow">CONTA CONECTADA</span><h2 id="dialog-title">Qual é seu objetivo agora?</h2><p class="dialog-intro">Olá, ${esc(user?.name||user?.email)}. Escolha como quer usar o app. Você pode trocar de objetivo depois; isso não altera a titularidade dos anúncios.</p><form class="form-grid account-form" data-account-form="role">${roleFields(intentRole||pref?.role||'',intentRole?intentGoal:pref?.workerGoal||'service')}${consentField()}<p class="account-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">Salvar objetivo e ver meu perfil</button></form>${adminActionMarkup()}<button type="button" class="btn secondary" data-account-signout>Sair da conta</button></section>`);
+    refreshAdminAction();
   }
   function showVerification() {
     const user=auth.getUser();
@@ -94,7 +105,8 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileSav
     } else if(configured || !store.readDraft()) return open();
     const preview=!user,profile=preview?store.readDraft():{...store.readPreferences(user.uid),name:user.name,email:user.email};
     const r=roles[profile.role]||roles.worker;
-    openDialog(`<section data-account-view="profile" class="profile-role-${esc(profile.role)}"><span class="eyebrow">${preview?'PRÉVIA · NÃO É CONTA AUTENTICADA':'MEU PERFIL'}</span><h2 id="dialog-title">${preview?'Prévia do seu perfil':`Olá, ${esc(profile.name||profile.email)}.`}</h2><div class="account-summary"><strong>${esc(profile.name||profile.email)}</strong><p>${esc(profile.email)}</p><span class="account-status">${r.icon} ${r.label}${preview?' · Pré-cadastro local':' · Conta conectada'}</span></div>${preview?'<p class="notice auth-unavailable">Estes dados estão apenas neste navegador, durante esta sessão. Nenhuma conta online ou anúncio foi criado. O login precisa ser configurado antes de solicitar PRO pela área autenticada.</p>':'<p class="notice">Conta básica. A identidade da conta não confirma titularidade de telefone, anúncio, assinatura ou selo. Os benefícios dependem de aprovação administrativa separada.</p>'}<div class="account-actions"><button class="btn secondary" type="button" data-account-edit>${preview?'Editar pré-cadastro':'Trocar meu objetivo'}</button>${preview?'<button class="btn secondary" type="button" data-account-clear>Apagar pré-cadastro local</button>':'<button class="btn secondary" type="button" data-account-signout>Sair da conta</button>'}</div>${profileBenefitsMarkup(profile.role,profile.workerGoal,config,{preview})}<p class="micro">O objetivo escolhido fica neste navegador, associado à conta quando há login. Ainda não há sincronização de preferências ou gerenciamento automático dos anúncios entre aparelhos.</p></section>`);
+    openDialog(`<section data-account-view="profile" class="profile-role-${esc(profile.role)}"><span class="eyebrow">${preview?'PRÉVIA · NÃO É CONTA AUTENTICADA':'MEU PERFIL'}</span><h2 id="dialog-title">${preview?'Prévia do seu perfil':`Olá, ${esc(profile.name||profile.email)}.`}</h2><div class="account-summary"><strong>${esc(profile.name||profile.email)}</strong><p>${esc(profile.email)}</p><span class="account-status">${r.icon} ${r.label}${preview?' · Pré-cadastro local':' · Conta conectada'}</span></div>${preview?'<p class="notice auth-unavailable">Estes dados estão apenas neste navegador, durante esta sessão. Nenhuma conta online ou anúncio foi criado. O login precisa ser configurado antes de solicitar PRO pela área autenticada.</p>':'<p class="notice">Conta básica. A identidade da conta não confirma titularidade de telefone, anúncio, assinatura ou selo. Os benefícios dependem de aprovação administrativa separada.</p>'}<div class="account-actions"><button class="btn secondary" type="button" data-account-edit>${preview?'Editar pré-cadastro':'Trocar meu objetivo'}</button>${preview?'<button class="btn secondary" type="button" data-account-clear>Apagar pré-cadastro local</button>':'<button class="btn secondary" type="button" data-account-signout>Sair da conta</button>'}</div>${!preview?adminActionMarkup():''}${profileBenefitsMarkup(profile.role,profile.workerGoal,config,{preview})}<p class="micro">O objetivo escolhido fica neste navegador, associado à conta quando há login. Ainda não há sincronização de preferências ou gerenciamento automático dos anúncios entre aparelhos.</p></section>`);
+    refreshAdminAction();
   }
   function open({role='',workerGoal='service',mode='signup'}={}) {
     if(role) {intentRole=validRole(role);intentGoal=workerGoal==='jobseeker'?'jobseeker':'service';}

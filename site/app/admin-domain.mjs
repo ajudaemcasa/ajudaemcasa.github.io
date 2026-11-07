@@ -1,5 +1,6 @@
-import {CATEGORIES,validateEvent} from './domain.mjs?v=dae75b201aa5';
-import {phoneDigits} from './telefone.mjs?v=dae75b201aa5';
+import {CATEGORIES,validateEvent} from './domain.mjs?v=4b7fdc914fc1';
+import {phoneDigits} from './telefone.mjs?v=4b7fdc914fc1';
+import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=4b7fdc914fc1';
 
 export const REQUEST_LABELS={novo_cadastro_gratuito:'Cadastro básico',solicitacao_upgrade_pro:'Solicitação PRO',ativacao_destaque_3dias:'Destaque',novo_orcamento_cliente:'Orçamento',interesse_patrocinio_loja:'Patrocínio',nova_vaga_empregador:'Vaga',solicitacao_titularidade:'Titularidade',nova_avaliacao:'Avaliação'};
 export function cleanText(raw,max,{required=false}={}) {
@@ -7,9 +8,9 @@ export function cleanText(raw,max,{required=false}={}) {
   if((required&&!value)||Array.from(value).length>max||/[<>\p{Cc}\p{Cf}]/u.test(value))throw new Error('Use texto simples dentro do limite indicado.');
   return value;
 }
-export function editProfessional(original,raw) {
+export function editProfessional(original,raw,{allowMissingPhone=false}={}) {
   const name=cleanText(raw.name,160,{required:true}),note=cleanText(raw.note,140),phone=raw.phone?phoneDigits(raw.phone):'';
-  if(raw.phone&&!phone)throw new Error('Informe um telefone válido com DDD.');
+  if(!phone && (!allowMissingPhone || String(raw.phone||'').trim()))throw new Error('Informe um telefone válido com DDD. Cadastro ativo não pode ficar sem telefone.');
   if(!CATEGORIES.some(c=>c.id===raw.category))throw new Error('Escolha um serviço válido.');
   if(original.entityType==='company'&&name!==original.legalName)throw new Error('A alteração de razão social exige conferência específica.');
   // Edição comum não concede plano, selo, titularidade, nota ou autorização.
@@ -51,18 +52,29 @@ export function createAdminService(client,auth) {
     },
     list:collection=>client.list(collection),
     async saveRecord(current,payload,reason,status=current.data.status) {
-      if(!['active','suspended'].includes(status))throw new Error('Situação inválida.');
+      if(current.data.status==='deleted')throw new Error('Este cadastro já foi excluído. O registro foi preservado somente para o histórico.');
+      if(!['active','suspended','deleted'].includes(status))throw new Error('Situação inválida.');
+      if(status==='active' && current.data.kind==='professional' && !phoneDigits(payload.phone))throw new Error('Informe um telefone válido com DDD antes de publicar ou reativar o cadastro.');
+      if(status==='active' && phoneDigits(payload.phone) && (await client.get('blocks/'+identityKey('phone',payload.phone)))?.data.enabled)throw new Error('Este telefone está bloqueado. Revise o bloqueio antes de publicar.');
       const publication=await client.get('publicCatalog/current');
       if(!publication)throw new Error('O catálogo ainda não foi importado pelo responsável.');
       if(current.data.kind==='professional'&&status==='active'&&phoneDigits(payload.phone)&&publication.data.profiles.some(p=>p.id!==payload.id&&phoneDigits(p.phone)===phoneDigits(payload.phone)&&p.category===payload.category))throw new Error('Este telefone já aparece em outro cadastro do mesmo serviço. Confira a duplicidade antes de salvar.');
       const record={...current.data,payload,status};
       publication.data=catalogWithRecord(publication.data,record);
-      return commitChange('records',current,record,{action:'record.save',reason,publication});
+      return commitChange('records',current,record,{action:status==='deleted'?'record.delete':'record.save',reason,publication});
     },
     async setUserStatus(current,status,reason) {
       if(current.data.uid===actor().uid)throw new Error('Você não pode suspender a própria conta neste painel.');
-      if(!['active','suspended'].includes(status))throw new Error('Situação inválida.');
-      return commitChange('users',current,{...current.data,status},{action:'user.status',reason});
+      if(!['active','suspended','deleted'].includes(status))throw new Error('Situação inválida.');
+      if(current.data.status==='deleted')throw new Error('Esta conta já foi excluída do app.');
+      const data={...current.data,status,...(status==='deleted'?{name:'Usuário excluído'}:{})};
+      return commitChange('users',current,data,{action:status==='deleted'?'user.delete':'user.status',reason});
+    },
+    async saveBlock(kind,raw,enabled,reason) {
+      const value=normalizeIdentity(kind,raw),id=identityKey(kind,value);
+      if(kind==='email' && value===actor().email.toLowerCase())throw new Error('Você não pode bloquear seu próprio e-mail de administrador.');
+      const current=await client.get('blocks/'+id);
+      return commitChange('blocks',current,{id,kind,value,enabled:enabled===true},{action:'block.save',reason});
     },
     async decideRequest(current,status,reason) {
       if(!['pending','in_progress'].includes(current.data.status))throw new Error('Este pedido já foi concluído. Atualize a lista.');
@@ -73,6 +85,7 @@ export function createAdminService(client,auth) {
       if(current.data.status!=='pending')throw new Error('Este pedido já recebeu uma decisão.');
       const recordId='cadastro-'+current.id;
       const payload=basicProfileFromRequest(current.data,{id:recordId,...checks});
+      if((await client.get('blocks/'+identityKey('phone',payload.phone)))?.data.enabled)throw new Error('Este telefone está bloqueado para novos cadastros.');
       const publication=await client.get('publicCatalog/current');
       if(!publication)throw new Error('O catálogo ainda não está disponível.');
       if(publication.data.profiles.some(p=>phoneDigits(p.phone)===payload.phone&&p.category===payload.category))throw new Error('Já existe um cadastro com o mesmo telefone e serviço. Trate como titularidade.');

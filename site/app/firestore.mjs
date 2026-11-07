@@ -1,4 +1,4 @@
-import {authConfigured} from './auth-service.mjs?v=dae75b201aa5';
+import {authConfigured} from './auth-service.mjs?v=4b7fdc914fc1';
 
 export const backendConfigured = config => authConfigured(config) && config?.data?.provider === 'firestore';
 export class DataError extends Error {
@@ -80,9 +80,15 @@ export function createDataClient(config,auth,{fetcher=globalThis.fetch}={}) {
     },
     write,
     commit:async writes=>request(':commit',{method:'POST',body:{writes}}),
+    async hasAdminAccess() {
+      const user=auth.getUser();
+      if(!enabled || !user?.emailVerified)return false;
+      const [access,account]=await Promise.all([this.get('adminAccess/'+user.email),this.get('users/'+user.uid)]);
+      return auth.getUser()?.uid===user.uid && access?.data.enabled===true && (!account || account.data.status==='active');
+    },
     async saveAccount(user,preferences={}) {
       const path='users/'+user.uid,current=await this.get(path);
-      if(current?.data.status==='suspended')throw new DataError('Esta conta está suspensa. Procure o atendimento.','SUSPENDED');
+      if(current && current.data.status!=='active')throw new DataError('Esta conta não está habilitada para usar o app. Procure o atendimento.','SUSPENDED');
       const data={...(current?.data||{}),uid:user.uid,email:user.email,name:user.name||user.email,role:preferences.role||current?.data.role||'contractor',workerGoal:preferences.workerGoal||current?.data.workerGoal||'service',status:current?.data.status||'active',consentVersion:'2026-11-07',revision:current?.data.revision||0};
       await this.commit([write(path,data,{version:current?.version,create:!current,timestamps:current?['updatedAt']:['createdAt','updatedAt']})]);
       return data;
