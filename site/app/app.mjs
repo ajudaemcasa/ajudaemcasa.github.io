@@ -1,16 +1,18 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=98736c3d20a4';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=98736c3d20a4';
-import { createN8nService } from './n8n-service.mjs?v=98736c3d20a4';
-import { commercialOffer } from './comercial.mjs?v=98736c3d20a4';
-import { proPaymentMarkup } from './comercial-ui.mjs?v=98736c3d20a4';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=98736c3d20a4';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=98736c3d20a4';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=98736c3d20a4';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=98736c3d20a4';
-import { createAuthService } from './auth-service.mjs?v=98736c3d20a4';
-import { createAccountStore } from './conta.mjs?v=98736c3d20a4';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=98736c3d20a4';
-import {profileHeading} from './perfil.mjs?v=98736c3d20a4';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=e71086cfe89e';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=e71086cfe89e';
+import { createN8nService } from './n8n-service.mjs?v=e71086cfe89e';
+import { commercialOffer } from './comercial.mjs?v=e71086cfe89e';
+import { proPaymentMarkup } from './comercial-ui.mjs?v=e71086cfe89e';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=e71086cfe89e';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=e71086cfe89e';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=e71086cfe89e';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=e71086cfe89e';
+import { createAuthService } from './auth-service.mjs?v=e71086cfe89e';
+import { createAccountStore } from './conta.mjs?v=e71086cfe89e';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=e71086cfe89e';
+import {profileHeading} from './perfil.mjs?v=e71086cfe89e';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=e71086cfe89e';
+import {createRequestService} from './request-service.mjs?v=e71086cfe89e';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -32,7 +34,7 @@ const icon = id => `<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">${p
 const options = (items, selected = '') => items.map(item => { const value = typeof item === 'string' ? item : item.id; const label = typeof item === 'string' ? item : item.name; return `<option value="${esc(value)}" ${value === selected ? 'selected' : ''}>${esc(label)}</option>`; }).join('');
 const dialog = $('#dialog');
 const infoDialog = $('#info-dialog');
-let config, catalog, vacancies, advertisers, service, accountUI, toastTimer, lastFocus;
+let config, catalog, vacancies, advertisers, service, accountUI, toastTimer, lastFocus, auth, dataClient;
 let infoLastFocus, lastResultMarkup='';
 let sponsorClickSent = false;
 const LISTING_PAGE_SIZE=4;
@@ -295,7 +297,8 @@ function showInfo(type,overForm=false) {
   const currentText=privacy?text.replace('A localização de busca e os formulários não são armazenados.','A localização de busca e os pedidos de serviço não são guardados pelo cache. O pré-cadastro de conta tem armazenamento separado, explicado abaixo.'):text.replace('Não há contratação, pagamento ou conta autenticada pelo site nesta versão.','Não há contratação ou pagamento operacional pelo site. O acesso à conta depende da configuração de autenticação descrita abaixo.');
   const accountText=privacy?'<h3>Conta, Google e pré-cadastro local</h3><p>Sem autenticação configurada, o pré-cadastro guarda apenas nome, e-mail, objetivo e aceite nesta sessão do navegador, ou em memória se o armazenamento estiver bloqueado. Ele não envia dados, não cria uma conta online e não publica contato. Você pode apagá-lo na prévia do perfil.</p><p>Quando o Firebase Authentication estiver configurado, o login Google usa identidade básica e e-mail; não pede contatos, agenda ou Drive. E-mail e senha são processados pelo Firebase, não enviados ao n8n ou publicados na vitrine. O SDK administra a sessão por aba. As preferências do objetivo ficam neste navegador, separadas por identificador da conta; ainda não são sincronizadas entre aparelhos. O cadastro de anúncio e a autorização para divulgar contato são etapas separadas.</p>':'<h3>Conta e escolha do objetivo</h3><p>Para acessar as opções PRO, cadastre-se ou entre e escolha contratar, ser contratado ou agenciar. Trabalhadores podem divulgar serviços ou procurar emprego. O cadastro por e-mail exige confirmação. O pré-cadastro local é apenas uma prévia e não equivale a login. Quando a autenticação não estiver configurada, a interface informa essa limitação.</p><p>Login não comprova propriedade de WhatsApp, profissão, identidade civil ou pagamento. A conta começa básica; a ativação de PRO, o selo e o vínculo aos anúncios dependem de conferência administrativa separada.</p>';
   const aiText=privacy?'<h3>Revisão assistida por IA</h3><p>Textos e até três fotos anexadas aos anúncios podem ser processados pela OpenAI para resumir o conteúdo, sugerir uma descrição e apontar pendências para a equipe. Evite enviar documentos, dados sensíveis ou fotos de terceiros sem autorização. Links externos permanecem para consulta da equipe.</p><p>A análise auxilia a revisão do anúncio; a equipe decide sobre sua publicação. Ela não confirma identidade, propriedade do telefone, pagamento ou qualificação profissional, nem decide contratações. Pedidos e decisões ficam na fila administrativa privada.</p>':'';
-  const html='<div class="document-copy"><span class="eyebrow">TRANSPARÊNCIA</span><h2 id="dialog-title">'+(privacy?'Seus dados, com clareza.':'Como funciona o Ajuda em Casa')+'</h2>'+currentText+accountText+aiText+'</div>';
+  const activeAccountText=backendConfigured(config)?(privacy?'<h3>Conta Google, pedidos e administração</h3><p>O Firebase Authentication processa o acesso com Google ou e-mail. O login Google usa identidade básica e e-mail, sem solicitar contatos, agenda ou Drive. O SDK mantém a sessão por aba; senhas e tokens não são publicados nem enviados ao atendimento.</p><p>Nome, e-mail, objetivo e versão do aceite ficam associados à conta no Cloud Firestore. Os pedidos e seus anexos ficam na fila privada, acessível aos administradores autorizados. O banco está na região de São Paulo. Alterações administrativas registram responsável, horário, motivo e cadastro afetado.</p><p>O anúncio público é separado da conta. Nome, telefone e dados do serviço só são divulgados após o procedimento de publicação. Para correção, suspensão ou retirada, use o pedido de titularidade no perfil. Entrar com Google não comprova propriedade de telefone ou qualificação profissional.</p>':'<h3>Sua conta e seus pedidos</h3><p>Você pode entrar com Google ou e-mail e escolher seu objetivo. Pedidos enviados com a conta ficam na fila de atendimento. Criar uma conta não publica contato, concede selo ou confirma pagamento.</p><p>A publicação básica exige conferir titularidade e autorização. Os administradores podem corrigir ou suspender cadastros, com registro da alteração. O básico continua gratuito e o PRO é opcional. Pagamentos ainda não estão ativados.</p>'):accountText;
+  const html='<div class="document-copy"><span class="eyebrow">TRANSPARÊNCIA</span><h2 id="dialog-title">'+(privacy?'Seus dados, com clareza.':'Como funciona o Ajuda em Casa')+'</h2>'+currentText+activeAccountText+aiText+'</div>';
   if(!overForm)return openDialog(html);
   infoLastFocus=document.activeElement;
   $('#info-dialog-content').innerHTML=html.replace('id="dialog-title"','id="info-dialog-title"');
@@ -315,6 +318,7 @@ function route() {
     if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
   }
   const routes = { contratar:()=>showRoleLanding('contractor'),'ser-contratado':()=>showRoleLanding('worker'),agenciar:()=>showRoleLanding('agency'),conta:()=>accountUI.open(),entrar:()=>accountUI.open({mode:'login'}),'perfil-conta':()=>accountUI.showProfile(),modelos:()=>openDialog(modelsMarkup()),agenciador:()=>showVacancyForm('agency'),'pro-emprego':()=>accountUI.guard(()=>showProForm('jobseeker'),{role:'worker',workerGoal:'jobseeker'}),planos:showPlans,cadastro:showFreeForm,pro:()=>accountUI.guard(()=>showProForm(),{role:'worker'}),orcamento:showQuoteForm,'publicar-vaga':()=>showVacancyForm(),'publicar-vaga-pro':()=>accountUI.guard(()=>showVacancyForm('employer',true),{role:'contractor'}),destaque:showFeatureForm,patrocinio:showSponsorForm,privacidade:()=>showInfo('privacidade'),termos:()=>showInfo('termos') };
+  if(backendConfigured(config) && (!auth.getUser()?.emailVerified || !accountUI.hasPreferences()) && (['cadastro','agenciador','pro-emprego','pro','orcamento','publicar-vaga','publicar-vaga-pro','destaque','patrocinio','meu-cadastro'].includes(hash)||hash.startsWith('avaliar/')||hash.startsWith('meu-cadastro/')))return accountUI.guard(route);
   if (hash.startsWith('perfil/')) showProfile(hash.slice(7));
   else if(hash==='meu-cadastro' || hash.startsWith('meu-cadastro/')) showOwnershipForm(hash.slice(13));
   else if(hash.startsWith('avaliar/')) showReviewForm(hash.slice(8));
@@ -493,15 +497,26 @@ let installPrompt;
 window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt=event; $('#install').hidden=false; });
 $('#install').addEventListener('click', async () => { if (installPrompt) { await installPrompt.prompt(); installPrompt=null; $('#install').hidden=true; } });
 
+async function refreshLiveCatalog() {
+  const [live,settings]=await Promise.all([dataClient.get('publicCatalog/current',{publicRead:true}),dataClient.get('settings/site',{publicRead:true})]);
+  const d=live?.data;
+  if(d?.schemaVersion!==1||![d.profiles,d.vacancies,d.advertisers].every(Array.isArray))throw new Error('Catálogo online indisponível.');
+  catalog={...catalog,profiles:d.profiles};vacancies={...vacancies,jobs:d.vacancies};advertisers={...advertisers,advertisers:d.advertisers};
+  config.directoryMessage=settings?.data.directoryMessage||'Encontre e converse gratuitamente.';
+  if($('#commercial-notice'))$('#commercial-notice').textContent=config.directoryMessage;
+}
 async function start() {
   const getJSON = async path => { const response=await fetch(path,{cache:'no-store'}); if (!response.ok) throw new Error('Falha ao carregar ' + path); return response.json(); };
   try {
     [config,catalog,vacancies,advertisers] = await Promise.all([getJSON('config.json'),getJSON('profissionais.json'),getJSON('vagas.json'),getJSON('anunciantes.json')]);
     if (!Array.isArray(catalog.profiles) || catalog.schemaVersion !== 1) throw new Error('Formato de catálogo inválido.');
-    service = createN8nService(config);
+    auth=createAuthService(config);
+    dataClient=createDataClient(config,auth);
+    service = backendConfigured(config)?createRequestService(dataClient,auth):createN8nService(config);
+    if(dataClient.enabled)await refreshLiveCatalog();
     let accountStorage;
     try {accountStorage=window.sessionStorage;} catch { /* Rascunho funciona em memória se o armazenamento estiver bloqueado. */ }
-    accountUI=createAccountUI({config,auth:createAuthService(config),store:createAccountStore(accountStorage),openDialog,toast});
+    accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onProfileSave:preferences=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve()});
     setMenuOpen(false);
     matchMedia('(max-width: 1050px)').addEventListener('change',()=>setMenuOpen(false));
     $('#results').addEventListener('scroll',updateCardsNavigation,{passive:true});
@@ -513,7 +528,7 @@ async function start() {
     }
     document.fonts?.ready.then(refreshCardsLayout);
     $('#demo-notice').hidden = !availableProfiles().some(p => p.demo);
-    $('#commercial-notice').textContent='Encontre e converse gratuitamente.';
+    $('#commercial-notice').textContent=config.directoryMessage||'Encontre e converse gratuitamente.';
     $('#year').textContent = new Date().getFullYear();
     $('#category').insertAdjacentHTML('beforeend',options(CATEGORIES));
     $('#locality-options').innerHTML=[...NEIGHBORHOODS,...CONDOMINIUMS.map(c=>`${c.name} · ${c.neighborhood || 'Petrolina'}`)].map(n=>`<option value="${esc(n)}"></option>`).join('');
@@ -538,7 +553,14 @@ async function start() {
     $('#clear').addEventListener('click',clearFilters);
     renderResults(); route();
     // Atualiza expirações sem exigir recarregamento; não recria o resultado durante interação.
-    setInterval(() => { if (!dialog.open && !$('#results').contains(document.activeElement)) renderResults(); }, 60000);
+    setInterval(async () => {
+      if(dialog.open||$('#results').contains(document.activeElement))return;
+      if(dataClient.enabled) {
+        try{await refreshLiveCatalog();}
+        catch{catalog.profiles=[];vacancies.jobs=[];advertisers.advertisers=[];toast('Não foi possível atualizar a vitrine. Verifique sua conexão e recarregue.');}
+      }
+      renderResults();
+    },60000);
   } catch {
     $('#result-count').textContent='Não foi possível carregar a vitrine.';
     $('#results').innerHTML='<div class="empty"><h3>Vamos tentar de novo?</h3><p>Verifique sua conexão e recarregue a página. Para visualizar a cópia no computador, use o servidor local indicado no README.</p><a class="btn secondary" href="index.html">Recarregar</a></div>';

@@ -13,15 +13,18 @@
   "auth": {
     "provider": "firebase",
     "firebase": {
-      "apiKey": "",
-      "authDomain": "",
-      "projectId": "",
-      "appId": ""
+      "apiKey": "AIzaSyDIawxHMinjBVMYCAE-okAzkmkPWiXsXSs",
+      "authDomain": "ajuda-em-casa-pnz.firebaseapp.com",
+      "projectId": "ajuda-em-casa-pnz",
+      "appId": "1:326621706228:web:ec488d2ccab2b82aefeba1"
     }
   },
   "proPriceMonthly": 19.9,
   "sponsorPriceMonthly": 49.9,
   "showDemoProfiles": false,
   "mapTileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  "requestTimeoutMs": 25000
+  "requestTimeoutMs": 25000,
+  "data": {
+    "provider": "firestore"
+  }
 }

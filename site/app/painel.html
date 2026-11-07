@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#B0472F">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://www.gstatic.com https://securetoken.googleapis.com; frame-src https://*.firebaseapp.com https://accounts.google.com; img-src 'self' data: https:; style-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
+  <title>Painel administrativo · Ajuda em Casa</title>
+  <link rel="icon" href="icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=e71086cfe89e">
+  <link rel="stylesheet" href="admin.css?v=e71086cfe89e">
+  <script type="module" src="admin.mjs?v=e71086cfe89e"></script>
+</head>
+<body class="admin-page">
+  <a class="skip-link" href="#admin-main">Pular para o painel</a>
+  <header class="admin-header"><a class="brand" href="index.html"><img src="icone.svg" width="36" height="36" alt=""><span>Ajuda em Casa<small>ADMINISTRAÇÃO</small></span></a><div class="admin-session"><span id="admin-account"></span><button id="admin-signout" class="btn secondary" type="button" hidden>Sair da conta</button></div></header>
+  <main id="admin-main" class="admin-main" tabindex="-1"><p class="notice" role="status">Conectando…</p></main>
+  <dialog id="admin-dialog" aria-labelledby="admin-dialog-title"><button class="dialog-close" type="button" aria-label="Fechar janela">×</button><div id="admin-dialog-content"></div></dialog>
+  <noscript>Ative o JavaScript para acessar o painel.</noscript>
+</body>
+</html>

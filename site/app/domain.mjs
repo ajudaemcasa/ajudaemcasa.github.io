@@ -1,14 +1,14 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=98736c3d20a4';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=98736c3d20a4';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=98736c3d20a4';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=e71086cfe89e';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=e71086cfe89e';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=e71086cfe89e';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { ratingSummary } from './avaliacoes.mjs?v=98736c3d20a4';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=98736c3d20a4';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=98736c3d20a4';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=98736c3d20a4';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=98736c3d20a4';
-import {paidBoostDays} from './promocoes.mjs?v=98736c3d20a4';
+import { ratingSummary } from './avaliacoes.mjs?v=e71086cfe89e';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=e71086cfe89e';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=e71086cfe89e';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=e71086cfe89e';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=e71086cfe89e';
+import {paidBoostDays} from './promocoes.mjs?v=e71086cfe89e';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },

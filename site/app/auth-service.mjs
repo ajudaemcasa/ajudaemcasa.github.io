@@ -1,7 +1,7 @@
 // SDK modular oficial, versão fixa conferida em 2026-11-02:
 // https://firebase.google.com/docs/web/alt-setup
 // https://firebase.google.com/support/release-notes/js
-const FIREBASE_VERSION = '13.1.0';
+const FIREBASE_VERSION = '13.2.0';
 const RESET_MESSAGE = 'Se houver uma conta para este e-mail, você receberá as instruções para redefinir a senha.';
 const MESSAGES = Object.freeze({
   'auth/not-configured': 'O acesso à conta ainda não foi configurado. Tente novamente mais tarde.',
@@ -214,6 +214,12 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
   return Object.freeze({
     ready,
     getUser,
+    getIdToken(forceRefresh=false) {
+      return operation(async()=>{
+        await ready();
+        return sdk.getIdToken(currentUser(),forceRefresh);
+      });
+    },
     signInGoogle() {
       // Sem await/then antes do SDK quando ready() já terminou: preserva o gesto do clique.
       return operation(() => initialized ? popup() : ready().then(popup));

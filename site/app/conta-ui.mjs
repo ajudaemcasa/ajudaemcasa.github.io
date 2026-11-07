@@ -1,6 +1,6 @@
-import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=98736c3d20a4';
-import { authConfigured, authErrorMessage } from './auth-service.mjs?v=98736c3d20a4';
-import { commercialOffer } from './comercial.mjs?v=98736c3d20a4';
+import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=e71086cfe89e';
+import { authConfigured, authErrorMessage } from './auth-service.mjs?v=e71086cfe89e';
+import { commercialOffer } from './comercial.mjs?v=e71086cfe89e';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const roles={
@@ -42,9 +42,10 @@ function roleFields(selected='',goal='service') {
 }
 const consentField=()=>'<label class="check full"><input type="checkbox" name="consent" required><span>Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a>. Concordo com o uso dos dados para criar meu perfil. Isso não autoriza publicação do meu contato nem cobrança.</span></label>';
 
-export function createAccountUI({config,auth,store,openDialog,toast}) {
+export function createAccountUI({config,auth,store,openDialog,toast,onProfileSave=async()=>{}}) {
   const configured=authConfigured(config);
-  let intentRole='',intentGoal='service',busy=false,ready=false;
+  let intentRole='',intentGoal='service',busy=false,ready=false,pendingAction;
+  const persistedProfiles=new Set();
   const area=()=>document.querySelector('[data-account-view]');
   const status=message=>{const el=area()?.querySelector('.account-status');if(el)el.textContent=message;};
   const googleStatus=message=>{const el=area()?.querySelector('[data-google-feedback]');if(el)el.textContent=message;};
@@ -87,7 +88,9 @@ export function createAccountUI({config,auth,store,openDialog,toast}) {
     const user=auth.getUser();
     if(user) {
       if(!user.emailVerified) return showVerification();
+      if(config?.data?.provider==='firestore' && !persistedProfiles.has(user.uid))return showRoleForm();
       if(edit||!store.readPreferences(user.uid)) return showRoleForm();
+      if(pendingAction){const action=pendingAction;pendingAction=undefined;return action();}
     } else if(configured || !store.readDraft()) return open();
     const preview=!user,profile=preview?store.readDraft():{...store.readPreferences(user.uid),name:user.name,email:user.email};
     const r=roles[profile.role]||roles.worker;
@@ -107,11 +110,12 @@ export function createAccountUI({config,auth,store,openDialog,toast}) {
   function guard(action,{role='',workerGoal='service'}={}) {
     const user=auth.getUser();
     if(user?.emailVerified && store.readPreferences(user.uid)) return action();
+    pendingAction=action;
     const requestedHash=location.hash;
     open({role,workerGoal});
     if(configured&&!ready)prepareAuth().then(()=>{
       const restored=auth.getUser();
-      if(location.hash===requestedHash && restored?.emailVerified && store.readPreferences(restored.uid)) action();
+      if(location.hash===requestedHash && restored?.emailVerified && store.readPreferences(restored.uid) && pendingAction){pendingAction=undefined;action();}
     });
   }
   async function perform(task,{after=showProfile,clearPasswords=false,onError}={}) {
@@ -137,11 +141,13 @@ export function createAccountUI({config,auth,store,openDialog,toast}) {
     event.preventDefault();if(busy||!form.reportValidity())return;
     const raw=Object.fromEntries(new FormData(form)),kind=form.dataset.accountForm;
     if(kind==='role') {
-      try {
+      perform(async()=>{
         const user=auth.getUser();if(!user?.emailVerified) return showVerification();
-        store.savePreferences(user.uid,{role:raw.role,workerGoal:raw.workerGoal});
-        intentRole='';showProfile();
-      } catch(error) {status(error.message);}
+        const preferences={role:raw.role,workerGoal:raw.workerGoal};
+        await onProfileSave(preferences);
+        persistedProfiles.add(user.uid);
+        store.savePreferences(user.uid,preferences);intentRole='';
+      });
       return;
     }
     if(kind==='signup') {
@@ -190,5 +196,5 @@ export function createAccountUI({config,auth,store,openDialog,toast}) {
       if(!auth.getUser()?.emailVerified) {event.preventDefault();event.stopImmediatePropagation();open({role:'agency'});}
     }
   });
-  return {open,openPro,showProfile,guard};
+  return {open,openPro,showProfile,guard,hasPreferences:()=>!!store.readPreferences(auth.getUser()?.uid)};
 }
