@@ -1,7 +1,7 @@
-import {vacancyPresentation} from './anuncios.mjs?v=4b7fdc914fc1';
-import {agencyFee} from './intermediacao.mjs?v=4b7fdc914fc1';
-import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=4b7fdc914fc1';
-import {phoneDigits} from './telefone.mjs?v=4b7fdc914fc1';
+import {vacancyPresentation} from './anuncios.mjs?v=e03be0096255';
+import {agencyFee} from './intermediacao.mjs?v=e03be0096255';
+import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=e03be0096255';
+import {phoneDigits} from './telefone.mjs?v=e03be0096255';
 export function approximateLocation(value) {
   if (!value || typeof value.lat !== 'number' || typeof value.lng !== 'number' || !Number.isFinite(value.lat) || !Number.isFinite(value.lng) || Math.abs(value.lat)>85 || Math.abs(value.lng)>180) return null;
   // Grade de ~1,1 km de lado em Petrolina. Não é anonimização nem coordenada exata.
@@ -28,8 +28,9 @@ function linkedVacancyAdvertiser(job,advertisers) {
     phoneDigits(job.phone)===phoneDigits(a.phone));
 }
 export function searchVacancies(jobs, filters={}, now=Date.now(), advertisers=[]) {
+  const time=value=>typeof value==='number'?value:Date.parse(value);
   const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-  return jobs.filter(j=>j.status==='approved' && Date.parse(j.expiresAt)>+new Date(now))
+  return jobs.filter(j=>j.status==='approved' && time(j.expiresAt)>+new Date(now))
     .filter(j=>!filters.publisherType || (j.publisherType||'employer')===filters.publisherType)
     .filter(j=>!filters.category || j.category===filters.category)
     .filter(j=>!filters.neighborhood || clean(j.neighborhood).includes(clean(filters.neighborhood)))
@@ -38,13 +39,13 @@ export function searchVacancies(jobs, filters={}, now=Date.now(), advertisers=[]
       const advertiser=job=>linkedVacancyAdvertiser(job,advertisers);
       return (filters.sort==='recommended'?0:compareDistance(a,b,filters.origin)) ||
         (filters.sort==='recommended'?promotionRank(advertiser(b)||{},now)-promotionRank(advertiser(a)||{},now):0) ||
-        Date.parse(b.createdAt)-Date.parse(a.createdAt);
+        time(b.createdAt)-time(a.createdAt);
     })
     .map(j=>{
       const account=linkedVacancyAdvertiser(j,advertisers);
       const ad=vacancyPresentation(j,advertisers,now);
       const linked=account?.kind===(j.publisherType||'employer') && account.ownershipVerified===true && account.contactAuthorized===true;
-      return {id:j.id,title:j.title,publicName:j.publicName,phone:j.phone,category:j.category,description:j.description,neighborhood:j.neighborhood,schedule:j.schedule,distanceKm:distanceKm(filters.origin,j.location),ad,intermediation:agencyFee(j),
+      return {id:j.id,title:j.title,publicName:j.publicName,phone:j.phone,email:j.email,contactOptions:j.contactOptions,contactRef:j.contactRef,category:j.category,description:j.description,neighborhood:j.neighborhood,schedule:j.schedule,distanceKm:distanceKm(filters.origin,j.location),ad,intermediation:agencyFee(j),
         promotion:linked?{agencyTrialDays:agencyTrialDays(account,now),paidBoostDays:paidBoostDays(account,now)}:{}};
     });
 }

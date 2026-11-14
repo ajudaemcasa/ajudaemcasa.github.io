@@ -1,4 +1,4 @@
-import {authConfigured} from './auth-service.mjs?v=4b7fdc914fc1';
+import {authConfigured} from './auth-service.mjs?v=e03be0096255';
 
 export const backendConfigured = config => authConfigured(config) && config?.data?.provider === 'firestore';
 export class DataError extends Error {
@@ -77,6 +77,12 @@ export function createDataClient(config,auth,{fetcher=globalThis.fetch}={}) {
       if(pageToken)params.set('pageToken',pageToken);
       const result=await request('/'+validPath(collection)+'?'+params);
       return {items:(result.documents||[]).map(unpack),nextPageToken:result.nextPageToken||''};
+    },
+    async find(collection,field,value,{limit=100}={}) {
+      validPath(collection);
+      if(!['senderUid','recipientUid','ownerUid'].includes(field))throw new DataError('Filtro inválido.','INVALID_QUERY');
+      const rows=await request(':runQuery',{method:'POST',body:{structuredQuery:{from:[{collectionId:collection}],where:{fieldFilter:{field:{fieldPath:field},op:'EQUAL',value:encodeValue(value)}},limit:Math.min(100,limit)}}});
+      return rows.filter(row=>row.document).map(row=>unpack(row.document));
     },
     write,
     commit:async writes=>request(':commit',{method:'POST',body:{writes}}),

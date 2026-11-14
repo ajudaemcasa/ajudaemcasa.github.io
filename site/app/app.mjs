@@ -1,21 +1,35 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=4b7fdc914fc1';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=4b7fdc914fc1';
-import { createN8nService } from './n8n-service.mjs?v=4b7fdc914fc1';
-import { commercialOffer } from './comercial.mjs?v=4b7fdc914fc1';
-import { proPaymentMarkup } from './comercial-ui.mjs?v=4b7fdc914fc1';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=4b7fdc914fc1';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=4b7fdc914fc1';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=4b7fdc914fc1';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=4b7fdc914fc1';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=4b7fdc914fc1';
-import { createAccountStore } from './conta.mjs?v=4b7fdc914fc1';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=4b7fdc914fc1';
-import {profileHeading} from './perfil.mjs?v=4b7fdc914fc1';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=4b7fdc914fc1';
-import {createRequestService} from './request-service.mjs?v=4b7fdc914fc1';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=e03be0096255';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=e03be0096255';
+import { createN8nService } from './n8n-service.mjs?v=e03be0096255';
+import { commercialOffer } from './comercial.mjs?v=e03be0096255';
+import { proPaymentMarkup } from './comercial-ui.mjs?v=e03be0096255';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=e03be0096255';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=e03be0096255';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=e03be0096255';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=e03be0096255';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=e03be0096255';
+import { createAccountStore } from './conta.mjs?v=e03be0096255';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=e03be0096255';
+import {profileHeading} from './perfil.mjs?v=e03be0096255';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=e03be0096255';
+import {createRequestService} from './request-service.mjs?v=e03be0096255';
+import {hasContact,validEmail} from './canais.mjs?v=e03be0096255';
+import {createPublicationService} from './autopublicacao.mjs?v=e03be0096255';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=e03be0096255';
+import {createMessagesService} from './mensagens.mjs?v=e03be0096255';
+import {createMessagesUI} from './mensagens-ui.mjs?v=e03be0096255';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=e03be0096255';
+import {setupInstallation} from './instalacao-ui.mjs?v=e03be0096255';
+import {crownMarkup} from './layout-conexao.mjs?v=e03be0096255';
+import {createNotificationService} from './avisos.mjs?v=e03be0096255';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
+const accountFirstName = user => {
+  const source=(user?.name||user?.email?.split('@')[0]||'').trim();
+  const first=source.split(/\s+/u)[0]||'';
+  return Array.from(first).slice(0,24).join('');
+};
 const paths = {
   snow: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M3 10l4-1-1-4M21 14l-4 1 1 4M3 14l4 1-1 4M21 10l-4-1 1-4"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
@@ -34,7 +48,7 @@ const icon = id => `<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">${p
 const options = (items, selected = '') => items.map(item => { const value = typeof item === 'string' ? item : item.id; const label = typeof item === 'string' ? item : item.name; return `<option value="${esc(value)}" ${value === selected ? 'selected' : ''}>${esc(label)}</option>`; }).join('');
 const dialog = $('#dialog');
 const infoDialog = $('#info-dialog');
-let config, catalog, vacancies, advertisers, service, accountUI, toastTimer, lastFocus, auth, dataClient;
+let config, catalog, vacancies, advertisers, service, accountUI, toastTimer, lastFocus, auth, dataClient,publicationService,messagesUI;
 let infoLastFocus, lastResultMarkup='';
 let sponsorClickSent = false;
 const LISTING_PAGE_SIZE=4;
@@ -55,7 +69,7 @@ function refreshCardsLayout() {
 }
 const filters = { category: '', neighborhood: '', query: '', emergency: false, sort:'recommended', origin:null, mode:'professionals' };
 const mediaBlobs = new Set();
-const availableProfiles=()=>catalog.profiles.filter(p=>(!p.demo || config.showDemoProfiles===true) && (p.demo || !!phoneDigits(p.phone)));
+const availableProfiles=()=>catalog.profiles.filter(p=>(!p.demo || config.showDemoProfiles===true) && (p.demo || hasContact(p)));
 const distanceMarkup=p=>Object.hasOwn(p,'distanceKm')?`<p class="distance-label">⌖ ${esc(distanceLabel(p.distanceKm))}</p>`:'';
 function resolveLocality(value) {
   const text=String(value||'').trim();
@@ -71,7 +85,7 @@ function vacancyCard(job) {
   const message=agency?'Olá! Vi a oportunidade '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e quero falar diretamente com o agenciador.':'Olá! Vi a vaga '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e tenho interesse em conversar sobre o trabalho.';
   const href=number?'https://wa.me/'+number+'?text='+encodeURIComponent(message):null;
   const ad=job.ad;
-  return `<article class="person-card basic-card job-card ad-poster ad-tone-${ad.tone}" data-job="${esc(job.id)}" data-plan="${ad.premium?'pro':'free'}">${job.promotion?.paidBoostDays?`<div class="feature-badge">🔥 Destaque avulso · restam ${job.promotion.paidBoostDays} dias</div>`:job.promotion?.agencyTrialDays?`<div class="feature-badge">Agenciador em destaque · período inicial de 6 meses · restam ${job.promotion.agencyTrialDays} dias</div>`:''}${adHeader(ad)}<p class="ad-model-name">${ad.premium?esc(ad.name):'Oportunidade · básico'}</p><h3>${esc(job.title)}</h3><p class="ad-byline">Divulgado por ${esc(job.publicName)}</p>${distanceMarkup(job)}<p>${esc(job.neighborhood)}</p><p>${esc(job.description)}</p>${ad.premium?adDetailsMarkup(ad,job.neighborhood):`<p>${esc(job.schedule)}</p>`}${intermediationMarkup(job.intermediation)}${href?`<a class="btn whatsapp" target="_blank" rel="noopener noreferrer" href="${esc(href)}">${agency?'Falar com o agenciador':'Tenho interesse na vaga'} ↗</a>`:''}<p class="micro">Confirme disponibilidade e condições. Endereço exato e referências só na conversa privada.</p></article>`;
+  return `<article class="person-card basic-card job-card ad-poster ad-tone-${ad.tone}" data-job="${esc(job.id)}" data-plan="${ad.premium?'pro':'free'}">${job.promotion?.paidBoostDays?`<div class="feature-badge">🔥 Destaque avulso · restam ${job.promotion.paidBoostDays} dias</div>`:job.promotion?.agencyTrialDays?`<div class="feature-badge">Agenciador em destaque · período inicial de 6 meses · restam ${job.promotion.agencyTrialDays} dias</div>`:''}${adHeader(ad)}<p class="ad-model-name">${ad.premium?esc(ad.name):'Oportunidade · básico'}</p><h3>${esc(job.title)}</h3><p class="ad-byline">Divulgado por ${esc(job.publicName)}</p>${distanceMarkup(job)}<p>${esc(job.neighborhood)}</p><p>${esc(job.description)}</p>${ad.premium?adDetailsMarkup(ad,job.neighborhood):`<p>${esc(job.schedule)}</p>`}${intermediationMarkup(job.intermediation)}${contactActions({...job,name:job.publicName},agency?'Falar com o agenciador':'Tenho interesse na vaga',message)}<p class="micro">Confirme disponibilidade e condições. Endereço exato e referências só na conversa privada.</p></article>`;
 }
 
 function toast(message) {
@@ -83,9 +97,25 @@ function gallery(profile) {
   return `<div class="carousel" aria-label="Trabalhos de ${esc(profile.name)}" aria-roledescription="carrossel"><div class="slides" tabindex="0" aria-label="Galeria; use as setas para navegar">${profile.media.map((media, index) => `<figure class="slide" aria-label="${index + 1} de ${profile.media.length}"><img ${media.type === 'cartao' || media.type === 'certificado' ? 'class="media-card"' : ''} src="${esc(media.url)}" alt="${esc(media.alt || MEDIA_LABELS[media.type] + ' · ' + profile.name)}" loading="lazy" referrerpolicy="no-referrer" width="600" height="340"><figcaption>${MEDIA_LABELS[media.type]}</figcaption></figure>`).join('')}</div><div class="carousel-bottom"><span class="carousel-label">${profile.demo ? 'IMAGENS ILUSTRATIVAS' : 'GALERIA DE TRABALHOS'} · <span class="slide-count">1 / ${profile.media.length}</span></span>${profile.media.length > 1 ? '<div class="carousel-controls"><button type="button" data-slide="-1" aria-label="Imagem anterior">‹</button><button type="button" data-slide="1" aria-label="Próxima imagem">›</button></div>' : ''}</div></div>`;
 }
 function contactButton(profile) {
-  if(profile.unverified && !profile.phone) return profile.sourceUrl ? `<a class="btn secondary" href="${esc(profile.sourceUrl)}" target="_blank" rel="noopener noreferrer">Ver anúncio original ↗</a>` : '<span class="micro">Telefone indisponível · aguardando conferência</span>';
+  return contactActions(profile);
+}
+function contactActions(profile,whatsappLabel='WhatsApp',message='') {
   const href = whatsappUrl(profile);
-  return href ? `<a class="btn whatsapp" href="${esc(href)}" data-contact="${esc(profile.id)}" target="_blank" rel="noopener noreferrer">WhatsApp <span aria-hidden="true">↗</span></a>` : `<button class="btn whatsapp" type="button" data-demo-contact>Ver contato de exemplo</button>`;
+  const text=message||`Olá! Encontrei ${profile.name||profile.publicName} no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e quero conversar sobre ${categoryName(profile.category)}.`;
+  const links=[];
+  if(href)links.push(`<a class="btn whatsapp" href="${esc(message?'https://wa.me/'+phoneDigits(profile.phone)+'?text='+encodeURIComponent(message):href)}" data-contact="${esc(profile.id)}" target="_blank" rel="noopener noreferrer">${esc(whatsappLabel)} <span aria-hidden="true">↗</span></a>`);
+  if(profile.contactOptions?.email && validEmail(profile.email))links.push(`<a class="btn secondary" href="mailto:${esc(encodeURIComponent(profile.email))}?subject=${encodeURIComponent(categoryName(profile.category)+' · Ajuda em Casa')}&amp;body=${encodeURIComponent(text)}">E-mail</a>`);
+  if(profile.contactOptions?.site && profile.contactRef)links.push(`<a class="btn secondary" href="#mensagem/${encodeURIComponent(profile.id)}">Mensagem pelo site</a>`);
+  return links.join('')||(profile.demo?'<button class="btn whatsapp" type="button" data-demo-contact>Ver contato de exemplo</button>':'<span class="micro">Canal de contato indisponível</span>');
+}
+function renderHome() {
+  if(!catalog)return;
+  const profiles=selectHomeProfiles(searchProfiles(availableProfiles(),{adType:'service'}));
+  const jobs=selectHomeJobs(searchVacancies(vacancies.jobs,{sort:'recommended'},Date.now(),advertisers.advertisers));
+  const offers=profiles.map(card).join('')||'<div class="empty"><h3>Seja o primeiro a oferecer este serviço</h3><a class="btn primary" href="#cadastro">Publicar meu cadastro</a></div>';
+  const wanted=jobs.map(vacancyCard).join('')||'<div class="empty"><h3>Nenhuma oportunidade publicada por enquanto</h3><p>Casas e agenciadores podem publicar uma oportunidade gratuita.</p><a class="btn primary" href="#publicar-vaga">Publicar oportunidade</a></div>';
+  if($('#home-offers').innerHTML!==offers){$('#home-offers').innerHTML=offers;initCarousels($('#home-offers'));}
+  if($('#home-jobs').innerHTML!==wanted)$('#home-jobs').innerHTML=wanted;
 }
 function ratingMarkup(profile,compact=false) {
   const r=profile.rating;
@@ -97,7 +127,7 @@ function managementLinks(profile) {
 }
 function card(profile) {
   if (profile.plan !== 'pro') return `<article class="person-card basic-card ${profile.featuredDays?'featured':''}" data-profile="${esc(profile.id)}" data-plan="free">${profile.featuredDays?`<div class="feature-badge">🔥 EM DESTAQUE (Restam ${profile.featuredDays} dias)</div>`:''}<h3>${esc(profile.heading || profile.name)}</h3>${!profile.heading||profile.heading===profile.name?`<p class="service-name">${esc(categoryName(profile.category))}</p>`:''}${profile.unverified?'<span class="unverified-badge" title="Identidade, disponibilidade e atendimento não confirmados">Não verificado</span>':''}${ratingMarkup(profile,true)}${profile.note?`<p class="card-note">${esc(profile.note)}</p>`:''}${profile.phone?`<p class="basic-phone">${esc(profile.phone)}</p>`:''}<div class="card-actions">${contactButton(profile)}</div><a class="card-detail-link" href="#perfil/${encodeURIComponent(profile.id)}">Ver detalhes</a></article>`;
-  return `<article class="person-card ad-tone-${profile.ad.tone} ${profile.featuredDays ? 'featured' : ''}" data-profile="${esc(profile.id)}" data-plan="pro">${profile.featuredDays ? `<div class="feature-badge"><span class="flame">🔥</span> EM DESTAQUE (Restam ${profile.featuredDays} ${profile.featuredDays === 1 ? 'dia' : 'dias'})</div>` : ''}${gallery(profile)}<div class="card-body">${adHeader(profile.ad)}<div class="title-row"><div><h3>${esc(profile.heading || profile.name)}</h3><p class="service-name">${esc(categoryName(profile.category))}</p></div><span class="plan-tag">${esc(profile.ad.accessLabel)}</span></div>${profile.verified ? `<div class="verified">${icon('check')} Profissional Verificado</div>` : ''}${ratingMarkup(profile)}<p class="card-note">${esc(profile.note)}</p><p class="card-regions">⌖ ${esc(profile.neighborhoods.slice(0, 2).join(' · '))}${profile.neighborhoods.length > 2 ? ` +${profile.neighborhoods.length - 2} regiões` : ''}${profile.emergency ? ' · Plantão 24h' : ''}</p>${adDetailsMarkup(profile.ad,profile.neighborhoods.slice(0,2).join(' · '))}<div class="card-actions"><a class="btn details" href="#perfil/${encodeURIComponent(profile.id)}">Ver perfil</a>${contactButton(profile)}</div>${managementLinks(profile)}</div></article>`;
+  return `<article class="person-card ad-tone-${profile.ad.tone} ${profile.featuredDays ? 'featured' : ''}" data-profile="${esc(profile.id)}" data-plan="pro">${profile.featuredDays ? `<div class="feature-badge"><span class="flame">🔥</span> EM DESTAQUE (Restam ${profile.featuredDays} ${profile.featuredDays === 1 ? 'dia' : 'dias'})</div>` : ''}${gallery(profile)}<div class="card-body">${adHeader(profile.ad)}<div class="title-row"><div><h3>${esc(profile.heading || profile.name)}</h3><p class="service-name">${esc(categoryName(profile.category))}</p></div><span class="plan-tag">${crownMarkup()}${esc(profile.ad.accessLabel)}</span></div>${profile.verified ? `<div class="verified">${icon('check')} Profissional Verificado</div>` : ''}${ratingMarkup(profile)}<p class="card-note">${esc(profile.note)}</p><p class="card-regions">⌖ ${esc(profile.neighborhoods.slice(0, 2).join(' · '))}${profile.neighborhoods.length > 2 ? ` +${profile.neighborhoods.length - 2} regiões` : ''}${profile.emergency ? ' · Plantão 24h' : ''}</p>${adDetailsMarkup(profile.ad,profile.neighborhoods.slice(0,2).join(' · '))}<div class="card-actions"><a class="btn details" href="#perfil/${encodeURIComponent(profile.id)}">Ver perfil</a>${contactButton(profile)}</div>${managementLinks(profile)}</div></article>`;
 }
 function renderResults() {
   if (!catalog) return;
@@ -176,6 +206,7 @@ function browseFor(mode) {
   filters.mode=mode;$('#directory-mode').value=mode;
   clearFilters();closeDialog();
   history.replaceState(null,'',location.pathname+location.search+'#profissionais');
+    route();
   $('#profissionais').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 }
 function clearFilters() {
@@ -201,26 +232,35 @@ function closeDialog() {
   if (/^#(?:perfil\/|perfil-conta|conta|entrar|contratar|ser-contratado|agenciar|modelos|agenciador|pro-emprego|planos|cadastro|meu-cadastro|avaliar|pro$|orcamento|publicar-vaga|destaque|patrocinio|privacidade|termos)/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search+'#profissionais');
   revokePreviews();
   dialog.close();
+  if(config&&catalog)route();
 }
 function openDialog(html) {
   closeFilters();
+  const central=/^#(?:contratar|ser-contratado|agenciar|conta|entrar|perfil-conta|planos|modelos|termos|privacidade|mensagens|mensagem\/)/.test(location.hash);
+  if(central && dialog.open)dialog.close();
+  const view=central?$('#central-view-content'):$('#dialog-content');
+  if(central){$('#dialog-content').replaceChildren();$('#central-view').hidden=false;$('#home-showcase').hidden=true;$('#profissionais').hidden=true;}
+  else if(!dialog.open && !$('#central-view').hidden){$('#central-view-content').replaceChildren();$('#central-view').hidden=true;$('#home-showcase').hidden=false;}
+
   if(infoDialog.open)infoDialog.close();
   revokePreviews();
   if (!dialog.open) lastFocus = document.activeElement;
-  $('#dialog-content').innerHTML = html;
-  const professionalForm=dialog.querySelector('form[data-event="novo_cadastro_gratuito"],form[data-event="solicitacao_upgrade_pro"]');
+  view.innerHTML = html;
+  initPublicationContacts(view);
+  const professionalForm=view.querySelector('form[data-event="novo_cadastro_gratuito"],form[data-event="solicitacao_upgrade_pro"]');
   if(professionalForm) {
     professionalForm.insertAdjacentHTML('afterbegin',`<div class="field full"><label for="entity-type">Quem vai divulgar o serviço?</label><select id="entity-type" name="entityType"><option value="person">Pessoa física</option><option value="company">Empresa · razão social</option></select></div><div class="field full" data-company-name hidden><label for="legal-name">Razão social da empresa</label><input id="legal-name" name="legalName" autocomplete="organization" maxlength="160" disabled></div>`);
     professionalForm.querySelector('#service').closest('.field').insertAdjacentHTML('afterend','<div class="notice full identity-preview"><strong>Assim aparecerá no cartão</strong><output data-profile-heading aria-live="polite"></output><small>Serviço primeiro; pessoa com primeiro nome e último sobrenome, ou razão social da empresa. O nome completo enviado não é alterado.</small></div>');
     updateIdentityPreview(professionalForm);
   }
-  if (!dialog.open) dialog.showModal();
-  document.body.classList.add('modal-open');
-  dialog.scrollTop = 0;
-  initCarousels(dialog);
-  initLocationPickers(dialog,config);
-  updateAdPreview(dialog.querySelector('form'));
-  const title = $('#dialog-title'); title?.setAttribute('tabindex', '-1'); title?.focus();
+  if (!central && !dialog.open) dialog.showModal();
+  if(!central)document.body.classList.add('modal-open');
+  view.scrollTop = 0;
+  initCarousels(view);
+  initLocationPickers(view,config);
+  updateAdPreview(view.querySelector('form'));
+  const title=view.querySelector('#dialog-title'); title?.setAttribute('tabindex','-1');title?.focus({preventScroll:true});
+  if(central)$('#main-content').scrollIntoView({block:'start',behavior:'instant'});
 }
 function updateIdentityPreview(form) {
   if(!form?.querySelector('[data-profile-heading]'))return;
@@ -236,13 +276,13 @@ function showPlans() {
 }
 const namePhone = `<div class="field"><label for="name">Seu nome e sobrenome</label><input id="name" name="name" autocomplete="name" maxlength="100" required></div><div class="field"><label for="phone">WhatsApp com DDD</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+55 87 99999-9999" maxlength="26" required></div>`;
 const categoryField = () => `<div class="field full"><label for="service">Categoria do serviço</label><select id="service" name="category" required><option value="">Selecione o serviço</option>${options(CATEGORIES, filters.category)}</select></div>`;
-const consent = '<label class="check consent full"><input type="checkbox" name="consent" required><span>Autorizo o envio destes dados à equipe do Ajuda em Casa para atender meu pedido. Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a>.</span></label>';
+const consent = '<label class="check consent full"><input type="checkbox" name="consent" required><span>Concordo com o tratamento destes dados pelo Ajuda em Casa para executar meu pedido. Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a>.</span></label>';
 function formShell(type, title, intro, fields, button) {
   if(['novo_cadastro_gratuito','solicitacao_upgrade_pro','novo_orcamento_cliente','nova_vaga_empregador'].includes(type)) fields+=registrationLocation();
-  return `<span class="eyebrow">AJUDA EM CASA · PETROLINA</span><h2 id="dialog-title">${title}</h2><p class="dialog-intro">${intro}</p>${!config.webhookUrl ? '<p class="notice">Os envios ainda não estão disponíveis nesta versão de teste. Você pode conhecer os campos; nenhum dado será enviado até o atendimento ser conectado.</p>' : ''}<form class="form-grid" data-event="${type}">${fields}<div class="trap" aria-hidden="true"><label>Deixe vazio<input name="website" tabindex="-1" autocomplete="off"></label></div>${consent}<p class="form-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">${button}</button><p class="micro full">O envio é uma solicitação para análise. Cadastros e alterações só aparecem depois da aprovação da equipe.</p></form>`;
+  return `<span class="eyebrow">AJUDA EM CASA · PETROLINA</span><h2 id="dialog-title">${title}</h2><p class="dialog-intro">${intro}</p>${!config.webhookUrl ? '<p class="notice">Os envios ainda não estão disponíveis nesta versão de teste. Você pode conhecer os campos; nenhum dado será enviado até o atendimento ser conectado.</p>' : ''}<form class="form-grid" data-event="${type}">${fields}<div class="trap" aria-hidden="true"><label>Deixe vazio<input name="website" tabindex="-1" autocomplete="off"></label></div>${consent}<p class="form-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">${button}</button><p class="micro full">${['novo_cadastro_gratuito','nova_vaga_empregador'].includes(type)?'A publicação básica é automática após as validações. Isso não concede selo, PRO ou cobrança.':'Pedidos de titularidade, avaliações e benefícios específicos seguem o procedimento correspondente.'}</p></form>`;
 }
 function showFreeForm() {
-  openDialog(formShell('novo_cadastro_gratuito', 'Seu trabalho começa aqui.', 'Crie seu perfil básico gratuitamente. Só nome, telefone, serviço e uma observação curta aparecem na vitrine.', `${namePhone}${purposeField()}${categoryField()}<div class="field full"><label for="note">Observação curta <span class="micro">(opcional)</span></label><textarea id="note" name="note" maxlength="140" rows="3" placeholder="Conte, em poucas palavras, como você pode ajudar."></textarea><span id="note-counter" class="counter">0 / 140 caracteres · somente texto</span></div><div class="notice full">Fotos de Antes/Depois, cartão profissional, descrição detalhada e destaque no topo fazem parte do <a href="#planos">Plano PRO</a>.</div>`, 'Enviar cadastro gratuito'));
+  openDialog(formShell('novo_cadastro_gratuito', 'Seu trabalho começa aqui.', 'Publique seu perfil básico gratuitamente. Escolha quais contatos divulgar; a publicação válida é automática.', `${publicationContactFields(auth.getUser())}${purposeField()}${categoryField()}<div class="field full"><label for="note">Observação curta <span class="micro">(opcional)</span></label><textarea id="note" name="note" maxlength="140" rows="3" placeholder="Conte, em poucas palavras, como você pode ajudar."></textarea><span id="note-counter" class="counter">0 / 140 caracteres · somente texto</span></div><div class="notice full">Fotos de Antes/Depois, cartão profissional, descrição detalhada e destaque no topo fazem parte do <a href="#planos">Plano PRO</a>.</div>`, 'Publicar meu cadastro grátis'));
 }
 function showProForm(adType='service') {
   const mediaFields = ['antes','depois','cartao'].map(type => `<div><label for="media-${type}">${MEDIA_LABELS[type]} <span class="micro">· link ou arquivo (opcional)</span></label><div class="upload-row"><input id="media-${type}" name="media-${type}" type="url" placeholder="https://…" maxlength="600" aria-label="Link ${MEDIA_LABELS[type]}"><input type="file" name="file-${type}" data-upload="${type}" accept="image/jpeg,image/png,image/webp" aria-label="Arquivo ${MEDIA_LABELS[type]}"></div><img id="preview-${type}" class="upload-preview" hidden alt="Prévia ${MEDIA_LABELS[type]}"></div>`).join('');
@@ -254,7 +294,7 @@ function showQuoteForm() {
   openDialog(formShell('novo_orcamento_cliente', 'O que sua casa precisa?', 'Pedido privado de orçamento: não vira vaga pública. Para receber candidatos, use Publicar vaga grátis.', `${namePhone}<div class="field full"><label for="quote-neighborhood">Seu bairro ou região</label><input id="quote-neighborhood" name="neighborhood" list="locality-options" required maxlength="100" placeholder="Digite bairro ou condomínio"></div>${categoryField()}<div class="field full"><label for="urgency">Quando precisa?</label><select id="urgency" name="urgency" required><option value="">Selecione a urgência</option>${options(['Emergência · agora','Hoje','Nesta semana','Sem pressa'])}</select></div>`, 'Pedir orçamento gratuito'));
 }
 function showVacancyForm(kind='employer',premium=false) {
-  openDialog(formShell('nova_vaga_empregador','Sua oportunidade, fácil de entender.','O básico é gratuito. Para publicar o modelo didático, solicite PRO: seis meses de teste após aprovação, depois assinatura opcional. Escolher o modelo abaixo não ativa o plano.',`${namePhone}<div class="field full"><label for="publisher-type">Quem está divulgando?</label><select id="publisher-type" name="publisherType"><option value="employer">Contratante direto · azul no PRO</option><option value="agency">Agenciador / agência · amarelo no PRO</option></select></div><div class="field full" data-agency-field hidden><label for="agency-name">Nome público da agência / agenciador</label><input id="agency-name" name="agencyName" maxlength="100"></div><div class="field full"><label for="requested-format">Modelo de divulgação</label><select id="requested-format" name="requestedFormat"><option value="standard">Básico gratuito · fundo neutro</option><option value="pro">Solicitar modelo PRO · 6 meses de teste no lançamento</option></select></div><div class="field full"><label for="advertiser-id">Código do anunciante PRO (se já aprovado)</label><input id="advertiser-id" name="advertiserId" maxlength="80" pattern="[a-z0-9-]+" placeholder="Opcional; a equipe confere o titular e o plano"><small>O código identifica a conta; não é senha nem prova de assinatura. Novos anunciantes solicitam o teste ao escolher o modelo PRO.</small></div>${categoryField()}<div class="field full"><label for="job-title">Título da vaga</label><input id="job-title" name="title" required maxlength="100" placeholder="Ex.: profissional para trabalho doméstico"></div><div class="field full"><label for="job-description">Resumo da oportunidade</label><textarea id="job-description" name="description" required maxlength="1500" rows="3" placeholder="Informe as atividades e condições principais; não inclua endereço exato."></textarea></div><div class="field full"><label for="schedule">Dias, horários e intervalo</label><input id="schedule" name="schedule" required maxlength="200" placeholder="Ex.: segunda a sexta, horário e intervalo a combinar"></div>${adEditorFields({job:true})}${agencyFeeEditor()}<label class="check full"><input type="checkbox" name="publishContact" required><span>Autorizo publicar esta vaga e meu WhatsApp após conferência. Se represento terceiros, tenho autorização para divulgar a oportunidade. Posso pedir a retirada.</span></label><p class="notice full">O teste pertence ao anunciante, não à vaga. Criar outra oportunidade não reinicia os seis meses. Sem adesão paga após o teste, o anúncio fica no modelo básico neutro.</p>`,'Enviar oportunidade para aprovação'));
+  openDialog(formShell('nova_vaga_empregador','Sua oportunidade, fácil de entender.','O básico é gratuito. Para publicar o modelo didático, solicite PRO: seis meses de teste após aprovação, depois assinatura opcional. Escolher o modelo abaixo não ativa o plano.',`${publicationContactFields(auth.getUser())}<div class="field full"><label for="publisher-type">Quem está divulgando?</label><select id="publisher-type" name="publisherType"><option value="employer">Contratante direto · azul no PRO</option><option value="agency">Agenciador / agência · amarelo no PRO</option></select></div><div class="field full" data-agency-field hidden><label for="agency-name">Nome público da agência / agenciador</label><input id="agency-name" name="agencyName" maxlength="100"></div><div class="field full"><label for="requested-format">Modelo de divulgação</label><select id="requested-format" name="requestedFormat"><option value="standard">Básico gratuito · fundo neutro</option><option value="pro">Solicitar modelo PRO · 6 meses de teste no lançamento</option></select></div><div class="field full"><label for="advertiser-id">Código do anunciante PRO (se já aprovado)</label><input id="advertiser-id" name="advertiserId" maxlength="80" pattern="[a-z0-9-]+" placeholder="Opcional; a equipe confere o titular e o plano"><small>O código identifica a conta; não é senha nem prova de assinatura. Novos anunciantes solicitam o teste ao escolher o modelo PRO.</small></div>${categoryField()}<div class="field full"><label for="job-title">Título da vaga</label><input id="job-title" name="title" required maxlength="100" placeholder="Ex.: profissional para trabalho doméstico"></div><div class="field full"><label for="job-description">Resumo da oportunidade</label><textarea id="job-description" name="description" required maxlength="1500" rows="3" placeholder="Informe as atividades e condições principais; não inclua endereço exato."></textarea></div><div class="field full"><label for="schedule">Dias, horários e intervalo</label><input id="schedule" name="schedule" required maxlength="200" placeholder="Ex.: segunda a sexta, horário e intervalo a combinar"></div>${adEditorFields({job:true})}${agencyFeeEditor()}<p class="notice full">O teste pertence ao anunciante, não à vaga. Criar outra oportunidade não reinicia os seis meses. Sem adesão paga após o teste, o anúncio fica no modelo básico neutro.</p>`,'Publicar oportunidade grátis'));
   $('#registration-area').required=true;
   $('#publisher-type').value=kind;
   if(kind==='agency' || premium) $('#requested-format').value='pro';
@@ -290,15 +330,11 @@ function showProfile(id) {
   openDialog(`<div class="profile-dialog ad-tone-${p.ad.tone}">${adHeader(p.ad)}<span class="eyebrow">PERFIL PRO ${p.demo ? '· DEMONSTRAÇÃO' : '· PETROLINA'}</span><h2 id="dialog-title">${esc(p.heading || p.name)}</h2>${ratingMarkup(p)}${managementLinks(p)}<p class="dialog-intro">${esc(categoryName(p.category))}</p>${p.verified ? `<div class="verified">${icon('check')} Profissional Verificado${p.demo ? ' · selo ilustrativo' : ''}</div>` : ''}${p.featuredDays ? `<p class="feature-badge">🔥 EM DESTAQUE (Restam ${p.featuredDays} dias)</p>` : ''}${gallery(p)}${adDetailsMarkup(p.ad,p.neighborhoods.join(' · '))}<h3>Conheça meu trabalho</h3><p class="profile-description">${esc(p.description)}</p><h3>Onde atendo</h3><div class="region-tags">${p.neighborhoods.map(n => `<span>${esc(n)}</span>`).join('')}</div>${p.emergency ? '<p class="notice">Plantão / Emergência 24h informado pelo profissional. Confirme a disponibilidade na conversa.</p>' : ''}<p>${esc(p.phone)}</p><div class="profile-actions">${contactButton(p)}<button type="button" class="btn secondary" data-share="${esc(p.id)}">Compartilhar perfil ↗</button></div><p class="micro">O selo indica uma conferência da equipe; não garante a qualidade ou a execução do serviço.</p></div>`);
 }
 function showInfo(type,overForm=false) {
-  const privacy=type==='privacidade', offer=commercialOffer(config);
+  const privacy=type==='privacidade';
   const text=privacy?
-    '<h3>Cadastro e contato</h3><p>Os formulários enviam contato e pedido ao n8n e ao Telegram privado do administrador, quando conectados. Publicação e verificação dependem de conferência. Não convertemos pedidos privados de orçamento em vagas públicas.</p><h3>Localização aproximada</h3><p>GPS só é solicitado após seu clique. Coordenadas são arredondadas em uma grade de cerca de 1 km antes de envio. Rua, número e apartamento não são enviados. Apenas bairro/região e localização aproximada autorizada podem constar no catálogo; isso não garante anonimato, sobretudo em áreas pouco povoadas.</p><p>O mapa é opcional: ao abri-lo, o OpenStreetMap recebe seu IP e as áreas visualizadas. Não enviamos o endereço digitado a geocodificadores. A localização usada apenas na busca fica em memória, não na URL ou no armazenamento do navegador. Limpar localização a remove.</p><h3>Fotos e vagas</h3><p>Use somente material autorizado. Vagas exigem autorização separada para publicar o WhatsApp. Descrições são revisadas para remover endereços e dados sensíveis antes da publicação.</p><h3>Revisão e remoção</h3><p>Peça atualização ou retirada pelo canal da equipe que confirmou seu cadastro. Use <a href="#meu-cadastro">Este cadastro é meu / pedir retirada</a>. Se o atendimento estiver desconectado, o administrador deve disponibilizar um canal operacional de privacidade antes do lançamento público. Cadastros importados podem aparecer como não verificados; isso não comprova identidade, disponibilidade ou autorização.</p><h3>Notas e avaliações</h3><p>A nota inicial 5/5 (ou 3/5 definida pelo administrador) não é avaliação de cliente. Quando há avaliações reais aprovadas, mostramos a média dessas avaliações sem misturá-la com a nota inicial.</p><h3>Cache</h3><p>O cache guarda a vitrine pública para uso offline. A localização de busca e os formulários não são armazenados. A contagem de cliques é local a este aparelho, sem identificar visitantes. Um catálogo offline pode estar desatualizado.</p>':
-    '<h3>Para moradores e profissionais</h3><p>Buscar, conversar e publicar vagas é gratuito. O básico continua sem mensalidade. O contato direto com profissionais é sem comissão. A intermediação de agenciadores é cobrada do contratante: valor padrão R$ 200,00, com 25% do valor líquido para o app e 75% para o agenciador, após as tarifas Asaas. O preço informado aparece antes do contato; o candidato não paga para concorrer. Não prometemos contratações.</p><h3>PRO no lançamento</h3><p>'+ (offer.launch?'Experimente por '+offer.trialMonths+' meses a partir da aprovação. Não faça Pix. Após o período, você pode permanecer no básico gratuito; o PRO pago será opcional quando a fase comercial for aberta.':'O PRO é opcional e depende de contratação e confirmação pela equipe.')+'</p><p>O PRO de profissionais, contratantes e agenciadores dá acesso aos modelos organizados e às cores por objetivo. Ao expirar, esses extras deixam de aparecer; o básico permanece gratuito. Não existe renovação ou cobrança automática. Pagamento não confere selo: a verificação é separada.</p><h3>Proximidade e destaque</h3><p>Mais próximos usa distância aproximada em linha reta; não estima trajeto ou tempo. Sem coordenadas, o resultado fica no final e não ganha uma distância inventada. Recomendados prioriza destaques ativos, PRO e gratuitos. O destaque dura 72 horas, uma ativação por mês no horário de Petrolina.</p><h3>Destaque de agenciadores e avulso</h3><p>Agenciadores aprovados têm seis meses iniciais de destaque. Após esse prazo poderá ser cobrada mensalidade ou valor avulso para manter prioridade no topo, mediante adesão. O destaque avulso custa R$ 99,90 por 72 horas. Sem adesão, a apresentação fica básica. Os valores são informados antes da contratação e não há renovação automática.</p><h3>Vagas</h3><p>Empregadores enviam solicitações; só anúncios autorizados e aprovados são publicados. Confirme horário, pagamento e condições diretamente. Não há contratação, pagamento ou conta autenticada pelo site nesta versão.</p>';
-  const currentText=privacy?text.replace('A localização de busca e os formulários não são armazenados.','A localização de busca e os pedidos de serviço não são guardados pelo cache. O pré-cadastro de conta tem armazenamento separado, explicado abaixo.'):text.replace('Não há contratação, pagamento ou conta autenticada pelo site nesta versão.','Não há contratação ou pagamento operacional pelo site. O acesso à conta depende da configuração de autenticação descrita abaixo.');
-  const accountText=privacy?'<h3>Conta, Google e pré-cadastro local</h3><p>Sem autenticação configurada, o pré-cadastro guarda apenas nome, e-mail, objetivo e aceite nesta sessão do navegador, ou em memória se o armazenamento estiver bloqueado. Ele não envia dados, não cria uma conta online e não publica contato. Você pode apagá-lo na prévia do perfil.</p><p>Quando o Firebase Authentication estiver configurado, o login Google usa identidade básica e e-mail; não pede contatos, agenda ou Drive. E-mail e senha são processados pelo Firebase, não enviados ao n8n ou publicados na vitrine. O SDK administra a sessão por aba. As preferências do objetivo ficam neste navegador, separadas por identificador da conta; ainda não são sincronizadas entre aparelhos. O cadastro de anúncio e a autorização para divulgar contato são etapas separadas.</p>':'<h3>Conta e escolha do objetivo</h3><p>Para acessar as opções PRO, cadastre-se ou entre e escolha contratar, ser contratado ou agenciar. Trabalhadores podem divulgar serviços ou procurar emprego. O cadastro por e-mail exige confirmação. O pré-cadastro local é apenas uma prévia e não equivale a login. Quando a autenticação não estiver configurada, a interface informa essa limitação.</p><p>Login não comprova propriedade de WhatsApp, profissão, identidade civil ou pagamento. A conta começa básica; a ativação de PRO, o selo e o vínculo aos anúncios dependem de conferência administrativa separada.</p>';
-  const aiText=privacy?'<h3>Revisão assistida por IA</h3><p>Textos e até três fotos anexadas aos anúncios podem ser processados pela OpenAI para resumir o conteúdo, sugerir uma descrição e apontar pendências para a equipe. Evite enviar documentos, dados sensíveis ou fotos de terceiros sem autorização. Links externos permanecem para consulta da equipe.</p><p>A análise auxilia a revisão do anúncio; a equipe decide sobre sua publicação. Ela não confirma identidade, propriedade do telefone, pagamento ou qualificação profissional, nem decide contratações. Pedidos e decisões ficam na fila administrativa privada.</p>':'';
-  const activeAccountText=backendConfigured(config)?(privacy?'<h3>Conta Google, pedidos e administração</h3><p>O Firebase Authentication processa o acesso com Google ou e-mail. O login Google usa identidade básica e e-mail, sem solicitar contatos, agenda ou Drive. O SDK mantém a sessão por aba; senhas e tokens não são publicados nem enviados ao atendimento.</p><p>Nome, e-mail, objetivo e versão do aceite ficam associados à conta no Cloud Firestore. Os pedidos e seus anexos ficam na fila privada, acessível aos administradores autorizados. O banco está na região de São Paulo. Alterações administrativas registram responsável, horário, motivo e cadastro afetado.</p><p>O anúncio público é separado da conta. Nome, telefone e dados do serviço só são divulgados após o procedimento de publicação. Para correção, suspensão ou retirada, use o pedido de titularidade no perfil. Entrar com Google não comprova propriedade de telefone ou qualificação profissional.</p>':'<h3>Sua conta e seus pedidos</h3><p>Você pode entrar com Google ou e-mail e escolher seu objetivo. Pedidos enviados com a conta ficam na fila de atendimento. Criar uma conta não publica contato, concede selo ou confirma pagamento.</p><p>A publicação básica exige conferir titularidade e autorização. Os administradores podem corrigir ou suspender cadastros, com registro da alteração. O básico continua gratuito e o PRO é opcional. Pagamentos ainda não estão ativados.</p>'):accountText;
-  const html='<div class="document-copy"><span class="eyebrow">TRANSPARÊNCIA</span><h2 id="dialog-title">'+(privacy?'Seus dados, com clareza.':'Como funciona o Ajuda em Casa')+'</h2>'+currentText+activeAccountText+aiText+'</div>';
+    '<h3>Conta Google e publicação</h3><p>O acesso e o cadastro usam somente Google pelo Firebase Authentication. Recebemos nome, e-mail e identificador da conta, sem acesso à agenda, Drive ou telefone. Nome, objetivo e aceite ficam no Cloud Firestore, na região de São Paulo. O login não verifica telefone, profissão ou identidade civil.</p><p>Cadastros básicos e oportunidades válidos são publicados automaticamente após sua autorização. Nome, serviço e apresentação ficam públicos. E-mail e WhatsApp vêm marcados: desmarque um canal se não quiser divulgá-lo. WhatsApp exige telefone. Sem telefone, você pode receber por e-mail e/ou na caixa de mensagens do site. O botão E-mail abre o programa de e-mail de quem escreve; não há envio automático de e-mail.</p><h3>Mensagens e atendimento</h3><p>As mensagens do site ficam no banco privado e podem ser lidas somente pelas contas participantes, em Meu perfil → Minhas mensagens. O texto não publica seu e-mail ou telefone. Consulte a caixa para ver respostas; ainda não há aviso automático por e-mail.</p><p>Pedidos de titularidade, avaliações, orçamento e extras ficam na fila privada de atendimento. O n8n valida temporariamente o token de acesso e o protocolo para enviar um aviso ao Telegram privado do administrador. O token não entra no aviso nem é armazenado nas execuções do fluxo. O aviso não contém o texto das mensagens privadas.</p><h3>Localização e cache</h3><p>Localização é opcional e depende de seu clique. Quando autorizada para publicação, é arredondada para uma região de cerca de 1 km. Não publique endereço exato. O mapa opcional usa OpenStreetMap, que recebe seu IP e a área visualizada. A localização usada na busca fica em memória. O cache guarda somente a vitrine pública para consulta offline, que pode estar desatualizada.</p><h3>Avaliações, correções e retirada</h3><p>Avaliações ficam pendentes de análise antes de alterar a média. Não usamos IP ou GPS para atribuir fraude automaticamente. A nota inicial do cadastro não é avaliação de cliente. Cadastros importados não verificados não confirmam identidade, autorização ou disponibilidade.</p><p>Para corrigir ou retirar um anúncio, use <a href="#meu-cadastro">Este cadastro é meu / pedir retirada</a>. Administradores autorizados podem corrigir, suspender e excluir da vitrine, com registro do motivo. O histórico necessário para segurança e bloqueios permanece privado.</p>':
+    '<h3>Buscar, publicar e conversar</h3><p>O acesso é somente com Google. O cadastro básico e a publicação de oportunidades são gratuitos e automáticos quando os dados e o consentimento são válidos. Não exigem aprovação administrativa. Você escolhe quais contatos ficam públicos; mantenha pelo menos as mensagens privadas do site. O Google não fornece seu telefone nesse acesso.</p><p>Não publique informações de terceiros sem autorização. Confirme condições, preço e disponibilidade diretamente com o profissional. Não prometemos contratação e o login não comprova profissão, identidade civil ou propriedade de telefone. Solicitações de titularidade e avaliações têm análise separada para proteger as pessoas envolvidas.</p><h3>Vitrine e oportunidades</h3><p>A página inicial mostra até quatro serviços e quatro oportunidades reais, com rodízio a cada visita. PRO tem prioridade, seguido de agenciadores e cadastros gratuitos, conforme a categoria da vitrine. Na busca Mais próximos, a distância aproximada vem primeiro. Oportunidades expiram em até 30 dias.</p><p>Agenciadores informam o preço de intermediação antes do contato. O candidato não paga para concorrer. Combine todas as condições de trabalho com quem anuncia.</p><h3>PRO e pagamentos</h3><p>PRO é opcional e segue procedimento próprio. Não concede selo de verificação automaticamente. Pagamentos e cobranças pelo site ainda não estão ativos. Nenhuma inscrição autoriza cobrança ou renovação automática.</p>';
+  const html='<div class="document-copy"><span class="eyebrow">TRANSPARÊNCIA</span><h2 id="dialog-title">'+(privacy?'Seus dados, com clareza.':'Como funciona o Ajuda em Casa')+'</h2>'+text+'</div>';
   if(!overForm)return openDialog(html);
   infoLastFocus=document.activeElement;
   $('#info-dialog-content').innerHTML=html.replace('id="dialog-title"','id="info-dialog-title"');
@@ -307,16 +343,31 @@ function showInfo(type,overForm=false) {
   $('#info-dialog-title').tabIndex=-1;$('#info-dialog-title').focus();
 }
 function route() {
-  if (!config || !catalog || dialog.querySelector('form[data-busy="true"]')) return;
+  if (!config || !catalog || document.querySelector('form[data-busy="true"]')) return;
   closeFilters();
   if(infoDialog.open)infoDialog.close();
   if($('#side-menu').classList.contains('is-open'))setMenuOpen(false);
   let hash;
   try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
   for(const link of document.querySelectorAll('#side-menu nav a')) {
-    const current=link.hash.slice(1)===hash || (link.hash==='#conta' && ['entrar','perfil-conta'].includes(hash));
+    const current=link.hash.slice(1)===(hash||'inicio') || (link.hash==='#conta' && ['entrar','perfil-conta'].includes(hash));
     if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
   }
+  const home=hash==='inicio'||(!hash&&!location.search);
+  const directory=['servicos','profissionais','oportunidades'].includes(hash)||(!hash&&!!location.search);
+  if(home||directory) {
+    if(dialog.open)dialog.close();
+    $('#central-view').hidden=true;$('#central-view-content').replaceChildren();
+    $('#home-showcase').hidden=!home;$('#profissionais').hidden=!directory;
+    if(hash==='servicos')filters.mode='professionals';if(hash==='oportunidades')filters.mode='jobs';
+    $('#directory-mode').value=filters.mode;renderResults();renderHome();return;
+  }
+  if(hash==='mensagens')return accountUI.guard(()=>messagesUI.open());
+  if(hash.startsWith('mensagem/'))return accountUI.guard(()=>{
+    const id=hash.slice(9),profile=[...catalog.profiles,...vacancies.jobs].find(p=>p.id===id);
+    if(!profile)return openDialog('<h2 id="dialog-title">Contato não encontrado</h2><p>Este anúncio pode ter sido retirado.</p>');
+    messagesUI.compose(profile);
+  });
   const routes = { contratar:()=>showRoleLanding('contractor'),'ser-contratado':()=>showRoleLanding('worker'),agenciar:()=>showRoleLanding('agency'),conta:()=>accountUI.open(),entrar:()=>accountUI.open({mode:'login'}),'perfil-conta':()=>accountUI.showProfile(),modelos:()=>openDialog(modelsMarkup()),agenciador:()=>showVacancyForm('agency'),'pro-emprego':()=>accountUI.guard(()=>showProForm('jobseeker'),{role:'worker',workerGoal:'jobseeker'}),planos:showPlans,cadastro:showFreeForm,pro:()=>accountUI.guard(()=>showProForm(),{role:'worker'}),orcamento:showQuoteForm,'publicar-vaga':()=>showVacancyForm(),'publicar-vaga-pro':()=>accountUI.guard(()=>showVacancyForm('employer',true),{role:'contractor'}),destaque:showFeatureForm,patrocinio:showSponsorForm,privacidade:()=>showInfo('privacidade'),termos:()=>showInfo('termos') };
   if(backendConfigured(config) && (!auth.getUser()?.emailVerified || !accountUI.hasPreferences()) && (['cadastro','agenciador','pro-emprego','pro','orcamento','publicar-vaga','publicar-vaga-pro','destaque','patrocinio','meu-cadastro'].includes(hash)||hash.startsWith('avaliar/')||hash.startsWith('meu-cadastro/')))return accountUI.guard(route);
   if (hash.startsWith('perfil/')) showProfile(hash.slice(7));
@@ -344,6 +395,7 @@ async function submitForm(form) {
     if(locality.neighborhood) Object.assign(data,locality);
     data.location=getLocation(form); data.locationConsent=fields.get('locationConsent')==='on';
     data.publishContact=fields.get('publishContact')==='on';
+    Object.assign(data,readPublicationContacts(form,auth.getUser()));
     if(form.dataset.event==='nova_vaga_empregador' && data.publisherType==='agency') data.intermediation=readIntermediation(fields);
     if(['solicitacao_upgrade_pro','nova_vaga_empregador'].includes(form.dataset.event)) data.adDetails=readAdDetails(fields);
     if(form.dataset.event==='nova_avaliacao') data.score=Number(fields.get('score'));
@@ -373,12 +425,21 @@ async function submitForm(form) {
     }
     form.dataset.eventId ||= crypto.randomUUID(); form.dataset.createdAt ||= new Date().toISOString();
     const payload = validateEvent({ type:form.dataset.event, schemaVersion:1, eventId:form.dataset.eventId, createdAt:form.dataset.createdAt, data });
-    status.textContent = 'Enviando para a equipe…'; button.textContent = 'Enviando…';
-    const receipt = await service.send(payload);
+    status.textContent = 'Salvando seus dados…'; button.textContent = 'Salvando…';
+    const automatic=['novo_cadastro_gratuito','nova_vaga_empregador'].includes(payload.type)&&payload.data.contactOptions;
+    const receipt=automatic?await publicationService.publish(payload):await service.send(payload);
+    if(receipt.published){try{await refreshLiveCatalog();renderResults();renderHome();}catch{/* A publicação confirmada não pode virar erro de envio. */}}
     status.className = 'form-status full success';
-    status.textContent = `Pedido recebido pela equipe! Protocolo: ${receipt.eventId}. Aguarde a conferência; isso não publica, altera, verifica nem remove dados automaticamente.`;
-    form.dataset.delivered = 'true'; button.textContent = 'Pedido enviado';
+    status.textContent=receipt.published?`Anúncio publicado! Protocolo: ${receipt.eventId}. Já está disponível na vitrine com os canais que você autorizou.`:`Pedido registrado. Protocolo: ${receipt.eventId}. Acompanhe pelo atendimento.`;
+    form.dataset.delivered = 'true'; button.textContent=receipt.published?'Anúncio publicado':'Pedido registrado';
     for (const input of form.querySelectorAll('input,textarea,select,button')) input.disabled = true;
+    const notice=document.createElement('p');notice.className='micro full';notice.setAttribute('role','status');status.after(notice);
+    const notify=async()=>{
+      notice.textContent='Enviando aviso ao atendimento…';
+      try{await createNotificationService(auth).notify(receipt.eventId);notice.textContent='Atendimento avisado pelo Telegram.';}
+      catch(error){notice.textContent=error.message+' ';const retry=document.createElement('button');retry.type='button';retry.className='btn secondary';retry.textContent='Reenviar somente o aviso';retry.onclick=notify;notice.append(retry);}
+    };
+    notify();
   } catch (error) {
     status.className = 'form-status full error'; status.textContent = error.message;
     button.disabled = false; button.textContent = originalLabel;
@@ -493,9 +554,7 @@ document.addEventListener('keydown',event=>{
 });
 window.addEventListener('hashchange', route);
 window.addEventListener('offline', () => toast('Você está offline. A vitrine pode continuar disponível; os pedidos precisam de conexão.'));
-let installPrompt;
-window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt=event; $('#install').hidden=false; });
-$('#install').addEventListener('click', async () => { if (installPrompt) { await installPrompt.prompt(); installPrompt=null; $('#install').hidden=true; } });
+setupInstallation({showInfo:html=>openDialog(html)});
 
 async function refreshLiveCatalog() {
   const [live,settings]=await Promise.all([dataClient.get('publicCatalog/current',{publicRead:true}),dataClient.get('settings/site',{publicRead:true})]);
@@ -513,18 +572,29 @@ async function start() {
     auth=createAuthService(config);
     dataClient=createDataClient(config,auth);
     service = backendConfigured(config)?createRequestService(dataClient,auth):createN8nService(config);
+    publicationService=createPublicationService(dataClient,auth);
+    messagesUI=createMessagesUI({service:createMessagesService(dataClient,auth),auth,showView:openDialog});
     if(dataClient.enabled)await refreshLiveCatalog();
     let accountStorage;
     try {accountStorage=window.sessionStorage;} catch { /* Rascunho funciona em memória se o armazenamento estiver bloqueado. */ }
     accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onAdminAccess:()=>dataClient.hasAdminAccess(),onProfileSave:preferences=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve()});
     auth.subscribe(user=>{
       const entry=$('.google-entry');
+      const firstName=accountFirstName(user);
       entry.href=user?'#conta':'#entrar';
       entry.querySelector('img').hidden=!!user;
-      entry.querySelector('span').textContent=user?'Meu perfil':'Entrar com Google';
-      entry.setAttribute('aria-label',user?'Abrir meu perfil':'Entrar ou cadastrar com Google');
+      entry.querySelector('span').textContent=user?(firstName?`Olá, ${firstName}`:'Meu perfil'):'Entrar com Google';
+      entry.setAttribute('aria-label',user?(firstName?`Abrir perfil de ${firstName}`:'Abrir meu perfil'):'Entrar ou cadastrar com Google');
+      const accountLabel=$('.nav-account span');
+      if(accountLabel)accountLabel.textContent=user?(firstName?`Meu perfil · ${firstName}`:'Meu perfil'):'Meu perfil / Entrar';
+      if(user&&auth.consumeGoogleRedirectResult())queueMicrotask(()=>{
+        history.replaceState(null,'',location.pathname+location.search+'#inicio');
+        toast(firstName?`Olá, ${firstName}! Seu acesso foi concluído.`:'Seu acesso foi concluído.');
+        route();
+      });
     });
-    // Restaura a sessao para apresentar o perfil depois do retorno do Google.
+    // Restaura a sessão sem bloquear a vitrine pública. O assinante acima trata
+    // o retorno do Google e leva a conta autenticada para a página principal.
     if(authConfigured(config))auth.ready().catch(()=>{});
     setMenuOpen(false);
     matchMedia('(max-width: 1050px)').addEventListener('change',()=>setMenuOpen(false));
@@ -560,7 +630,7 @@ async function start() {
     $('#directory-mode').addEventListener('change',event=>{filters.mode=event.target.value;renderResults();});
     $('#emergency').addEventListener('click',() => { filters.emergency=!filters.emergency; $('#emergency').setAttribute('aria-pressed',String(filters.emergency)); renderResults(); });
     $('#clear').addEventListener('click',clearFilters);
-    renderResults(); route();
+    renderResults();renderHome();route();
     // Atualiza expirações sem exigir recarregamento; não recria o resultado durante interação.
     setInterval(async () => {
       if(dialog.open||$('#results').contains(document.activeElement))return;
@@ -568,9 +638,11 @@ async function start() {
         try{await refreshLiveCatalog();}
         catch{catalog.profiles=[];vacancies.jobs=[];advertisers.advertisers=[];toast('Não foi possível atualizar a vitrine. Verifique sua conexão e recarregue.');}
       }
-      renderResults();
+      renderResults();renderHome();
     },60000);
-  } catch {
+  } catch (error) {
+    console.error('Falha ao carregar a vitrine:',error.message);
+    const startup=$('#startup-status');if(startup){startup.hidden=false;startup.textContent='Não foi possível carregar a vitrine. Verifique sua conexão e recarregue a página.';}
     $('#result-count').textContent='Não foi possível carregar a vitrine.';
     $('#results').innerHTML='<div class="empty"><h3>Vamos tentar de novo?</h3><p>Verifique sua conexão e recarregue a página. Para visualizar a cópia no computador, use o servidor local indicado no README.</p><a class="btn secondary" href="index.html">Recarregar</a></div>';
   }

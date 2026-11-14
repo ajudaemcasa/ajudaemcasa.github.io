@@ -3,38 +3,57 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#B0472F">
-  <meta name="description" content="Profissionais em Petrolina. Encontre o serviço e converse diretamente pelo WhatsApp.">
+  <meta name="theme-color" content="#315BCB">
+  <meta name="description" content="Encontre profissionais e oportunidades em Petrolina. Converse por WhatsApp, e-mail ou mensagens pelo Ajuda em Casa.">
   <title>Ajuda em Casa · Profissionais em Petrolina</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icone.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icone-192.png">
-  <link rel="stylesheet" href="styles.css?v=4b7fdc914fc1">
-  <script type="module" src="bootstrap.mjs?v=4b7fdc914fc1"></script>
+  <link rel="stylesheet" href="styles.css?v=e03be0096255">
+  <link rel="stylesheet" href="conexao.css?v=e03be0096255">
+  <script type="module" src="bootstrap.mjs?v=e03be0096255"></script>
 </head>
-<body class="compact-home">
-  <a class="skip-link" href="#profissionais">Pular para os contatos</a>
+<body class="compact-home conexao-site">
+  <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
   <header class="site-header container">
-    <a class="brand" href="index.html"><img src="icone.svg" width="36" height="36" alt=""><span>Ajuda em Casa<small>PETROLINA · PE</small></span></a>
-    <a class="google-entry google-button" href="#entrar" aria-label="Entrar ou cadastrar com Google"><img src="assets/google-g.svg" width="20" height="20" alt=""><span>Entrar com Google</span></a>
-    <button id="menu-toggle" class="menu-toggle" type="button" aria-controls="side-menu" aria-expanded="false"><span aria-hidden="true">☰</span> Menu</button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-controls="side-menu" aria-expanded="false" aria-label="Abrir menu principal"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span class="menu-toggle-label">Menu</span></button>
+    <a class="brand" href="#inicio"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></svg></span><span>Ajuda em Casa<small>PETROLINA · PE</small></span></a>
+    <span class="header-location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>Petrolina, PE</span>
+    <div class="header-actions">
+      <a class="google-entry google-button" href="#entrar" aria-label="Entrar ou cadastrar com Google"><img src="assets/google-g.svg" width="20" height="20" alt=""><span>Entrar com Google</span></a>
+      <button id="install-shortcut" class="install-shortcut" type="button" data-install-app><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>Instalar app</span></button>
+    </div>
   </header>
-  <p id="startup-status" class="container notice" role="alert" hidden></p>
   <button id="menu-backdrop" class="menu-backdrop" type="button" aria-label="Fechar menu principal" tabindex="-1" hidden></button>
   <div class="app-shell">
     <aside id="side-menu" class="side-menu" aria-labelledby="side-menu-title">
-      <div class="side-menu-heading"><h2 id="side-menu-title">O que você precisa?</h2><button id="menu-close" class="menu-close" type="button" aria-label="Fechar menu principal">×</button></div>
+      <div class="side-menu-heading"><h2 id="side-menu-title">Seu dia mais fácil</h2><button id="menu-close" class="menu-close" type="button" aria-label="Fechar menu principal">×</button></div>
       <nav aria-label="Menu principal">
-        <a data-nav-role="contractor" href="#contratar">Contrate um serviço</a>
-        <a data-nav-role="worker" href="#ser-contratado">Seja contratado</a>
-        <a data-nav-role="agency" href="#agenciar">Agencie empregos</a>
-        <a href="#planos">Torne-se PRO</a>
-        <a href="#conta">Meu perfil / Entrar</a>
+        <a href="#inicio"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></svg><span>Início</span></a>
+        <a href="#servicos"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Encontrar profissionais</span></a>
+        <a href="#oportunidades"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V4h8v3M3 12l9 3 9-3"/></svg><span>Procurando serviço</span></a>
+        <a data-nav-role="contractor" href="#contratar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9 10 10 0 0 1-4-.8L3 21l1.8-5a9 9 0 1 1 16.2-5Z"/><path d="M8 10h8M8 14h5"/></svg><span>Quero contratar</span></a>
+        <a data-nav-role="worker" href="#ser-contratado"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 4 6 6-11 11-6-6L14 4Z"/><path d="m11 7 6 6M3 21l3-1-2-2-1 3Z"/></svg><span>Quero trabalhar</span></a>
+        <a data-nav-role="agency" href="#agenciar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M17 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 5"/></svg><span>Para agenciadores</span></a>
+        <a class="nav-pro" href="#planos"><svg class="icon crown-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 4.5 4L12 3l4.5 7L21 6l-2 13H5L3 6Z"/><path d="M6 16h12"/></svg><span>Conheça o PRO</span></a>
+        <a class="nav-account" href="#conta"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/></svg><span>Meu perfil / Entrar</span></a>
       </nav>
+      <div class="sidebar-note"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21 3.5 12.5A6 6 0 0 1 12 4a6 6 0 0 1 8.5 8.5L12 21Z"/></svg><p>Uma rede de gente<br><strong>que faz acontecer.</strong></p></div>
     </aside>
     <div class="page-content">
-      <main>
-        <section class="directory-section" id="profissionais" aria-labelledby="directory-title">
+      <main id="main-content" tabindex="-1">
+        <section id="home-showcase" class="home-showcase" aria-labelledby="home-title">
+          <p id="startup-status" class="notice home-startup-status" role="alert" hidden></p>
+          <div class="connection-hero">
+            <div class="connection-hero-copy"><span class="connection-eyebrow"><span aria-hidden="true"></span>Petrolina mais conectada</span><h1 id="home-title">O próximo serviço.<br><em>A próxima oportunidade.</em></h1><p>Conecte sua necessidade com quem pode resolver. Simples, perto e direto ao ponto.</p><div class="hero-actions"><a class="btn hero-primary" href="#servicos">Encontrar profissionais<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a><a class="hero-opportunities" href="#oportunidades">Quero encontrar oportunidades</a></div></div>
+            <div class="connection-hero-art" aria-hidden="true"><svg viewBox="0 0 320 250" fill="none"><circle cx="164" cy="126" r="110" fill="#7FA6ED" opacity=".15"/><path d="m64 129 96-83 95 83v98H64Z" fill="#9ABBF2"/><path d="m51 130 109-94 109 94" stroke="#D7E6FF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><path d="M139 227v-77h45v77" fill="#E9F0FF"/><rect x="87" y="141" width="30" height="31" rx="7" fill="#E9F0FF"/><rect x="204" y="141" width="30" height="31" rx="7" fill="#E9F0FF"/><path d="M41 225h241" stroke="#C0D5FF" stroke-width="4" stroke-linecap="round"/><path d="M260 225v-45m0 22c-17 0-24-17-21-27 17 0 24 15 21 27Zm0-14c17 0 24-17 21-27-17 0-24 15-21 27Z" fill="#BED3F7"/><circle cx="248" cy="53" r="20" fill="#E6BC6F"/></svg><span>Aqui em Petrolina</span></div>
+          </div>
+          <section class="home-directory" aria-labelledby="home-offers-title"><div class="home-section-heading"><div><span class="section-eyebrow">A ajuda certa, bem perto</span><h2 id="home-offers-title">SERVIÇOS OFERTADOS</h2><p>Conheça profissionais e encontre a ajuda certa para sua casa.</p></div><a href="#servicos">Ver todos<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a></div><div id="home-offers" class="home-card-grid" aria-live="polite" aria-label="Serviços ofertados em destaque"><p class="home-loading" role="status"><span class="loading-indicator" aria-hidden="true"></span>Carregando serviços…</p></div></section>
+          <section class="home-opportunities" aria-labelledby="home-jobs-title"><div class="home-section-heading"><div><span class="section-eyebrow">Quem precisa da sua ajuda</span><h2 id="home-jobs-title">PROCURANDO SERVIÇO</h2><p>Casas e agenciadores com oportunidades para profissionais.</p></div><a href="#oportunidades">Ver todos<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a></div><div id="home-jobs" class="home-card-grid" aria-live="polite" aria-label="Oportunidades de casas e agenciadores"><p class="home-loading" role="status"><span class="loading-indicator" aria-hidden="true"></span>Carregando oportunidades…</p></div></section>
+          <section class="home-install" aria-labelledby="home-install-title"><span class="home-install-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4M10 6h4M12 8v7m-3-3 3 3 3-3"/></svg></span><div><span class="section-eyebrow">Sua ajuda, sempre por perto</span><h2 id="home-install-title">Leve o Ajuda em Casa com você.</h2><p>Adicione à tela inicial do celular ou instale no computador.</p></div><button id="install-home" class="btn primary" type="button" data-install-app>Instalar app<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg></button></section>
+        </section>
+        <section id="central-view" class="central-view" aria-label="Conteúdo selecionado" hidden><div id="central-view-content"></div></section>
+        <section class="directory-section" id="profissionais" aria-labelledby="directory-title" hidden>
           <div class="container">
             <h1 id="directory-title">Profissionais em Petrolina</h1>
             <p id="commercial-notice" class="directory-intro">Encontre e converse gratuitamente.</p>

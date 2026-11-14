@@ -1,6 +1,7 @@
-import {CATEGORIES,validateEvent} from './domain.mjs?v=4b7fdc914fc1';
-import {phoneDigits} from './telefone.mjs?v=4b7fdc914fc1';
-import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=4b7fdc914fc1';
+import {CATEGORIES,validateEvent} from './domain.mjs?v=e03be0096255';
+import {phoneDigits} from './telefone.mjs?v=e03be0096255';
+import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=e03be0096255';
+import {hasContact} from './canais.mjs?v=e03be0096255';
 
 export const REQUEST_LABELS={novo_cadastro_gratuito:'Cadastro básico',solicitacao_upgrade_pro:'Solicitação PRO',ativacao_destaque_3dias:'Destaque',novo_orcamento_cliente:'Orçamento',interesse_patrocinio_loja:'Patrocínio',nova_vaga_empregador:'Vaga',solicitacao_titularidade:'Titularidade',nova_avaliacao:'Avaliação'};
 export function cleanText(raw,max,{required=false}={}) {
@@ -10,7 +11,8 @@ export function cleanText(raw,max,{required=false}={}) {
 }
 export function editProfessional(original,raw,{allowMissingPhone=false}={}) {
   const name=cleanText(raw.name,160,{required:true}),note=cleanText(raw.note,140),phone=raw.phone?phoneDigits(raw.phone):'';
-  if(!phone && (!allowMissingPhone || String(raw.phone||'').trim()))throw new Error('Informe um telefone válido com DDD. Cadastro ativo não pode ficar sem telefone.');
+  const alternative=original.contactOptions?.whatsapp===false && hasContact({...original,phone:''});
+  if(!phone && ((!allowMissingPhone&&!alternative) || String(raw.phone||'').trim()))throw new Error('Informe um telefone válido com DDD. Cadastro ativo precisa de um canal de contato autorizado.');
   if(!CATEGORIES.some(c=>c.id===raw.category))throw new Error('Escolha um serviço válido.');
   if(original.entityType==='company'&&name!==original.legalName)throw new Error('A alteração de razão social exige conferência específica.');
   // Edição comum não concede plano, selo, titularidade, nota ou autorização.
@@ -35,11 +37,12 @@ export function basicProfileFromRequest(request,{id,ownershipConfirmed=false,pub
 export function createAdminService(client,auth) {
   const actor=()=>{const user=auth.getUser();if(!user?.emailVerified)throw new Error('Entre com uma conta confirmada.');return user;};
   const audit=(id,collection,targetId,action,reason,revision)=>({actorUid:actor().uid,actorEmail:actor().email,collection,targetId,action,reason:cleanText(reason,500,{required:true}),revision});
-  async function commitChange(collection,current,next,{action,reason,publication}={}) {
+  async function commitChange(collection,current,next,{action,reason,publication,claims=[]}={}) {
     const actionId=crypto.randomUUID(),revision=(current?.data.revision??-1)+1,targetId=current?.id||next.id;
     const data={...next,revision,lastActionId:actionId,updatedBy:actor().uid};
     delete data.id;
     const writes=[client.write(collection+'/'+targetId,data,{version:current?.version,create:!current,timestamps:['updatedAt']})];
+    for(const claim of claims)writes.push(client.write('publicationClaims/'+claim,{ownerUid:next.ownerUid||'legacy-import',profileId:targetId},{create:true,timestamps:['createdAt']}));
     if(publication)writes.push(client.write('publicCatalog/current',{...publication.data,revision:publication.data.revision+1,lastActionId:actionId},{version:publication.version,timestamps:['updatedAt']}));
     writes.push(client.write('audit/'+actionId,audit(actionId,collection,targetId,action,reason,revision),{create:true,timestamps:['createdAt']}));
     await client.commit(writes);
@@ -54,14 +57,17 @@ export function createAdminService(client,auth) {
     async saveRecord(current,payload,reason,status=current.data.status) {
       if(current.data.status==='deleted')throw new Error('Este cadastro já foi excluído. O registro foi preservado somente para o histórico.');
       if(!['active','suspended','deleted'].includes(status))throw new Error('Situação inválida.');
-      if(status==='active' && current.data.kind==='professional' && !phoneDigits(payload.phone))throw new Error('Informe um telefone válido com DDD antes de publicar ou reativar o cadastro.');
+      if(status==='active' && current.data.kind==='professional' && !hasContact(payload))throw new Error('Informe um telefone válido com DDD antes de publicar ou reativar o cadastro.');
       if(status==='active' && phoneDigits(payload.phone) && (await client.get('blocks/'+identityKey('phone',payload.phone)))?.data.enabled)throw new Error('Este telefone está bloqueado. Revise o bloqueio antes de publicar.');
       const publication=await client.get('publicCatalog/current');
       if(!publication)throw new Error('O catálogo ainda não foi importado pelo responsável.');
       if(current.data.kind==='professional'&&status==='active'&&phoneDigits(payload.phone)&&publication.data.profiles.some(p=>p.id!==payload.id&&phoneDigits(p.phone)===phoneDigits(payload.phone)&&p.category===payload.category))throw new Error('Este telefone já aparece em outro cadastro do mesmo serviço. Confira a duplicidade antes de salvar.');
       const record={...current.data,payload,status};
+      const claim=phoneDigits(payload.phone)?'phone:'+phoneDigits(payload.phone)+':'+payload.category:'';
+      const reserved=claim?await client.get('publicationClaims/'+claim):null;
+      if(status==='active'&&reserved&&reserved.data.profileId!==payload.id)throw new Error('Telefone e serviço reservados para outro cadastro. Confira a titularidade antes de salvar.');
       publication.data=catalogWithRecord(publication.data,record);
-      return commitChange('records',current,record,{action:status==='deleted'?'record.delete':'record.save',reason,publication});
+      return commitChange('records',current,record,{action:status==='deleted'?'record.delete':'record.save',reason,publication,claims:status==='active'&&claim&&!reserved?[claim]:[]});
     },
     async setUserStatus(current,status,reason) {
       if(current.data.uid===actor().uid)throw new Error('Você não pode suspender a própria conta neste painel.');
@@ -89,11 +95,14 @@ export function createAdminService(client,auth) {
       const publication=await client.get('publicCatalog/current');
       if(!publication)throw new Error('O catálogo ainda não está disponível.');
       if(publication.data.profiles.some(p=>phoneDigits(p.phone)===payload.phone&&p.category===payload.category))throw new Error('Já existe um cadastro com o mesmo telefone e serviço. Trate como titularidade.');
+      const claim='phone:'+payload.phone+':'+payload.category,reserved=await client.get('publicationClaims/'+claim);
+      if(reserved)throw new Error('Telefone e serviço já reservados. Confira a titularidade.');
       const actionId=crypto.randomUUID(),revision=current.data.revision+1;
       const record={kind:'professional',payload,status:'active',revision:0,lastActionId:actionId,updatedBy:actor().uid};
       const updatedCatalog=catalogWithRecord(publication.data,record);
       await client.commit([
         client.write('records/'+recordId,record,{create:true,timestamps:['updatedAt']}),
+        client.write('publicationClaims/'+claim,{ownerUid:current.data.ownerUid,profileId:recordId},{create:true,timestamps:['createdAt']}),
         client.write('requests/'+current.id,{...current.data,status:'published',revision,lastActionId:actionId,updatedBy:actor().uid},{version:current.version,timestamps:['updatedAt']}),
         client.write('publicCatalog/current',{...updatedCatalog,revision:publication.data.revision+1,lastActionId:actionId},{version:publication.version,timestamps:['updatedAt']}),
         client.write('audit/'+actionId,{...audit(actionId,'requests',current.id,'request.publish',reason,revision),recordId},{create:true,timestamps:['createdAt']})

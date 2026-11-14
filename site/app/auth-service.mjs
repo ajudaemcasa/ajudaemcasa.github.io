@@ -137,6 +137,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
   let initialized = false;
   let readyPromise;
   let unsubscribeAuth;
+  let completedGoogleRedirect = false;
   const redirectMode=config?.auth?.flow==='redirect';
   const accessOrigin=settings?'https://'+settings.authDomain:'';
   const googleProvider=()=>{
@@ -188,7 +189,8 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
         auth.languageCode = 'pt-BR';
         await waitForInitialState(sdk, auth);
         if(redirectMode && navigation?.location?.origin===accessOrigin) {
-          await sdk.getRedirectResult(auth);
+          const redirectResult=await sdk.getRedirectResult(auth);
+          completedGoogleRedirect=!!redirectResult?.user && !!auth.currentUser;
           const url=new URL(navigation.location.href);
           if(url.searchParams.get('entrarGoogle')==='1' && !auth.currentUser) {
             url.searchParams.delete('entrarGoogle');
@@ -203,6 +205,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
       })().catch(error => {
         stopWatching();
         initialized = false;
+        completedGoogleRedirect = false;
         sdk = undefined;
         auth = undefined;
         readyPromise = undefined;
@@ -234,6 +237,11 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
   return Object.freeze({
     ready,
     getUser,
+    consumeGoogleRedirectResult() {
+      const completed=completedGoogleRedirect;
+      completedGoogleRedirect=false;
+      return completed;
+    },
     getIdToken(forceRefresh=false) {
       return operation(async()=>{
         await ready();
@@ -259,6 +267,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
     },
     signUpEmail(raw) {
       return operation(async () => {
+        if(config?.auth?.googleOnly)fail('auth/operation-not-allowed');
         const name = normalizeName(raw?.name);
         const email = normalizeEmail(raw?.email);
         if (typeof raw?.password !== 'string' || raw.password.length < 8 || raw.password.length > 128) fail('auth/weak-password');
@@ -272,6 +281,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
     },
     signInEmail(raw) {
       return operation(async () => {
+        if(config?.auth?.googleOnly)fail('auth/operation-not-allowed');
         const email = normalizeEmail(raw?.email);
         if (typeof raw?.password !== 'string' || !raw.password || raw.password.length > 128) fail('auth/missing-password');
         await ready();
@@ -281,6 +291,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
     },
     resetPassword(rawEmail) {
       return operation(async () => {
+        if(config?.auth?.googleOnly)fail('auth/operation-not-allowed');
         const email = normalizeEmail(rawEmail);
         await ready();
         try {

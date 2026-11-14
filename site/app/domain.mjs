@@ -1,14 +1,15 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=4b7fdc914fc1';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=4b7fdc914fc1';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=4b7fdc914fc1';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=e03be0096255';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=e03be0096255';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=e03be0096255';
+import {contactChoices,hasContact} from './canais.mjs?v=e03be0096255';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { ratingSummary } from './avaliacoes.mjs?v=4b7fdc914fc1';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=4b7fdc914fc1';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=4b7fdc914fc1';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=4b7fdc914fc1';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=4b7fdc914fc1';
-import {paidBoostDays} from './promocoes.mjs?v=4b7fdc914fc1';
+import { ratingSummary } from './avaliacoes.mjs?v=e03be0096255';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=e03be0096255';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=e03be0096255';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=e03be0096255';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=e03be0096255';
+import {paidBoostDays} from './promocoes.mjs?v=e03be0096255';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },
@@ -70,6 +71,8 @@ export function activateFeature(profile, now = new Date()) {
 }
 export function visibleProfile(profile, now = Date.now()) {
   const basic = { id: profile.id, name: publicPersonName(profile), heading: profileHeading(profile, categoryName(profile.category)), rating: ratingSummary(profile), phone: formatPhone(profile.phone) || (profile.demo ? profile.phone : ''), category: profile.category, note: shortText(profile.note), plan: 'free', demo: !!profile.demo };
+  if(profile.contactOptions)Object.assign(basic,{contactOptions:profile.contactOptions,contactRef:profile.contactRef,email:profile.contactOptions.email?profile.email:''});
+  if(profile.registrationSource==='self' && !profile.ownershipVerified)basic.unverified=true;
   if(profile.status==='unverified') Object.assign(basic,{unverified:true,sourceUrl:safeMediaUrl(profile.sourceUrl)?profile.sourceUrl:'',contactUnavailable:!phoneDigits(profile.phone)});
   if(profile.adType) basic.adType=profile.adType;
   if(paidBoostDays(profile,now)) Object.assign(basic,{featuredDays:paidBoostDays(profile,now),paidBoost:true});
@@ -78,7 +81,7 @@ export function visibleProfile(profile, now = Date.now()) {
 }
 export function searchProfiles(profiles, filters = {}, now = Date.now()) {
   return profiles.filter(p => ['approved','unverified'].includes(p.status))
-    .filter(p=>p.demo || !!phoneDigits(p.phone))
+    .filter(p=>p.demo || hasContact(p))
     .filter(p=>!filters.adType || (p.adType||'service')===filters.adType)
     .filter(p => !filters.category || p.category === filters.category)
     .filter(p => !filters.neighborhood || (p.neighborhoods || []).some(n=>fold(n).includes(fold(filters.neighborhood))) || fold(p.neighborhood).includes(fold(filters.neighborhood)))
@@ -126,7 +129,15 @@ export function validateEvent(event) {
   };
   field('name', 'Nome', 100);
   data.phone = phoneDigits(raw.phone);
-  if (!data.phone) fail('Informe um telefone brasileiro válido com DDD.');
+  const optionalChannels=['novo_cadastro_gratuito','solicitacao_upgrade_pro','nova_vaga_empregador'].includes(event.type) && raw.contactOptions!==undefined;
+  if(optionalChannels) {
+    data.contactOptions=contactChoices(raw.contactOptions,raw.email);
+    data.email=data.contactOptions.email?String(raw.email).trim():'';
+    if(!data.contactOptions.whatsapp)data.phone='';
+    if(data.contactOptions.whatsapp&&!data.phone)fail('Informe um telefone brasileiro válido com DDD para receber pelo WhatsApp.');
+    if(raw.publishContact!==true)fail('Autorize a publicação do anúncio e dos canais de contato selecionados.');
+    data.publishContact=true;
+  } else if (!data.phone) fail('Informe um telefone brasileiro válido com DDD.');
   if (['novo_cadastro_gratuito', 'solicitacao_upgrade_pro', 'novo_orcamento_cliente', 'nova_vaga_empregador'].includes(event.type)) {
     field('category', 'Serviço', 40);
     if (!CATEGORIES.some(c => c.id === data.category)) fail('Selecione uma categoria válida.');

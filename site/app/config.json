@@ -12,6 +12,7 @@
   "listingPageSize": 4,
   "auth": {
     "provider": "firebase",
+    "googleOnly": true,
     "firebase": {
       "apiKey": "AIzaSyDIawxHMinjBVMYCAE-okAzkmkPWiXsXSs",
       "authDomain": "ajuda-em-casa-pnz.firebaseapp.com",
