@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="260" viewBox="0 0 440 260" fill="none">
+  <title>Casa e representação da Ponte Presidente Dutra, em Petrolina</title>
+  <defs>
+    <linearGradient id="sun" x1="304" y1="65" x2="304" y2="155" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE7A0"/><stop offset="1" stop-color="#E6BC6F"/></linearGradient>
+    <linearGradient id="reflection" x1="304" y1="192" x2="304" y2="246" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE7A0" stop-opacity=".7"/><stop offset="1" stop-color="#FFE7A0" stop-opacity="0"/></linearGradient>
+  </defs>
+  <circle cx="132" cy="139" r="94" fill="#7FA6ED" opacity=".16"/>
+  <path d="M204 201c50-14 137-13 218-5v48H204Z" fill="#8FB4F0" opacity=".13"/>
+  <circle cx="304" cy="112" r="40" fill="url(#sun)"/>
+  <path d="M285 194h38l11 49h-62Z" fill="url(#reflection)"/>
+  <!-- Tabuleiro horizontal e os dois pilares altos da referência enviada. -->
+  <g aria-label="Ponte Presidente Dutra">
+    <path d="M195 166h231" stroke="#DCE9FF" stroke-width="11" stroke-linecap="round"/>
+    <path d="M195 157h231" stroke="#ABC9F8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M253 81h15v120h-15ZM336 81h15v120h-15Z" fill="#BFD5F9"/>
+    <path d="m253 81 6-5h15v125h-6V81Zm83 0 6-5h15v125h-6V81Z" fill="#8DB0EB"/>
+    <path d="M214 172v30m190-30v30" stroke="#BFD5F9" stroke-width="9"/>
+    <path d="M233 155v-17m-4 0h8m54 17v-17m-4 0h8m80 17v-17m-4 0h8m33 17v-17m-4 0h8" stroke="#BFD5F9" stroke-width="2" stroke-linecap="round"/>
+    <path d="M278 155v-8a3 3 0 0 1 3-3h22a3 3 0 0 1 3 3v8Zm88 0v-6h13l4 6Z" fill="#E9F0FF"/>
+  </g>
+  <path d="M207 212h40m27 0h37m20 0h70m-189 11h28m19 0h61m19 0h68m-163 11h35m26 0h30m17 0h29" stroke="#B7D1F7" stroke-opacity=".6" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M286 210h31m-26 10h29m-25 10h22" stroke="#FFE7A0" stroke-opacity=".65" stroke-width="3" stroke-linecap="round"/>
+  <!-- A casa mantém a linguagem visual da marca; a ponte fica ao seu lado. -->
+  <path d="m45 132 74-63 74 63v78H45Z" fill="#9ABBF2"/>
+  <path d="m35 133 84-72 84 72" stroke="#D7E6FF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M103 210v-61h33v61" fill="#E9F0FF"/>
+  <rect x="64" y="144" width="24" height="25" rx="5" fill="#E9F0FF"/>
+  <rect x="151" y="144" width="24" height="25" rx="5" fill="#E9F0FF"/>
+  <path d="M27 211h172" stroke="#C0D5FF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M184 211v-30m0 14c-13 0-19-12-17-20 13 0 19 11 17 20Zm0-11c13 0 19-12 17-20-13 0-19 11-17 20Z" fill="#BED3F7"/>
+</svg>

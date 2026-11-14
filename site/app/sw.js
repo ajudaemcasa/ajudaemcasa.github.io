@@ -1,9 +1,10 @@
 const PREFIX = 'ajuda-codex:' + new URL(self.registration.scope).pathname + ':';
-const BUILD = 'd544c6e559df';
+const BUILD = 'a72bd4388845';
 const CACHE = PREFIX + BUILD;
 const versioned = file => /\.(?:mjs|css)$/.test(file)?file+'?v='+BUILD:file;
 const CORE = ['./', 'index.html', 'styles.css', 'bootstrap.mjs', 'app.mjs', 'conta.mjs', 'conta-ui.mjs', 'auth-service.mjs', 'anuncios.mjs', 'anuncios-ui.mjs', 'intermediacao.mjs', 'intermediacao-ui.mjs', 'promocoes.mjs', 'domain.mjs', 'telefone.mjs', 'servicos-extra.mjs', 'avaliacoes.mjs', 'perfil.mjs', 'localidades.mjs', 'localizacao.mjs', 'localizacao-ui.mjs', 'comercial.mjs', 'comercial-ui.mjs', 'n8n-service.mjs', 'manifest.webmanifest', 'icone.svg', 'icone-192.png', 'icone-512.png', 'assets/vizinhanca.svg', 'assets/antes.svg', 'assets/depois.svg', 'assets/cartao.svg'].map(versioned);
 CORE.push('assets/google-g.svg');
+CORE.push('assets/casa-ponte-petrolina.svg');
 CORE.push(versioned('firestore.mjs'),versioned('request-service.mjs'));
 CORE.push(versioned('bloqueios.mjs'),versioned('avisos.mjs'));
 CORE.push(versioned('canais.mjs'),versioned('autopublicacao.mjs'),versioned('mensagens.mjs'));

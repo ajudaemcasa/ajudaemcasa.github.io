@@ -1,4 +1,4 @@
-import { commercialOffer } from './comercial.mjs?v=d544c6e559df';
+import { commercialOffer } from './comercial.mjs?v=a72bd4388845';
 const money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function plansMarkup(config) {
