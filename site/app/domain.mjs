@@ -1,15 +1,15 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=77f496c8aac1';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=77f496c8aac1';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=77f496c8aac1';
-import {contactChoices,hasContact} from './canais.mjs?v=77f496c8aac1';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=563d09a12b14';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=563d09a12b14';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=563d09a12b14';
+import {contactChoices,hasContact} from './canais.mjs?v=563d09a12b14';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { communityRatingSummary as ratingSummary } from './votos.mjs?v=77f496c8aac1';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=77f496c8aac1';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=77f496c8aac1';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=77f496c8aac1';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=77f496c8aac1';
-import {paidBoostDays} from './promocoes.mjs?v=77f496c8aac1';
+import { communityRatingSummary as ratingSummary } from './votos.mjs?v=563d09a12b14';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=563d09a12b14';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=563d09a12b14';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=563d09a12b14';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=563d09a12b14';
+import {paidBoostDays} from './promocoes.mjs?v=563d09a12b14';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },

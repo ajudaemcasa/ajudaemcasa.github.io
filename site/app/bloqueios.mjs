@@ -1,4 +1,4 @@
-import {phoneDigits} from './telefone.mjs?v=77f496c8aac1';
+import {phoneDigits} from './telefone.mjs?v=563d09a12b14';
 
 export function normalizeIdentity(kind,raw) {
   const text=String(raw??'').trim();

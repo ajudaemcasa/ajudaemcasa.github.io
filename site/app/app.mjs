@@ -1,30 +1,32 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=77f496c8aac1';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=77f496c8aac1';
-import { createN8nService } from './n8n-service.mjs?v=77f496c8aac1';
-import { commercialOffer } from './comercial.mjs?v=77f496c8aac1';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=77f496c8aac1';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=77f496c8aac1';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=77f496c8aac1';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=77f496c8aac1';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=77f496c8aac1';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=77f496c8aac1';
-import { createAccountStore } from './conta.mjs?v=77f496c8aac1';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=77f496c8aac1';
-import {profileHeading} from './perfil.mjs?v=77f496c8aac1';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=77f496c8aac1';
-import {createRequestService} from './request-service.mjs?v=77f496c8aac1';
-import {hasContact,validEmail} from './canais.mjs?v=77f496c8aac1';
-import {createPublicationService} from './autopublicacao.mjs?v=77f496c8aac1';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=77f496c8aac1';
-import {createMessagesService} from './mensagens.mjs?v=77f496c8aac1';
-import {createMessagesUI} from './mensagens-ui.mjs?v=77f496c8aac1';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=77f496c8aac1';
-import {setupInstallation} from './instalacao-ui.mjs?v=77f496c8aac1';
-import {crownMarkup} from './layout-conexao.mjs?v=77f496c8aac1';
-import {createNotificationService} from './avisos.mjs?v=77f496c8aac1';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=77f496c8aac1';
-import {createVotesService} from './votos.mjs?v=77f496c8aac1';
-import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=77f496c8aac1';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=563d09a12b14';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=563d09a12b14';
+import { createN8nService } from './n8n-service.mjs?v=563d09a12b14';
+import { commercialOffer } from './comercial.mjs?v=563d09a12b14';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=563d09a12b14';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=563d09a12b14';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=563d09a12b14';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=563d09a12b14';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=563d09a12b14';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=563d09a12b14';
+import { createAccountStore } from './conta.mjs?v=563d09a12b14';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=563d09a12b14';
+import {profileHeading} from './perfil.mjs?v=563d09a12b14';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=563d09a12b14';
+import {createRequestService} from './request-service.mjs?v=563d09a12b14';
+import {hasContact,validEmail} from './canais.mjs?v=563d09a12b14';
+import {createPublicationService} from './autopublicacao.mjs?v=563d09a12b14';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=563d09a12b14';
+import {createMessagesService} from './mensagens.mjs?v=563d09a12b14';
+import {createMessagesUI} from './mensagens-ui.mjs?v=563d09a12b14';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=563d09a12b14';
+import {selectSpotlightProfiles} from './destaques-home.mjs?v=563d09a12b14';
+import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=563d09a12b14';
+import {setupInstallation} from './instalacao-ui.mjs?v=563d09a12b14';
+import {crownMarkup} from './layout-conexao.mjs?v=563d09a12b14';
+import {createNotificationService} from './avisos.mjs?v=563d09a12b14';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=563d09a12b14';
+import {createVotesService} from './votos.mjs?v=563d09a12b14';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=563d09a12b14';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -67,6 +69,7 @@ const PUBLIC_CATALOG_CACHE='ajuda-codex:catalogo-publico:v1';
 const LISTING_PAGE_SIZE=4;
 let visibleLimit=LISTING_PAGE_SIZE,lastFiltersKey='';
 let cardsLayoutFrame;
+let profileReturnHash='#inicio';
 function refreshCardsLayout() {
   cancelAnimationFrame(cardsLayoutFrame);
   cardsLayoutFrame=requestAnimationFrame(()=>{
@@ -123,7 +126,11 @@ function contactActions(profile,whatsappLabel='WhatsApp',message='') {
 }
 function renderHome() {
   if(!catalog)return;
-  const profiles=selectHomeProfiles(searchProfiles(availableProfiles(),{adType:'service'}));
+  const eligible=searchProfiles(availableProfiles(),{adType:'service'});
+  const profiles=selectHomeProfiles(eligible);
+  const spotlight=selectSpotlightProfiles(eligible);
+  const spotlightMarkup=spotlight.map(spotlightCardMarkup).join('')||`<div class="spotlight-empty"><span aria-hidden="true">${crownMarkup()}</span><div><strong>Seu trabalho pode ganhar este espaço.</strong><p>Os perfis PRO e os melhores avaliados aparecerão aqui quando houver profissionais elegíveis. Conheça os planos e os benefícios de visibilidade.</p></div><a class="btn primary" href="#planos">Conhecer o PRO</a></div>`;
+  if($('#home-spotlight').innerHTML!==spotlightMarkup){$('#home-spotlight').innerHTML=spotlightMarkup;initSpotlightMedia($('#home-spotlight'));}
   const jobs=selectHomeJobs(searchVacancies(vacancies.jobs,{sort:'recommended'},Date.now(),advertisers.advertisers));
   const offers=profiles.map(card).join('')||'<div class="empty"><h3>Seja o primeiro a oferecer este serviço</h3><a class="btn primary" href="#cadastro">Publicar meu cadastro</a></div>';
   const wanted=jobs.map(vacancyCard).join('')||'<div class="empty"><h3>Nenhuma oportunidade publicada por enquanto</h3><p>Casas e agenciadores podem publicar uma oportunidade gratuita.</p><a class="btn primary" href="#publicar-vaga">Publicar oportunidade</a></div>';
@@ -242,7 +249,7 @@ function slideBy(carousel, direction) {
 function revokePreviews() { for (const url of mediaBlobs) URL.revokeObjectURL(url); mediaBlobs.clear(); }
 function closeDialog() {
   if (dialog.querySelector('form[data-busy="true"]')) return;
-  if (/^#(?:perfil\/|perfil-conta|conta|entrar|contratar|ser-contratado|agenciar|modelos|agenciador|pro-emprego|planos|cadastro|meu-cadastro|avaliar|pro$|orcamento|publicar-vaga|destaque|patrocinio|privacidade|termos)/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search+'#profissionais');
+  if (/^#(?:perfil\/|perfil-conta|conta|entrar|contratar|ser-contratado|agenciar|modelos|agenciador|pro-emprego|planos|cadastro|meu-cadastro|avaliar|pro$|orcamento|publicar-vaga|destaque|patrocinio|privacidade|termos)/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search+(location.hash.startsWith('#perfil/')?profileReturnHash:'#profissionais'));
   revokePreviews();
   dialog.close();
   if(config&&catalog)route();
@@ -341,8 +348,7 @@ function showProfile(id) {
   const raw = availableProfiles().find(p => p.id === id && ['approved','unverified'].includes(p.status));
   if (!raw) { openDialog('<h2 id="dialog-title">Perfil não encontrado</h2><p>Este perfil pode ter sido removido ou ainda estar em análise.</p><button class="btn secondary" type="button" data-close>Voltar para a busca</button>'); return; }
   const p = visibleProfile(raw);
-  if (p.plan !== 'pro') { openDialog(`<h2 id="dialog-title">${esc(p.heading || p.name)}</h2>${p.unverified ? '<p class="unverified-badge">Não verificado</p>' : ''}${ratingMarkup(p)}${managementLinks(p)}<p>${esc(categoryName(p.category))}</p><p>${esc(p.phone)}</p><p>${esc(p.note)}</p>${contactButton(p)}<p class="plan-note"><a href="#pro">É você? Vire PRO para adicionar fotos de Antes/Depois e ficar no topo.</a></p>`); return; }
-  openDialog(`<div class="profile-dialog ad-tone-${p.ad.tone}">${adHeader(p.ad)}<span class="eyebrow">PERFIL PRO ${p.demo ? '· DEMONSTRAÇÃO' : '· PETROLINA'}</span><h2 id="dialog-title">${esc(p.heading || p.name)}</h2>${ratingMarkup(p)}${managementLinks(p)}<p class="dialog-intro">${esc(categoryName(p.category))}</p>${p.verified ? `<div class="verified">${icon('check')} Profissional Verificado${p.demo ? ' · selo ilustrativo' : ''}</div>` : ''}${p.featuredDays ? `<p class="feature-badge">🔥 EM DESTAQUE (Restam ${p.featuredDays} dias)</p>` : ''}${gallery(p)}${adDetailsMarkup(p.ad,p.neighborhoods.join(' · '))}<h3>Conheça meu trabalho</h3><p class="profile-description">${esc(p.description)}</p><h3>Onde atendo</h3><div class="region-tags">${p.neighborhoods.map(n => `<span>${esc(n)}</span>`).join('')}</div>${p.emergency ? '<p class="notice">Plantão / Emergência 24h informado pelo profissional. Confirme a disponibilidade na conversa.</p>' : ''}<p>${esc(p.phone)}</p><div class="profile-actions">${contactButton(p)}<button type="button" class="btn secondary" data-share="${esc(p.id)}">Compartilhar perfil ↗</button></div><p class="micro">O selo indica uma conferência da equipe; não garante a qualidade ou a execução do serviço.</p></div>`);
+  openDialog(professionalProfileMarkup(p,{galleryMarkup:gallery(p),contactMarkup:contactButton(p),managementMarkup:managementLinks(p)}));
 }
 function showInfo(type,overForm=false) {
   const privacy=type==='privacidade';
@@ -371,6 +377,7 @@ function route() {
   const home=hash==='inicio'||(!hash&&!location.search);
   const directory=['servicos','profissionais','oportunidades'].includes(hash)||(!hash&&!!location.search);
   if(home||directory) {
+    profileReturnHash=home?'#inicio':hash?'#'+hash:'#profissionais';
     if(dialog.open)dialog.close();
     $('#central-view').hidden=true;$('#central-view-content').replaceChildren();
     $('#home-showcase').hidden=!home;$('#profissionais').hidden=!directory;
