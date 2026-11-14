@@ -1,15 +1,15 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=a72bd4388845';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=a72bd4388845';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=a72bd4388845';
-import {contactChoices,hasContact} from './canais.mjs?v=a72bd4388845';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=77f496c8aac1';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=77f496c8aac1';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=77f496c8aac1';
+import {contactChoices,hasContact} from './canais.mjs?v=77f496c8aac1';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { ratingSummary } from './avaliacoes.mjs?v=a72bd4388845';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=a72bd4388845';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=a72bd4388845';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=a72bd4388845';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=a72bd4388845';
-import {paidBoostDays} from './promocoes.mjs?v=a72bd4388845';
+import { communityRatingSummary as ratingSummary } from './votos.mjs?v=77f496c8aac1';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=77f496c8aac1';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=77f496c8aac1';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=77f496c8aac1';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=77f496c8aac1';
+import {paidBoostDays} from './promocoes.mjs?v=77f496c8aac1';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },

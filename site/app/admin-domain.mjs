@@ -1,8 +1,8 @@
-import {CATEGORIES,validateEvent} from './domain.mjs?v=a72bd4388845';
-import {phoneDigits} from './telefone.mjs?v=a72bd4388845';
-import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=a72bd4388845';
-import {hasContact} from './canais.mjs?v=a72bd4388845';
-import {grantAdminTrial} from './comercial.mjs?v=a72bd4388845';
+import {CATEGORIES,validateEvent} from './domain.mjs?v=77f496c8aac1';
+import {phoneDigits} from './telefone.mjs?v=77f496c8aac1';
+import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=77f496c8aac1';
+import {hasContact} from './canais.mjs?v=77f496c8aac1';
+import {grantAdminTrial} from './comercial.mjs?v=77f496c8aac1';
 
 export const REQUEST_LABELS={novo_cadastro_gratuito:'Cadastro básico',solicitacao_upgrade_pro:'Solicitação PRO',ativacao_destaque_3dias:'Destaque',novo_orcamento_cliente:'Orçamento',interesse_patrocinio_loja:'Patrocínio',nova_vaga_empregador:'Vaga',solicitacao_titularidade:'Titularidade',nova_avaliacao:'Avaliação'};
 export function cleanText(raw,max,{required=false}={}) {

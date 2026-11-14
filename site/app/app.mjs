@@ -1,28 +1,30 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=a72bd4388845';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=a72bd4388845';
-import { createN8nService } from './n8n-service.mjs?v=a72bd4388845';
-import { commercialOffer } from './comercial.mjs?v=a72bd4388845';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=a72bd4388845';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=a72bd4388845';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=a72bd4388845';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=a72bd4388845';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=a72bd4388845';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=a72bd4388845';
-import { createAccountStore } from './conta.mjs?v=a72bd4388845';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=a72bd4388845';
-import {profileHeading} from './perfil.mjs?v=a72bd4388845';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=a72bd4388845';
-import {createRequestService} from './request-service.mjs?v=a72bd4388845';
-import {hasContact,validEmail} from './canais.mjs?v=a72bd4388845';
-import {createPublicationService} from './autopublicacao.mjs?v=a72bd4388845';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=a72bd4388845';
-import {createMessagesService} from './mensagens.mjs?v=a72bd4388845';
-import {createMessagesUI} from './mensagens-ui.mjs?v=a72bd4388845';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=a72bd4388845';
-import {setupInstallation} from './instalacao-ui.mjs?v=a72bd4388845';
-import {crownMarkup} from './layout-conexao.mjs?v=a72bd4388845';
-import {createNotificationService} from './avisos.mjs?v=a72bd4388845';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=a72bd4388845';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=77f496c8aac1';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=77f496c8aac1';
+import { createN8nService } from './n8n-service.mjs?v=77f496c8aac1';
+import { commercialOffer } from './comercial.mjs?v=77f496c8aac1';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=77f496c8aac1';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=77f496c8aac1';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=77f496c8aac1';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=77f496c8aac1';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=77f496c8aac1';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=77f496c8aac1';
+import { createAccountStore } from './conta.mjs?v=77f496c8aac1';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=77f496c8aac1';
+import {profileHeading} from './perfil.mjs?v=77f496c8aac1';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=77f496c8aac1';
+import {createRequestService} from './request-service.mjs?v=77f496c8aac1';
+import {hasContact,validEmail} from './canais.mjs?v=77f496c8aac1';
+import {createPublicationService} from './autopublicacao.mjs?v=77f496c8aac1';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=77f496c8aac1';
+import {createMessagesService} from './mensagens.mjs?v=77f496c8aac1';
+import {createMessagesUI} from './mensagens-ui.mjs?v=77f496c8aac1';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=77f496c8aac1';
+import {setupInstallation} from './instalacao-ui.mjs?v=77f496c8aac1';
+import {crownMarkup} from './layout-conexao.mjs?v=77f496c8aac1';
+import {createNotificationService} from './avisos.mjs?v=77f496c8aac1';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=77f496c8aac1';
+import {createVotesService} from './votos.mjs?v=77f496c8aac1';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=77f496c8aac1';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -58,6 +60,7 @@ const dialog = $('#dialog');
 const infoDialog = $('#info-dialog');
 let config, catalog, vacancies, advertisers, service, accountUI, toastTimer, lastFocus, auth, dataClient,publicationService,messagesUI;
 let infoLastFocus, lastResultMarkup='';
+let votesService,votesUI;
 let sponsorClickSent = false;
 let catalogFallback = '';
 const PUBLIC_CATALOG_CACHE='ajuda-codex:catalogo-publico:v1';
@@ -128,9 +131,7 @@ function renderHome() {
   if($('#home-jobs').innerHTML!==wanted)$('#home-jobs').innerHTML=wanted;
 }
 function ratingMarkup(profile,compact=false) {
-  const r=profile.rating;
-  if(!r||r.kind==='initial')return '<p class="micro">Ainda sem avaliações de clientes</p>';
-  return r ? `<p class="rating${compact?' compact':''}" title="${esc(r.label)}"><strong>★ ${r.score.toLocaleString('pt-BR')}/5</strong><small>${esc(compact&&r.kind==='initial'?'Nota inicial':r.label)}</small></p>` : '';
+  return communityRatingMarkup(profile,compact);
 }
 function managementLinks(profile) {
   if(profile.unverified) return `<p class="micro"><a href="#meu-cadastro/${encodeURIComponent(profile.id)}">Este cadastro é meu / pedir correção ou retirada</a></p>`;
@@ -248,7 +249,7 @@ function closeDialog() {
 }
 function openDialog(html) {
   closeFilters();
-  const central=/^#(?:contratar|ser-contratado|agenciar|conta|entrar|perfil-conta|planos|modelos|termos|privacidade|mensagens|mensagem\/)/.test(location.hash);
+  const central=/^#(?:contratar|ser-contratado|agenciar|conta|entrar|perfil-conta|planos|modelos|termos|privacidade|mensagens|mensagem\/|avaliar\/)/.test(location.hash);
   if(central && dialog.open)dialog.close();
   const view=central?$('#central-view-content'):$('#dialog-content');
   if(central){$('#dialog-content').replaceChildren();$('#central-view').hidden=false;$('#home-showcase').hidden=true;$('#profissionais').hidden=true;}
@@ -331,9 +332,10 @@ function showOwnershipForm(id='',prefill={}) {
   $('#service').value=prefill.category || p?.category || '';
 }
 function showReviewForm(id) {
-  const p=availableProfiles().find(p=>p.id===id && p.status==='approved' && !p.demo);
+  const [profileId,side]=id.split('/');
+  const p=availableProfiles().find(p=>p.id===profileId && ['approved','unverified'].includes(p.status) && !p.demo);
   if(!p) {openDialog('<h2 id="dialog-title">Perfil indisponível para avaliação</h2><p>Somente serviços de profissionais reais podem ser avaliados.</p>');return;}
-  openDialog(formShell('nova_avaliacao','Como foi o serviço?','Avalie somente um serviço que você contratou. A equipe confere a avaliação antes de atualizar a nota. Seus dados de contato não são publicados.',`${namePhone}<input type="hidden" name="category" value="${esc(p.category)}"><input type="hidden" name="profileId" value="${esc(p.id)}"><input type="hidden" name="professionalPhone" value="${esc(p.phone)}"><div class="field full"><label for="review-score">Nota do serviço</label><select id="review-score" name="score" required><option value="">Escolha</option>${[1,2,3,4,5].map(n=>`<option value="${n}">${n}/5</option>`).join('')}</select></div><div class="field full"><label for="review-comment">Conte sua experiência</label><textarea id="review-comment" name="comment" maxlength="1000" required></textarea></div>`,'Enviar avaliação para análise'));
+  votesUI.open(p,['positive','negative'].includes(side)?side:'');
 }
 function showProfile(id) {
   const raw = availableProfiles().find(p => p.id === id && ['approved','unverified'].includes(p.status));
@@ -345,8 +347,8 @@ function showProfile(id) {
 function showInfo(type,overForm=false) {
   const privacy=type==='privacidade';
   const text=privacy?
-    '<h3>Conta Google e publicação</h3><p>O acesso e o cadastro usam somente Google pelo Firebase Authentication. Recebemos nome, e-mail e identificador da conta, sem acesso à agenda, Drive ou telefone. No primeiro acesso, você informa um WhatsApp para sua conta. Esse número fica privado e só aparece em um anúncio se houver uma autorização separada no formulário de publicação. Nome, objetivo, WhatsApp privado e aceite ficam no Cloud Firestore, na região de São Paulo. O login não verifica telefone, profissão ou identidade civil.</p><p>Cadastros básicos e oportunidades válidos são publicados automaticamente após sua autorização. Nome, serviço e apresentação ficam públicos. Você escolhe separadamente quais canais deseja publicar. Sem autorizar o WhatsApp, pode receber por e-mail e/ou na caixa de mensagens do site. O botão E-mail abre o programa de e-mail de quem escreve; não há envio automático de e-mail.</p><h3>Mensagens e atendimento</h3><p>As mensagens do site ficam no banco privado e podem ser lidas somente pelas contas participantes, em Meu perfil → Minhas mensagens. O texto não publica seu e-mail ou telefone. Consulte a caixa para ver respostas; ainda não há aviso automático por e-mail.</p><p>Pedidos de titularidade, avaliações, orçamento e extras ficam na fila privada de atendimento. O n8n valida temporariamente o token de acesso e o protocolo para enviar um aviso ao Telegram privado do administrador. O token não entra no aviso nem é armazenado nas execuções do fluxo. O aviso não contém o texto das mensagens privadas.</p><h3>Localização e cache</h3><p>Localização é opcional e depende de seu clique. Quando autorizada para publicação, é arredondada para uma região de cerca de 1 km. Não publique endereço exato. O mapa opcional usa OpenStreetMap, que recebe seu IP e a área visualizada. A localização usada na busca fica em memória. O cache guarda somente a vitrine pública para consulta offline, que pode estar desatualizada.</p><h3>Avaliações, correções e retirada</h3><p>Avaliações ficam pendentes de análise antes de alterar a média. Não usamos IP ou GPS para atribuir fraude automaticamente. A nota inicial do cadastro não é avaliação de cliente. Cadastros importados não verificados não confirmam identidade, autorização ou disponibilidade.</p><p>Para corrigir ou retirar um anúncio, use <a href="#meu-cadastro">Este cadastro é meu / pedir retirada</a>. Administradores autorizados podem corrigir, suspender e excluir da vitrine, com registro do motivo. O histórico necessário para segurança e bloqueios permanece privado.</p>':
-    '<h3>Buscar, publicar e conversar</h3><p>O acesso é somente com Google. O Google fornece nome e e-mail, não seu telefone. No primeiro acesso, você confirma um WhatsApp privado para a conta e aceita as políticas. Publicar esse número exige autorização separada em um anúncio. O cadastro básico e a publicação de oportunidades são gratuitos e automáticos quando os dados e o consentimento são válidos.</p><p>Não publique informações de terceiros sem autorização. Confirme condições, preço e disponibilidade diretamente com o profissional. Não prometemos contratação e o login não comprova profissão, identidade civil ou propriedade de telefone. Solicitações de titularidade e avaliações têm análise separada para proteger as pessoas envolvidas.</p><h3>Vitrine e oportunidades</h3><p>A página inicial mostra até quatro serviços e quatro oportunidades reais, com rodízio a cada visita. PRO tem prioridade, seguido de agenciadores e cadastros gratuitos, conforme a categoria da vitrine. Na busca Mais próximos, a distância aproximada vem primeiro. Oportunidades expiram em até 30 dias.</p><p>Agenciadores informam o preço de intermediação antes do contato. O candidato não paga para concorrer. Combine todas as condições de trabalho com quem anuncia.</p><h3>PRO e pagamentos</h3><p>PRO é opcional e segue procedimento próprio. Não concede selo de verificação automaticamente. Pagamentos e cobranças pelo site ainda não estão ativos. Nenhuma inscrição autoriza cobrança ou renovação automática.</p>';
+    '<h3>Conta Google e publicação</h3><p>O acesso e o cadastro usam somente Google pelo Firebase Authentication. Recebemos nome, e-mail e identificador da conta, sem acesso à agenda, Drive ou telefone. No primeiro acesso, você informa um WhatsApp para sua conta. Esse número fica privado e só aparece em um anúncio se houver uma autorização separada no formulário de publicação. Nome, objetivo, WhatsApp privado e aceite ficam no Cloud Firestore, na região de São Paulo. O login não verifica telefone, profissão ou identidade civil.</p><p>Cadastros básicos e oportunidades válidos são publicados automaticamente após sua autorização. Nome, serviço e apresentação ficam públicos. Você escolhe separadamente quais canais deseja publicar. Sem autorizar o WhatsApp, pode receber por e-mail e/ou na caixa de mensagens do site. O botão E-mail abre o programa de e-mail de quem escreve; não há envio automático de e-mail.</p><h3>Mensagens e atendimento</h3><p>As mensagens do site ficam no banco privado e podem ser lidas somente pelas contas participantes, em Meu perfil → Minhas mensagens. O texto não publica seu e-mail ou telefone. Consulte a caixa para ver respostas; ainda não há aviso automático por e-mail.</p><p>Pedidos de titularidade, avaliações escritas anteriores, orçamento e extras ficam na fila privada de atendimento. O n8n valida temporariamente o token de acesso e o protocolo para enviar um aviso ao Telegram privado do administrador. O token não entra no aviso nem é armazenado nas execuções do fluxo. O aviso não contém o texto das mensagens privadas.</p><h3>Localização e cache</h3><p>Localização é opcional e depende de seu clique. Quando autorizada para publicação, é arredondada para uma região de cerca de 1 km. Não publique endereço exato. O mapa opcional usa OpenStreetMap, que recebe seu IP e a área visualizada. A localização usada na busca fica em memória. O cache guarda somente a vitrine pública para consulta offline, que pode estar desatualizada.</p><h3>Avaliações, correções e retirada</h3><p>As marcações positivas e negativas são feitas por contas conectadas, com um voto editável por contato e vários motivos opcionais. Os motivos somam peso à média; todos começam em 4/5, indicada como nota inicial sem votos. A nota muda após salvar o voto no servidor, sem depender de pagamento ou PRO. Nome, telefone e identificador do avaliador não são públicos; somente contagens e pesos agregados são públicos. O avaliador pode retirar o próprio voto. Administradores autorizados podem consultar as marcações para conferência. Votos não suspendem automaticamente um profissional. Não usamos IP ou GPS para atribuir fraude automaticamente. A nota inicial do cadastro não é avaliação de cliente. Cadastros importados não verificados não confirmam identidade, autorização ou disponibilidade.</p><p>Para corrigir ou retirar um anúncio, use <a href="#meu-cadastro">Este cadastro é meu / pedir retirada</a>. Administradores autorizados podem corrigir, suspender e excluir da vitrine, com registro do motivo. O histórico necessário para segurança e bloqueios permanece privado.</p>':
+    '<h3>Buscar, publicar e conversar</h3><p>O acesso é somente com Google. O Google fornece nome e e-mail, não seu telefone. No primeiro acesso, você confirma um WhatsApp privado para a conta e aceita as políticas. Publicar esse número exige autorização separada em um anúncio. O cadastro básico e a publicação de oportunidades são gratuitos e automáticos quando os dados e o consentimento são válidos.</p><p>Não publique informações de terceiros sem autorização. Confirme condições, preço e disponibilidade diretamente com o profissional. Não prometemos contratação e o login não comprova profissão, identidade civil ou propriedade de telefone. Pedidos de titularidade têm análise separada. Avaliações positivas ou negativas devem descrever experiências reais, sem votar no próprio cadastro identificado. Cada conta mantém um voto por contato, editável e removível. Os totais são públicos; a identidade do avaliador fica privada.</p><h3>Vitrine e oportunidades</h3><p>A página inicial mostra até quatro serviços e quatro oportunidades reais, com rodízio a cada visita. Destaques ativos e PRO têm prioridade; há rodízio dentro da mesma faixa, seguido dos cadastros básicos. Na busca Mais próximos, a distância aproximada vem primeiro. Oportunidades expiram em até 30 dias.</p><p>Agenciadores informam o preço de intermediação antes do contato. O candidato não paga para concorrer. Combine todas as condições de trabalho com quem anuncia.</p><h3>PRO e pagamentos</h3><p>PRO é opcional e segue procedimento próprio. Não concede selo de verificação automaticamente. Pagamentos e cobranças pelo site ainda não estão ativos. Nenhuma inscrição autoriza cobrança ou renovação automática.</p>';
   const html='<div class="document-copy"><span class="eyebrow">TRANSPARÊNCIA</span><h2 id="dialog-title">'+(privacy?'Seus dados, com clareza.':'Como funciona o Ajuda em Casa')+'</h2>'+text+'</div>';
   if(!overForm)return openDialog(html);
   infoLastFocus=document.activeElement;
@@ -577,13 +579,13 @@ window.addEventListener('offline', () => toast('Você está offline. A vitrine p
 setupInstallation({showInfo:html=>openDialog(html),toast});
 
 async function refreshLiveCatalog() {
-  const [live,settings]=await Promise.all([dataClient.get('publicCatalog/current',{publicRead:true}),dataClient.get('settings/site',{publicRead:true})]);
+  const [live,settings,ratings]=await Promise.all([dataClient.get('publicCatalog/current',{publicRead:true}),dataClient.get('settings/site',{publicRead:true}),votesService.listPublic()]);
   const d=live?.data;
   if(d?.schemaVersion!==1||![d.profiles,d.vacancies,d.advertisers].every(Array.isArray))throw new Error('Catálogo online indisponível.');
-  catalog={...catalog,profiles:d.profiles};vacancies={...vacancies,jobs:d.vacancies};advertisers={...advertisers,advertisers:d.advertisers};
+  catalog={...catalog,profiles:d.profiles.map(p=>({...p,communityRating:ratings.get(p.id)}))};vacancies={...vacancies,jobs:d.vacancies};advertisers={...advertisers,advertisers:d.advertisers};
   config.directoryMessage=settings?.data.directoryMessage||'Encontre e converse gratuitamente.'; if(['paid','launch'].includes(settings?.data.commercialStage))config.commercialStage=settings.data.commercialStage;
   try {
-    const snapshot=JSON.stringify({schemaVersion:1,profiles:d.profiles,vacancies:d.vacancies,advertisers:d.advertisers,directoryMessage:config.directoryMessage,savedAt:Date.now()});
+    const snapshot=JSON.stringify({schemaVersion:1,profiles:catalog.profiles,vacancies:d.vacancies,advertisers:d.advertisers,directoryMessage:config.directoryMessage,savedAt:Date.now()});
     if(snapshot.length<=4000000)localStorage.setItem(PUBLIC_CATALOG_CACHE,snapshot);
   } catch { /* A vitrine online continua funcionando sem armazenamento local. */ }
   if($('#commercial-notice'))$('#commercial-notice').textContent=config.directoryMessage;
@@ -608,6 +610,8 @@ async function start() {
     if (!Array.isArray(catalog.profiles) || catalog.schemaVersion !== 1) throw new Error('Formato de catálogo inválido.');
     auth=createAuthService(config);
     dataClient=createDataClient(config,auth);
+    votesService=createVotesService(dataClient,auth);
+    votesUI=createVotesUI({service:votesService,showView:openDialog,onSaved:async(id,totals)=>{catalog.profiles=catalog.profiles.map(p=>p.id===id?{...p,communityRating:totals}:p);renderResults();renderHome();}});
     service = backendConfigured(config)?createRequestService(dataClient,auth):createN8nService(config);
     publicationService=createPublicationService(dataClient,auth);
     messagesUI=createMessagesUI({service:createMessagesService(dataClient,auth),auth,showView:openDialog});

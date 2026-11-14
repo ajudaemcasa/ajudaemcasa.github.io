@@ -1,5 +1,5 @@
-import {authConfigured} from './auth-service.mjs?v=a72bd4388845';
-import {phoneDigits} from './telefone.mjs?v=a72bd4388845'; import {accountObjectives} from './objetivos.mjs?v=a72bd4388845';
+import {authConfigured} from './auth-service.mjs?v=77f496c8aac1';
+import {phoneDigits} from './telefone.mjs?v=77f496c8aac1'; import {accountObjectives} from './objetivos.mjs?v=77f496c8aac1';
 
 export const backendConfigured = config => authConfigured(config) && config?.data?.provider === 'firestore';
 export class DataError extends Error {
@@ -71,12 +71,13 @@ export function createDataClient(config,auth,{fetcher=globalThis.fetch}={}) {
   return Object.freeze({
     enabled,
     get:async(documentPath,options={})=>unpack(await request('/'+validPath(documentPath),{missing:true,...options})),
-    async list(collection,{pageToken='',pageSize=100}={}) {
+    documentName:documentPath=>prefix+'/'+validPath(documentPath),
+    async list(collection,{pageToken='',pageSize=100,publicRead=false}={}) {
       const params=new URLSearchParams({pageSize:String(Math.min(100,Math.max(1,pageSize)))});
       if(['requests','users','audit'].includes(collection))params.set('orderBy','createdAt desc');
       if(collection==='records')params.set('orderBy','updatedAt desc');
       if(pageToken)params.set('pageToken',pageToken);
-      const result=await request('/'+validPath(collection)+'?'+params);
+      const result=await request('/'+validPath(collection)+'?'+params,{publicRead});
       return {items:(result.documents||[]).map(unpack),nextPageToken:result.nextPageToken||''};
     },
     async find(collection,field,value,{limit=100}={}) {

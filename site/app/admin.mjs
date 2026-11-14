@@ -1,8 +1,8 @@
-import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=a72bd4388845';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=a72bd4388845';
-import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=a72bd4388845';
-import {CATEGORIES,categoryName} from './domain.mjs?v=a72bd4388845';
-import {beginLoading,finishStartup} from './carregamento.mjs?v=a72bd4388845';
+import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=77f496c8aac1';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=77f496c8aac1';
+import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=77f496c8aac1';
+import {CATEGORIES,categoryName} from './domain.mjs?v=77f496c8aac1';
+import {beginLoading,finishStartup} from './carregamento.mjs?v=77f496c8aac1';
 
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const labels={active:'Ativo',suspended:'Suspenso',pending:'Pendente',in_progress:'Em atendimento',rejected:'Recusado',resolved:'Concluído',published:'Publicado',deleted:'Excluído'};

@@ -1,6 +1,6 @@
-import {validateEvent} from './domain.mjs?v=a72bd4388845';
-import {contactChoices} from './canais.mjs?v=a72bd4388845';
-import {phoneDigits} from './telefone.mjs?v=a72bd4388845';
+import {validateEvent} from './domain.mjs?v=77f496c8aac1';
+import {contactChoices} from './canais.mjs?v=77f496c8aac1';
+import {phoneDigits} from './telefone.mjs?v=77f496c8aac1';
 
 export function automaticPublication(raw,user) {
   const event=validateEvent(raw),d=event.data;
