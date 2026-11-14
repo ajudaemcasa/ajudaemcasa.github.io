@@ -1,0 +1,27 @@
+import {PETROLINA_AGENCY as agency,isRepublishedVacancy,isAutomatedVacancy} from './vagas-publicas.mjs?v=30eafcf774dd';
+import {publicVacancyCard as legacyCard,publicVacancyDetails as legacyDetails} from './vagas-publicas-ui.mjs?v=30eafcf774dd';
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const external='target="_blank" rel="noopener noreferrer"';
+const date=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short'}).format(new Date(value.length===10?value+'T12:00:00-03:00':value));
+const isAgency=job=>job.publicSource.managedSourceId==='sedepe-petrolina';
+function tags(job) {
+  const s=job.publicSource;
+  return `<div class="public-job-tags"><span>Sem taxa do Ajuda em Casa</span>${s.pcd?'<span>PCD: veja o anúncio</span>':s.variants?.some(v=>v.specialSection)?'<span>Seção especial · confirmar PCD</span>':''}${s.apprentice?'<span>Aprendiz</span>':''}${s.contract?`<span>${esc(s.contract)}</span>`:''}</div>`;
+}
+function contacts(job) {
+  if(!isAgency(job))return `<a class="btn primary" href="${esc(job.publicSource.sourceUrl)}" ${external}>Ver anúncio e candidatar-se ↗</a>`;
+  const text='Olá! A oportunidade de '+job.title+' do boletim SEDEPE de '+date(job.publicSource.bulletinDate)+' ainda está disponível? Vi a republicação no Ajuda em Casa.';
+  return `<a class="btn primary" href="https://wa.me/${agency.whatsapp}?text=${encodeURIComponent(text)}" ${external}>WhatsApp · ${agency.whatsappLabel}</a><a class="btn secondary" href="tel:+${agency.phone}">Ligar · ${agency.phoneLabel}</a><a class="btn secondary" href="mailto:${agency.email}?subject=${encodeURIComponent('Consulta sobre '+job.title)}">Enviar e-mail à agência</a>`;
+}
+export function publicVacancyCard(job) {
+  if(!isAutomatedVacancy(job))return legacyCard(job);
+  const s=job.publicSource;
+  return `<article class="person-card basic-card job-card public-job" data-job="${esc(job.id)}" data-plan="free"><p class="public-job-eyebrow">${isAgency(job)?'Boletim oficial · Petrolina':'Página de carreira · Petrolina'}</p><h3><a href="#vaga/${encodeURIComponent(job.id)}">${esc(job.title)}</a></h3><p class="public-job-agency">${esc(job.publicName)}</p>${tags(job)}<p>${isAgency(job)?'Boletim de '+date(s.bulletinDate)+'. ':'Presente na página de carreira consultada. '}Confirme a disponibilidade na fonte.</p><p class="micro">Fonte consultada em ${date(s.checkedAt)}. Republicação informativa, sem vínculo oficial.</p><div class="card-actions"><a class="btn primary" href="#vaga/${encodeURIComponent(job.id)}">Ver vaga e contatos</a>${!isAgency(job)?`<a class="btn secondary" href="${esc(s.sourceUrl)}" ${external}>Anúncio original ↗</a>`:''}</div></article>`;
+}
+export function publicVacancyDetails(job) {
+  if(!isRepublishedVacancy(job))return legacyDetails(undefined);
+  if(!isAutomatedVacancy(job))return legacyDetails(job);
+  const s=job.publicSource;
+  const variants=Array.isArray(s.variants)?s.variants:[];
+  return `<div class="public-job-details"><p class="public-job-eyebrow">OPORTUNIDADES DE TRABALHO · PETROLINA</p><h2 id="dialog-title">${esc(job.title)}</h2><p class="public-job-agency">${esc(job.publicName)}</p>${tags(job)}<p class="notice"><strong>Disponibilidade a confirmar.</strong> ${isAgency(job)?'Boletim de '+date(s.bulletinDate)+'. ':''}Fonte consultada em ${date(s.checkedAt)}. A lista pode mudar entre as consultas; confirme na origem antes de se deslocar ou enviar documentos. O Ajuda em Casa não representa a instituição.</p><p>${esc(job.description)}</p>${s.note?`<p class="notice">${esc(s.note)}</p>`:''}${variants.length?`<h3>Dados do boletim</h3><p>Postos informados nesta ocupação: ${esc(s.quantity)}. Não é uma confirmação de saldo disponível hoje.</p><div class="public-job-variants">${variants.map(v=>`<section><h4>${esc(v.quantity)} posto(s) · ${esc(v.contract)}</h4><p>${esc(v.salary)} · Escolaridade: ${esc(v.education)} · Experiência: ${esc(v.experience)}.</p></section>`).join('')}</div>`:''}<h3>${isAgency(job)?'Como se candidatar':'Candidatura diretamente pela empresa'}</h3><div class="public-job-contacts">${contacts(job)}</div>${isAgency(job)?`<p>E-mail: ${agency.email}</p><p>${agency.address}</p><p>${agency.hours}. Este é o horário da unidade, não a jornada da vaga.</p><p class="micro">WhatsApp informado no cartaz de 12/11/2026; a linha não foi testada. Telefone e e-mail conferidos no <a href="${agency.directoryUrl}" ${external}>diretório oficial</a>. O fixo ${agency.posterPhoneLabel} do cartaz difere do diretório. Confirme os dados com a unidade.</p><p>O cartaz orienta levar currículo impresso, CPF, RG e carteira de trabalho. Não envie documentos pessoais pelo Ajuda em Casa.</p><a href="${esc(s.bulletinUrl)}" ${external}>Consultar boletim oficial completo (PDF) ↗</a>`:`<p>Os requisitos, prazos, etapas e tratamento do currículo são definidos pela empresa na plataforma original. Não inventamos telefone ou e-mail de recrutadores e não recebemos currículos por esta republicação.</p>`}<p class="micro">Sem taxa de candidatura ou intermediação do Ajuda em Casa, sem conta oficial ou selo PRO concedido à fonte. A atualização automática consulta as fontes a cada dois dias; falhas de rede preservam a última cópia válida. Anúncios sem uma fonte válida recente saem da vitrine em até sete dias. Ausência na lista não é prova de contratação ou preenchimento.</p></div>`;
+}

@@ -1,7 +1,7 @@
-import {categoryName,safeMediaUrl} from './domain.mjs?v=b10f7360f103';
-import {crownMarkup} from './layout-conexao.mjs?v=b10f7360f103';
-import {communityRatingMarkup} from './votos-ui.mjs?v=b10f7360f103';
-import {adDetailsMarkup} from './anuncios-ui.mjs?v=b10f7360f103';
+import {categoryName,safeMediaUrl} from './domain.mjs?v=30eafcf774dd';
+import {crownMarkup} from './layout-conexao.mjs?v=30eafcf774dd';
+import {communityRatingMarkup} from './votos-ui.mjs?v=30eafcf774dd';
+import {adDetailsMarkup} from './anuncios-ui.mjs?v=30eafcf774dd';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function spotlightCardMarkup(p) {
   const pro=p.plan==='pro',boosted=p.featuredDays>0;

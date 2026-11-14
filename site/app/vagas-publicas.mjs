@@ -21,3 +21,12 @@ export function isPublicAgencyVacancy(job) {
 export function bulletinDateLabel(job) {
   return isPublicAgencyVacancy(job)?'12/11/2026':'';
 }
+export const CAREER_SOURCE_HOSTS=['colegiomotivo','grupobel','grupoitadil','freitas'];
+export function isAutomatedVacancy(job) {
+  const s=job?.publicSource,terms=job?.intermediationSource??job?.intermediation;
+  if(!s||job.publicationFormat!=='standard'||terms?.totalCents!==0||!Number.isFinite(Date.parse(s.checkedAt)))return false;
+  if(s.managedSourceId==='sedepe-petrolina')return s.kind==='public-agency-republication'&&s.agencyId==='sedepe-petrolina'&&/^\d{4}-\d{2}-\d{2}$/.test(s.bulletinDate)&&new RegExp('^https://www\\.sedepe\\.pe\\.gov\\.br/wp-content/uploads/\\d{4}/\\d{2}/QUADRO-DE-VAGAS-'+s.bulletinDate.split('-').reverse().join('\\.')+'\\.pdf$','i').test(s.bulletinUrl);
+  const host=s.managedSourceId?.replace(/^gupy-/,'');
+  return CAREER_SOURCE_HOSTS.includes(host)&&s.kind==='external-job-republication'&&new RegExp('^https://'+host+'\\.gupy\\.io/jobs/\\d+$').test(s.sourceUrl);
+}
+export function isRepublishedVacancy(job) {return isPublicAgencyVacancy(job)||isAutomatedVacancy(job);}

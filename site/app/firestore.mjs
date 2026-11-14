@@ -1,5 +1,5 @@
-import {authConfigured} from './auth-service.mjs?v=b10f7360f103';
-import {phoneDigits} from './telefone.mjs?v=b10f7360f103'; import {accountObjectives} from './objetivos.mjs?v=b10f7360f103';
+import {authConfigured} from './auth-service.mjs?v=30eafcf774dd';
+import {phoneDigits} from './telefone.mjs?v=30eafcf774dd'; import {accountObjectives} from './objetivos.mjs?v=30eafcf774dd';
 
 export const backendConfigured = config => authConfigured(config) && config?.data?.provider === 'firestore';
 export class DataError extends Error {

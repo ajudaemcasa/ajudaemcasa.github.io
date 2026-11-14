@@ -1,5 +1,5 @@
 // Valores em centavos. A taxa é do contratante; candidatura e contato do trabalhador são gratuitos.
-import {isPublicAgencyVacancy} from './vagas-publicas.mjs?v=b10f7360f103';
+import {isRepublishedVacancy} from './vagas-publicas.mjs?v=30eafcf774dd';
 export const DEFAULT_INTERMEDIATION_CENTS=20000;
 export const PLATFORM_SHARE_PERCENT=30;
 export function intermediationSplit(totalCents=DEFAULT_INTERMEDIATION_CENTS) {
@@ -21,7 +21,7 @@ export function sanitizeIntermediation(raw) {
   return {totalCents:intermediationSplit(raw.totalCents).totalCents,payer:'employer'};
 }
 export function agencyFee(job) {
-  if(isPublicAgencyVacancy(job))return null;
+  if(isRepublishedVacancy(job))return null;
   if(job.publisherType!=='agency') return null;
   if(job.intermediation===undefined) return {...intermediationSplit(),source:'default'};
   return {...intermediationSplit(sanitizeIntermediation(job.intermediation).totalCents),source:'agency'};

@@ -1,4 +1,4 @@
-import {PETROLINA_AGENCY as agency,isPublicAgencyVacancy,bulletinDateLabel} from './vagas-publicas.mjs?v=b10f7360f103';
+import {PETROLINA_AGENCY as agency,isPublicAgencyVacancy,bulletinDateLabel} from './vagas-publicas.mjs?v=30eafcf774dd';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const outside='target="_blank" rel="noopener noreferrer"';
 function tags(job) {

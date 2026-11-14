@@ -1,34 +1,35 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=b10f7360f103';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=b10f7360f103';
-import { createN8nService } from './n8n-service.mjs?v=b10f7360f103';
-import { commercialOffer } from './comercial.mjs?v=b10f7360f103';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=b10f7360f103';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=b10f7360f103';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=b10f7360f103';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=b10f7360f103';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=b10f7360f103';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=b10f7360f103';
-import { createAccountStore } from './conta.mjs?v=b10f7360f103';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=b10f7360f103';
-import {profileHeading} from './perfil.mjs?v=b10f7360f103';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=b10f7360f103';
-import {createRequestService} from './request-service.mjs?v=b10f7360f103';
-import {hasContact,validEmail} from './canais.mjs?v=b10f7360f103';
-import {createPublicationService} from './autopublicacao.mjs?v=b10f7360f103';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=b10f7360f103';
-import {createMessagesService} from './mensagens.mjs?v=b10f7360f103';
-import {createMessagesUI} from './mensagens-ui.mjs?v=b10f7360f103';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=b10f7360f103';
-import {selectSpotlightProfiles} from './destaques-home.mjs?v=b10f7360f103';
-import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=b10f7360f103';
-import {setupInstallation} from './instalacao-ui.mjs?v=b10f7360f103';
-import {crownMarkup} from './layout-conexao.mjs?v=b10f7360f103';
-import {createNotificationService} from './avisos.mjs?v=b10f7360f103';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=b10f7360f103';
-import {createVotesService} from './votos.mjs?v=b10f7360f103';
-import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=b10f7360f103';
-import {PUBLIC_JOB_CATEGORY,isPublicAgencyVacancy} from './vagas-publicas.mjs?v=b10f7360f103';
-import {publicVacancyCard,publicVacancyDetails} from './vagas-publicas-ui.mjs?v=b10f7360f103';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=30eafcf774dd';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=30eafcf774dd';
+import { createN8nService } from './n8n-service.mjs?v=30eafcf774dd';
+import { commercialOffer } from './comercial.mjs?v=30eafcf774dd';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=30eafcf774dd';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=30eafcf774dd';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=30eafcf774dd';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=30eafcf774dd';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=30eafcf774dd';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=30eafcf774dd';
+import { createAccountStore } from './conta.mjs?v=30eafcf774dd';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=30eafcf774dd';
+import {profileHeading} from './perfil.mjs?v=30eafcf774dd';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=30eafcf774dd';
+import {createRequestService} from './request-service.mjs?v=30eafcf774dd';
+import {hasContact,validEmail} from './canais.mjs?v=30eafcf774dd';
+import {createPublicationService} from './autopublicacao.mjs?v=30eafcf774dd';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=30eafcf774dd';
+import {createMessagesService} from './mensagens.mjs?v=30eafcf774dd';
+import {createMessagesUI} from './mensagens-ui.mjs?v=30eafcf774dd';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=30eafcf774dd';
+import {selectSpotlightProfiles} from './destaques-home.mjs?v=30eafcf774dd';
+import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=30eafcf774dd';
+import {setupInstallation} from './instalacao-ui.mjs?v=30eafcf774dd';
+import {crownMarkup} from './layout-conexao.mjs?v=30eafcf774dd';
+import {createNotificationService} from './avisos.mjs?v=30eafcf774dd';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=30eafcf774dd';
+import {createVotesService} from './votos.mjs?v=30eafcf774dd';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=30eafcf774dd';
+import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=30eafcf774dd';
+import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=30eafcf774dd';
+import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=30eafcf774dd';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -72,6 +73,7 @@ const LISTING_PAGE_SIZE=4;
 let visibleLimit=LISTING_PAGE_SIZE,lastFiltersKey='';
 let cardsLayoutFrame;
 let profileReturnHash='#inicio';
+let managedJobsFeed=null,lastJobsFeedFetch=0;
 function refreshCardsLayout() {
   cancelAnimationFrame(cardsLayoutFrame);
   cardsLayoutFrame=requestAnimationFrame(()=>{
@@ -98,7 +100,7 @@ function registrationLocation() {
   return `<fieldset class="full"><legend>Endereço de referência · localização aproximada</legend><label for="registration-area">Bairro ou condomínio em Petrolina</label><input id="registration-area" name="area" list="locality-options" maxlength="220" placeholder="Digite para buscar na lista ou informe outro bairro"><label for="registration-street">Rua ou avenida (opcional, sem número)</label><input id="registration-street" maxlength="100" autocomplete="off" placeholder="Referência apenas nesta tela"><p class="micro">Rua não é enviada nem armazenada. O bairro e a região aproximada ajudam a encontrar oportunidades perto de você; não publique número ou apartamento.</p>${locationPicker()}<label class="check"><input type="checkbox" name="locationConsent"><span>Autorizo usar e divulgar somente minha região aproximada (~1 km), se eu definir um ponto. Sei que ela não garante anonimato.</span></label></fieldset>`;
 }
 function vacancyCard(job) {
-  if(isPublicAgencyVacancy(job))return publicVacancyCard(job);
+  if(isRepublishedVacancy(job))return publicVacancyCard(job);
   const number=phoneDigits(job.phone);
   const agency=job.ad.kind==='agency';
   const message=agency?'Olá! Vi a oportunidade '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e quero falar diretamente com o agenciador.':'Olá! Vi a vaga '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e tenho interesse em conversar sobre o trabalho.';
@@ -601,7 +603,7 @@ async function refreshLiveCatalog() {
   const [live,settings,ratings]=await Promise.all([dataClient.get('publicCatalog/current',{publicRead:true}),dataClient.get('settings/site',{publicRead:true}),votesService.listPublic()]);
   const d=live?.data;
   if(d?.schemaVersion!==1||![d.profiles,d.vacancies,d.advertisers].every(Array.isArray))throw new Error('Catálogo online indisponível.');
-  catalog={...catalog,profiles:d.profiles.map(p=>({...p,communityRating:ratings.get(p.id)}))};vacancies={...vacancies,jobs:d.vacancies};advertisers={...advertisers,advertisers:d.advertisers};
+  catalog={...catalog,profiles:d.profiles.map(p=>({...p,communityRating:ratings.get(p.id)}))};vacancies={...vacancies,jobs:mergeManagedPublicJobs(d.vacancies,managedJobsFeed)};advertisers={...advertisers,advertisers:d.advertisers};
   config.directoryMessage=settings?.data.directoryMessage||'Encontre e converse gratuitamente.'; if(['paid','launch'].includes(settings?.data.commercialStage))config.commercialStage=settings.data.commercialStage;
   try {
     const snapshot=JSON.stringify({schemaVersion:1,profiles:catalog.profiles,vacancies:d.vacancies,advertisers:d.advertisers,directoryMessage:config.directoryMessage,savedAt:Date.now()});
@@ -613,7 +615,7 @@ function restorePublicCatalog() {
   try {
     const d=JSON.parse(localStorage.getItem(PUBLIC_CATALOG_CACHE)||'null');
     if(d?.schemaVersion!==1||![d.profiles,d.vacancies,d.advertisers].every(Array.isArray))return false;
-    catalog={...catalog,profiles:d.profiles};vacancies={...vacancies,jobs:d.vacancies};advertisers={...advertisers,advertisers:d.advertisers};
+    catalog={...catalog,profiles:d.profiles};vacancies={...vacancies,jobs:mergeManagedPublicJobs(d.vacancies,managedJobsFeed)};advertisers={...advertisers,advertisers:d.advertisers};
     if(typeof d.directoryMessage==='string'&&d.directoryMessage.length<=300)config.directoryMessage=d.directoryMessage;
     return true;
   } catch { return false; }
@@ -627,6 +629,7 @@ async function start() {
   try {
     [config,catalog,vacancies,advertisers] = await Promise.all([getJSON('config.json'),getJSON('profissionais.json'),getJSON('vagas.json'),getJSON('anunciantes.json')]);
     if (!Array.isArray(catalog.profiles) || catalog.schemaVersion !== 1) throw new Error('Formato de catálogo inválido.');
+    if(config.publicJobsFeedUrl)try{managedJobsFeed=normalizeJobsFeed(JSON.parse(localStorage.getItem(PUBLIC_JOBS_FEED_CACHE)||'null'));}catch{/* Fonte independente: sua falha não bloqueia o catálogo. */}
     auth=createAuthService(config);
     dataClient=createDataClient(config,auth);
     votesService=createVotesService(dataClient,auth);
@@ -729,6 +732,7 @@ async function start() {
     $('#emergency').addEventListener('click',() => { filters.emergency=!filters.emergency; $('#emergency').setAttribute('aria-pressed',String(filters.emergency)); renderResults(); });
     $('#clear').addEventListener('click',clearFilters);
     renderResults();renderHome();route();
+    refreshJobsFeed();
     if(catalogFallback==='cached')toast('Conexão instável: exibindo a última cópia pública disponível.');
     else if(catalogFallback==='empty')toast('Conexão instável: os contatos serão carregados quando a internet voltar.');
     // Atualiza expirações sem exigir recarregamento; não recria o resultado durante interação.
@@ -739,6 +743,7 @@ async function start() {
         catch{toast('Não foi possível atualizar agora. A vitrine anterior foi preservada.');}
       }
       renderResults();renderHome();
+      refreshJobsFeed();
     },60000);
   } catch (error) {
     console.error('Falha ao carregar a vitrine:',error.message);
@@ -748,3 +753,13 @@ async function start() {
   }
 }
 start().finally(finishStartup);
+async function refreshJobsFeed() {
+  if(!config?.publicJobsFeedUrl||!navigator.onLine||Date.now()-lastJobsFeedFetch<300000)return;
+  lastJobsFeedFetch=Date.now();
+  try {
+    const feed=await fetchPublicJobsFeed(config.publicJobsFeedUrl);
+    managedJobsFeed=feed;vacancies.jobs=mergeManagedPublicJobs(vacancies.jobs,feed);
+    try{localStorage.setItem(PUBLIC_JOBS_FEED_CACHE,JSON.stringify(feed));}catch{/* Continua em memória. */}
+    renderResults();renderHome();
+  } catch(error){console.warn('Não foi possível consultar as vagas públicas; a cópia anterior foi preservada.',error.message);}
+}
