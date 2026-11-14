@@ -22,3 +22,10 @@ export function grantProTrial(profile, config, now = new Date()) {
   if (Date.parse(profile.proUntil) > start) throw new Error('O perfil já tem PRO ativo.');
   return {...profile, plan:'pro', trialStartedAt:new Date(start).toISOString(), proUntil:addCalendarMonths(start, offer.trialMonths).toISOString(), proAccessSource:'launch_trial'};
 }
+
+// Exclusivo do painel autorizado: o modo pago não impede uma cortesia individual.
+export function grantAdminTrial(profile, now=new Date()) {
+  const time=+new Date(now);
+  if(profile.status!=='approved'||profile.demo||!Number.isFinite(time)||Date.parse(profile.proUntil)>time||profile.adminTrialGrantedAt)throw new Error('Cortesia exige cadastro aprovado, sem PRO ativo e sem cortesia anterior.');
+  return {...profile,plan:'pro',proAccessSource:'admin_trial',adminTrialGrantedAt:new Date(time).toISOString(),proUntil:addCalendarMonths(time,6).toISOString()};
+}

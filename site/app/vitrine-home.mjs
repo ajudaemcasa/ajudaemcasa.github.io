@@ -64,10 +64,10 @@ function select(items,key,tierOf,force) {
 
 /** Máximo de quatro profissionais, sem criar cards para completar uma vitrine vazia. */
 export function selectHomeProfiles(profiles,{key='offers',force=false}={}) {
-  return select(profiles,'profiles:'+String(key),item=>item.plan==='pro'?0:item.ad?.kind==='agency'?1:2,force);
+  return select(profiles,'profiles:'+String(key),item=>item.featuredDays?0:item.plan==='pro'?1:2,force);
 }
 
 /** Máximo de quatro oportunidades de contratantes/agenciadores já elegíveis. */
 export function selectHomeJobs(jobs,{key='jobs',force=false}={}) {
-  return select(jobs,'jobs:'+String(key),item=>item.ad?.premium?0:item.ad?.kind==='agency'?1:2,force);
+  return select(jobs,'jobs:'+String(key),item=>item.promotion?.paidBoostDays?0:item.ad?.premium?1:2,force);
 }

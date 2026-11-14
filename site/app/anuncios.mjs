@@ -1,4 +1,4 @@
-import {phoneDigits} from './telefone.mjs?v=40b629349f7e';
+import {phoneDigits} from './telefone.mjs?v=d544c6e559df';
 
 export const AD_KINDS = {
   service: {title:'Ofereço serviços',name:'PRO Serviços',tone:'service',symbol:'✦'},

@@ -1,7 +1,8 @@
-import {CATEGORIES,validateEvent} from './domain.mjs?v=40b629349f7e';
-import {phoneDigits} from './telefone.mjs?v=40b629349f7e';
-import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=40b629349f7e';
-import {hasContact} from './canais.mjs?v=40b629349f7e';
+import {CATEGORIES,validateEvent} from './domain.mjs?v=d544c6e559df';
+import {phoneDigits} from './telefone.mjs?v=d544c6e559df';
+import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=d544c6e559df';
+import {hasContact} from './canais.mjs?v=d544c6e559df';
+import {grantAdminTrial} from './comercial.mjs?v=d544c6e559df';
 
 export const REQUEST_LABELS={novo_cadastro_gratuito:'Cadastro básico',solicitacao_upgrade_pro:'Solicitação PRO',ativacao_destaque_3dias:'Destaque',novo_orcamento_cliente:'Orçamento',interesse_patrocinio_loja:'Patrocínio',nova_vaga_empregador:'Vaga',solicitacao_titularidade:'Titularidade',nova_avaliacao:'Avaliação'};
 export function cleanText(raw,max,{required=false}={}) {
@@ -76,6 +77,10 @@ export function createAdminService(client,auth) {
       const data={...current.data,status,...(status==='deleted'?{name:'Usuário excluído'}:{})};
       return commitChange('users',current,data,{action:status==='deleted'?'user.delete':'user.status',reason});
     },
+    async grantTrial(current,reason) {
+      if(current.data.status!=='active')throw new Error('Reative e revise o anúncio antes de conceder cortesia.');
+      return this.saveRecord(current,grantAdminTrial(current.data.payload),reason);
+    },
     async saveBlock(kind,raw,enabled,reason) {
       const value=normalizeIdentity(kind,raw),id=identityKey(kind,value);
       if(kind==='email' && value===actor().email.toLowerCase())throw new Error('Você não pode bloquear seu próprio e-mail de administrador.');
@@ -110,7 +115,7 @@ export function createAdminService(client,auth) {
     },
     async saveSettings(current,raw,reason) {
       const directoryMessage=cleanText(raw.directoryMessage,180,{required:true});
-      return commitChange('settings',current,{...current.data,directoryMessage,registrationOpen:raw.registrationOpen===true},{action:'settings.save',reason});
+      return commitChange('settings',current,{...current.data,directoryMessage,registrationOpen:raw.registrationOpen===true,...(raw.commercialStage?{commercialStage:raw.commercialStage==='launch'?'launch':'paid'}:{})},{action:'settings.save',reason});
     }
   });
 }

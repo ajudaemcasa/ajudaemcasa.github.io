@@ -1,27 +1,28 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=40b629349f7e';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=40b629349f7e';
-import { createN8nService } from './n8n-service.mjs?v=40b629349f7e';
-import { commercialOffer } from './comercial.mjs?v=40b629349f7e';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=40b629349f7e';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=40b629349f7e';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=40b629349f7e';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=40b629349f7e';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=40b629349f7e';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=40b629349f7e';
-import { createAccountStore } from './conta.mjs?v=40b629349f7e';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=40b629349f7e';
-import {profileHeading} from './perfil.mjs?v=40b629349f7e';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=40b629349f7e';
-import {createRequestService} from './request-service.mjs?v=40b629349f7e';
-import {hasContact,validEmail} from './canais.mjs?v=40b629349f7e';
-import {createPublicationService} from './autopublicacao.mjs?v=40b629349f7e';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=40b629349f7e';
-import {createMessagesService} from './mensagens.mjs?v=40b629349f7e';
-import {createMessagesUI} from './mensagens-ui.mjs?v=40b629349f7e';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=40b629349f7e';
-import {setupInstallation} from './instalacao-ui.mjs?v=40b629349f7e';
-import {crownMarkup} from './layout-conexao.mjs?v=40b629349f7e';
-import {createNotificationService} from './avisos.mjs?v=40b629349f7e';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=d544c6e559df';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=d544c6e559df';
+import { createN8nService } from './n8n-service.mjs?v=d544c6e559df';
+import { commercialOffer } from './comercial.mjs?v=d544c6e559df';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=d544c6e559df';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=d544c6e559df';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=d544c6e559df';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=d544c6e559df';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=d544c6e559df';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=d544c6e559df';
+import { createAccountStore } from './conta.mjs?v=d544c6e559df';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=d544c6e559df';
+import {profileHeading} from './perfil.mjs?v=d544c6e559df';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=d544c6e559df';
+import {createRequestService} from './request-service.mjs?v=d544c6e559df';
+import {hasContact,validEmail} from './canais.mjs?v=d544c6e559df';
+import {createPublicationService} from './autopublicacao.mjs?v=d544c6e559df';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=d544c6e559df';
+import {createMessagesService} from './mensagens.mjs?v=d544c6e559df';
+import {createMessagesUI} from './mensagens-ui.mjs?v=d544c6e559df';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=d544c6e559df';
+import {setupInstallation} from './instalacao-ui.mjs?v=d544c6e559df';
+import {crownMarkup} from './layout-conexao.mjs?v=d544c6e559df';
+import {createNotificationService} from './avisos.mjs?v=d544c6e559df';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=d544c6e559df';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -128,6 +129,7 @@ function renderHome() {
 }
 function ratingMarkup(profile,compact=false) {
   const r=profile.rating;
+  if(!r||r.kind==='initial')return '<p class="micro">Ainda sem avaliações de clientes</p>';
   return r ? `<p class="rating${compact?' compact':''}" title="${esc(r.label)}"><strong>★ ${r.score.toLocaleString('pt-BR')}/5</strong><small>${esc(compact&&r.kind==='initial'?'Nota inicial':r.label)}</small></p>` : '';
 }
 function managementLinks(profile) {
@@ -314,7 +316,7 @@ function showVacancyForm(kind='employer',premium=false) {
 
 function showFeatureForm() {
   const active=availableProfiles().filter(p=>p.status==='approved');
-  openDialog(formShell('ativacao_destaque_3dias','Apareça no topo por 3 dias.','Escolha o benefício mensal PRO ou o destaque avulso de R$ 99,90 por 72 horas. A equipe confere o cadastro e o pagamento antes da ativação.',`${namePhone}<div class="field full"><label for="boost-mode">Como deseja destacar?</label><select id="boost-mode" name="purchaseMode"><option value="pro_monthly">Benefício mensal de um PRO ativo · 3 dias</option><option value="one_off">Destaque avulso · R$ 99,90 por 72 horas</option></select></div><div class="field full"><label for="profileId">Código do seu cadastro</label><input id="profileId" name="profileId" required pattern="[a-z0-9-]+" maxlength="80" list="pro-profiles" placeholder="Código recebido na aprovação"><datalist id="pro-profiles">${active.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</datalist><small>A equipe confirma o titular. O destaque avulso não exige assinatura PRO.</small></div><div id="feature-status" class="notice full">Agenciadores aprovados têm destaque inicial por seis meses. Depois, poderá haver mensalidade ou destaque avulso para manter prioridade. Não há renovação automática.</div><p class="micro full">O pagamento Asaas ainda está em preparação. Enviar este pedido não faz cobrança nem garante ativação.</p>`,'Solicitar meu destaque'));
+  openDialog(formShell('ativacao_destaque_3dias','Apareça no topo por 3 dias.','Escolha o benefício mensal PRO ou o destaque avulso de R$ 99,90 por 72 horas. A equipe confere o cadastro e o pagamento antes da ativação.',`${namePhone}<div class="field full"><label for="boost-mode">Como deseja destacar?</label><select id="boost-mode" name="purchaseMode"><option value="pro_monthly">Benefício mensal de um PRO ativo · 3 dias</option><option value="one_off">Destaque avulso · R$ 99,90 por 72 horas</option></select></div><div class="field full"><label for="profileId">Código do seu cadastro</label><input id="profileId" name="profileId" required pattern="[a-z0-9-]+" maxlength="80" list="pro-profiles" placeholder="Código recebido na aprovação"><datalist id="pro-profiles">${active.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</datalist><small>A equipe confirma o titular. O destaque avulso não exige assinatura PRO.</small></div><div id="feature-status" class="notice full">Destaque avulso tem preço separado. Não há teste automático de seis meses; cortesias dependem de concessão do administrador. Não há renovação automática.</div><p class="micro full">O pagamento Asaas ainda está em preparação. Enviar este pedido não faz cobrança nem garante ativação.</p>`,'Solicitar meu destaque'));
 }
 
 function showSponsorForm() {
@@ -395,6 +397,7 @@ async function readFile(file, type) {
 }
 async function submitForm(form) {
   if (form.dataset.busy === 'true' || !form.reportValidity()) return;
+  const finishLoading=beginLoading();
   form.dataset.busy = 'true';
   const status = form.querySelector('.form-status'), button = form.querySelector('[type=submit]'), close = $('.dialog-close');
   const originalLabel = button.textContent;
@@ -428,7 +431,7 @@ async function submitForm(form) {
       data.files = await Promise.all(['antes','depois','cartao'].filter(type => fields.get('file-' + type)?.size).map(type => readFile(fields.get('file-' + type), type)));
     }
     if (form.dataset.event === 'ativacao_destaque_3dias') {
-      const profile = catalog.profiles.find(p => p.id === data.profileId?.trim());
+      const profile = [...catalog.profiles,...vacancies.jobs,...advertisers.advertisers].find(p => p.id === data.profileId?.trim());
       if (!profile || profile.status!=='approved') throw new Error('Informe o código de um cadastro aprovado.');
       if(data.purchaseMode!=='one_off' && !isPro(profile)) throw new Error('Informe o código de um perfil com PRO ativo.');
       if (profile.demo) throw new Error('Este é um perfil de demonstração. A solicitação estará disponível para seu perfil real depois da aprovação.');
@@ -455,7 +458,7 @@ async function submitForm(form) {
   } catch (error) {
     status.className = 'form-status full error'; status.textContent = error.message;
     button.disabled = false; button.textContent = originalLabel;
-  } finally { form.dataset.busy = 'false'; close.disabled = false; }
+  } finally { form.dataset.busy = 'false'; close.disabled = false; finishLoading(); }
 }
 document.addEventListener('submit', event => { if (event.target.matches('form[data-event]')) { event.preventDefault(); submitForm(event.target); } });
 document.addEventListener('input', event => {
@@ -465,7 +468,7 @@ document.addEventListener('input', event => {
   if (form && form.dataset.busy !== 'true') { delete form.dataset.eventId; delete form.dataset.createdAt; }
   if (event.target.id === 'note') $('#note-counter').textContent = `${Array.from(event.target.value).length} / 140 caracteres · somente texto`;
   if (event.target.id === 'profileId' && $('#feature-status')) {
-    const p = catalog.profiles.find(p => p.id === event.target.value.trim());
+    const p = [...catalog.profiles,...vacancies.jobs,...advertisers.advertisers].find(p => p.id === event.target.value.trim());
     $('#feature-status').textContent = p ? `${p.name}: ${p.demo ? 'perfil de demonstração. ' : ''}${!isPro(p) ? 'PRO inativo.' : featuredDays(p) ? 'Destaque já ativo.' : (p.featuredMonths || []).includes(monthKey()) || p.featuredMonth === monthKey() ? 'Benefício utilizado neste mês.' : 'Pode solicitar análise para ativação.'}` : 'Informe o código enviado pela equipe quando seu perfil foi aprovado.';
   }
 });
@@ -578,7 +581,7 @@ async function refreshLiveCatalog() {
   const d=live?.data;
   if(d?.schemaVersion!==1||![d.profiles,d.vacancies,d.advertisers].every(Array.isArray))throw new Error('Catálogo online indisponível.');
   catalog={...catalog,profiles:d.profiles};vacancies={...vacancies,jobs:d.vacancies};advertisers={...advertisers,advertisers:d.advertisers};
-  config.directoryMessage=settings?.data.directoryMessage||'Encontre e converse gratuitamente.';
+  config.directoryMessage=settings?.data.directoryMessage||'Encontre e converse gratuitamente.'; if(['paid','launch'].includes(settings?.data.commercialStage))config.commercialStage=settings.data.commercialStage;
   try {
     const snapshot=JSON.stringify({schemaVersion:1,profiles:d.profiles,vacancies:d.vacancies,advertisers:d.advertisers,directoryMessage:config.directoryMessage,savedAt:Date.now()});
     if(snapshot.length<=4000000)localStorage.setItem(PUBLIC_CATALOG_CACHE,snapshot);
@@ -595,7 +598,11 @@ function restorePublicCatalog() {
   } catch { return false; }
 }
 async function start() {
-  const getJSON = async path => { const response=await fetch(path,{cache:'no-store'}); if (!response.ok) throw new Error('Falha ao carregar ' + path); return response.json(); };
+  const getJSON = async path => {
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+    try {const response=await fetch(path,{cache:'no-store',signal:controller.signal});if(!response.ok)throw new Error('Falha ao carregar '+path);return await response.json();}
+    finally {clearTimeout(timer);}
+  };
   try {
     [config,catalog,vacancies,advertisers] = await Promise.all([getJSON('config.json'),getJSON('profissionais.json'),getJSON('vagas.json'),getJSON('anunciantes.json')]);
     if (!Array.isArray(catalog.profiles) || catalog.schemaVersion !== 1) throw new Error('Formato de catálogo inválido.');
@@ -625,7 +632,7 @@ async function start() {
     }
     let accountStorage;
     try {accountStorage=window.sessionStorage;} catch { /* Rascunho funciona em memória se o armazenamento estiver bloqueado. */ }
-    accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onAdminAccess:()=>dataClient.hasAdminAccess(),onProfileLoad:user=>dataClient.enabled?dataClient.loadAccount(user):Promise.resolve(null),onProfileSave:preferences=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve(),onRegistrationComplete:()=>{history.replaceState(null,'',location.pathname+location.search+'#inicio');route();}});
+    accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onAdminAccess:()=>dataClient.hasAdminAccess(),onProfileLoad:user=>withLoading(()=>dataClient.enabled?dataClient.loadAccount(user):Promise.resolve(null)),onProfileSave:preferences=>withLoading(()=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve()),onRegistrationComplete:()=>{history.replaceState(null,'',location.pathname+location.search+'#inicio');route();}});
     auth.subscribe(user=>{
       const entry=$('.google-entry');
       const firstName=accountFirstName(user);
@@ -654,7 +661,10 @@ async function start() {
     });
     // Restaura a sessão sem bloquear a vitrine pública. O assinante acima trata
     // o retorno do Google e leva a conta autenticada para a página principal.
-    if(authConfigured(config))auth.ready().catch(()=>{});
+    if(authConfigured(config)){
+      const arrivingGoogle=new URLSearchParams(location.search).get('entrarGoogle')==='1';
+      (arrivingGoogle?withLoading(()=>auth.ready()):auth.ready()).catch(()=>{});
+    }
     setMenuOpen(false);
     matchMedia('(max-width: 1050px)').addEventListener('change',()=>setMenuOpen(false));
     $('#results').addEventListener('scroll',updateCardsNavigation,{passive:true});
@@ -714,4 +724,4 @@ async function start() {
     $('#results').innerHTML='<div class="empty"><h3>Vamos tentar de novo?</h3><p>Verifique sua conexão e recarregue a página. Para visualizar a cópia no computador, use o servidor local indicado no README.</p><a class="btn secondary" href="index.html">Recarregar</a></div>';
   }
 }
-start();
+start().finally(finishStartup);

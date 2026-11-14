@@ -63,23 +63,34 @@ export function setupInstallation({showInfo,toast=()=>{}}={}) {
   if(typeof showInfo!=='function')throw new TypeError('setupInstallation precisa de showInfo(html).');
   disposePrevious?.();
   let deferredPrompt=window.__ajudaInstallPrompt||null,prompting=false,confirmedInstalled=false,disposed=false;
+  const supportsNativeInstall=()=>typeof navigator.install==='function';
+  const appScope=new URL('./',location.href).href;
   const displayMode=window.matchMedia?.('(display-mode: standalone), (display-mode: minimal-ui), (display-mode: window-controls-overlay)');
   const appInUse=()=>navigator.standalone===true||displayMode?.matches===true;
   const platform=platformOf(navigator),browser=browserOf(navigator);
 
   function refresh() {
-    const label=appInUse()?'App em uso':confirmedInstalled?'App instalado':prompting?'Abrindo instalação…':platform==='ios'?'Adicionar à tela inicial':platform==='mac'&&browser==='safari'?'Adicionar ao Dock':'Instalar app';
+    const available=supportsNativeInstall()||!!deferredPrompt;
+    const label=appInUse()?'App em uso':prompting?'Abrindo app…':confirmedInstalled?'Abrir app':available?'Instalar app':platform==='ios'?'Adicionar à tela inicial':platform==='mac'&&browser==='safari'?'Adicionar ao Dock':'Opções do app';
     for(const button of document.querySelectorAll(buttonSelector)) {
       button.hidden=false;
       labelElement(button,document).textContent=label;
       button.disabled=prompting;
       button.setAttribute('aria-busy',String(prompting));
-      button.setAttribute('aria-label',appInUse()?'Ajuda em Casa já está aberto como app':confirmedInstalled?'Instalação confirmada pelo navegador':label);
+      button.setAttribute('aria-label',appInUse()?'Ajuda em Casa já está aberto como app':label);
+      button.dataset.installState=appInUse()?'standalone':confirmedInstalled?'installed':available?'available':'unsupported';
     }
   }
 
-  function showInstalled() {
-    showInfo(`<section class="installation-help"><span class="eyebrow">SEU AJUDA EM CASA</span><h2 id="dialog-title">${appInUse()?'Você já está usando o app.':'O navegador confirmou a instalação.'}</h2><p class="dialog-intro">${appInUse()?'Continue encontrando serviços e oportunidades por aqui.':'Abra o Ajuda em Casa pelo ícone criado na tela inicial, no Dock ou na lista de aplicativos do seu aparelho.'}</p><p class="installation-note">Em outro aparelho, abra o site e escolha Instalar app novamente.</p></section>`);
+  async function detectInstalled() {
+    if(typeof navigator.getInstalledRelatedApps!=='function')return;
+    try {
+      const apps=await navigator.getInstalledRelatedApps();
+      if(disposed)return;
+      confirmedInstalled=apps.some(app=>app.platform==='webapp'&&new URL(app.id||app.url,location.href).href===appScope);
+      if(confirmedInstalled)deferredPrompt=null;
+      refresh();
+    } catch {/* Falta de suporte à consulta não impede o convite nativo. */}
   }
 
   async function install(event) {
@@ -87,14 +98,27 @@ export function setupInstallation({showInfo,toast=()=>{}}={}) {
     if(!button)return;
     event.preventDefault();
     if(prompting)return;
-    if(appInUse()||confirmedInstalled){showInstalled();return;}
+    if(appInUse()){toast('Você já está usando o Ajuda em Casa como aplicativo.');return;}
+    if(supportsNativeInstall()){
+      prompting=true;refresh();
+      try {
+        // A chamada permanece no gesto original, sem await de rede antes dela.
+        await navigator.install();
+        if(!disposed){confirmedInstalled=true;toast('Ajuda em Casa instalado ou aberto pelo navegador.');}
+      }catch(error){
+        if(error.name==='AbortError')toast('Instalação cancelada. Você pode tentar novamente.');
+        else {console.warn('Instalação nativa indisponível:',error.name);toast('O navegador não concluiu a instalação. Tente novamente.');}
+      }finally{prompting=false;if(!disposed)refresh();}
+      return;
+    }
+    if(confirmedInstalled){window.open(appScope,'_blank','noopener');return;}
     if(!deferredPrompt){showInfo(instructionsMarkup(platform));return;}
     const promptEvent=deferredPrompt;deferredPrompt=null;window.__ajudaInstallPrompt=null;prompting=true;refresh();
     try {
       const result=await promptEvent.prompt();
       const choice=promptEvent.userChoice?await promptEvent.userChoice:result;
       if(disposed)return;
-      if(appInUse()||confirmedInstalled)showInstalled();
+      if(appInUse()||confirmedInstalled)toast('Ajuda em Casa instalado. Abra pelo ícone criado no aparelho.');
       else if(choice?.outcome==='accepted')toast('Instalação aceita. Aguarde o navegador concluir e abra pelo ícone do Ajuda em Casa.');
       // Ao dispensar o convite nativo, a página permanece na tarefa anterior.
     } catch {
@@ -115,6 +139,7 @@ export function setupInstallation({showInfo,toast=()=>{}}={}) {
   document.addEventListener('click',install);
   displayMode?.addEventListener?.('change',refresh);
   refresh();
+  detectInstalled();
   const dispose=()=>{
     disposed=true;deferredPrompt=null;
     window.removeEventListener('beforeinstallprompt',beforePrompt);

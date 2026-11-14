@@ -1,0 +1,2 @@
+body[data-app-loading]>:not(#app-loading) { visibility:visible!important; pointer-events:auto!important; }
+#app-loading { display:none!important; }

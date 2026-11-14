@@ -4,7 +4,7 @@
   "pixKey": "06089311448",
   "pixType": "CPF",
   "paymentUrl": "",
-  "commercialStage": "launch",
+  "commercialStage": "paid",
   "proTrialMonths": 6,
   "paymentProvider": "asaas",
   "paymentStatus": "not_configured",

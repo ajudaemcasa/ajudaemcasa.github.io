@@ -1,5 +1,5 @@
-import {authConfigured} from './auth-service.mjs?v=40b629349f7e';
-import {phoneDigits} from './telefone.mjs?v=40b629349f7e';
+import {authConfigured} from './auth-service.mjs?v=d544c6e559df';
+import {phoneDigits} from './telefone.mjs?v=d544c6e559df'; import {accountObjectives} from './objetivos.mjs?v=d544c6e559df';
 
 export const backendConfigured = config => authConfigured(config) && config?.data?.provider === 'firestore';
 export class DataError extends Error {
@@ -103,7 +103,7 @@ export function createDataClient(config,auth,{fetcher=globalThis.fetch}={}) {
       if(current && current.data.status!=='active')throw new DataError('Esta conta não está habilitada para usar o app. Procure o atendimento.','SUSPENDED');
       const suppliedPhone=Object.hasOwn(preferences,'phone'),phone=suppliedPhone?phoneDigits(preferences.phone):(current?.data.phone||'');
       if((suppliedPhone||!current)&&!phone)throw new DataError('Informe um WhatsApp brasileiro válido com DDD.','INVALID_PHONE');
-      const data={...(current?.data||{}),uid:user.uid,email:user.email,name:user.name||user.email,role:preferences.role||current?.data.role||'contractor',workerGoal:preferences.workerGoal||current?.data.workerGoal||'service',status:current?.data.status||'active',consentVersion:'2026-11-14',revision:current?.data.revision||0,...(phone?{phone}:{})};
+      const data={...(current?.data||{}),uid:user.uid,email:user.email,name:user.name||user.email,role:preferences.role||current?.data.role||'contractor',workerGoal:preferences.workerGoal||current?.data.workerGoal||'service',status:current?.data.status||'active',consentVersion:'2026-11-14',revision:current?.data.revision||0,...(phone?{phone}:{}),...(preferences.roles?accountObjectives(preferences):{})};
       await this.commit([write(path,data,{version:current?.version,create:!current,timestamps:current?['updatedAt']:['createdAt','updatedAt']})]);
       return data;
     }

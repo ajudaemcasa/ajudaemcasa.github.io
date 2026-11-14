@@ -1,13 +1,15 @@
-import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=40b629349f7e';
-import { authConfigured, authErrorMessage } from './auth-service.mjs?v=40b629349f7e';
-import { commercialOffer } from './comercial.mjs?v=40b629349f7e';
-import {formatPhone,phoneDigits} from './telefone.mjs?v=40b629349f7e';
+import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=d544c6e559df';
+import { authConfigured, authErrorMessage } from './auth-service.mjs?v=d544c6e559df';
+import { commercialOffer } from './comercial.mjs?v=d544c6e559df';
+import {formatPhone,phoneDigits} from './telefone.mjs?v=d544c6e559df';
+import {beginLoading,withLoading} from './carregamento.mjs?v=d544c6e559df';
+import {accountObjectives} from './objetivos.mjs?v=d544c6e559df';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const roles={
-  contractor:{label:'Quero contratar',title:'Contrate um serviço',icon:'⌂',description:'Encontre profissionais ou divulgue uma oportunidade de trabalho.'},
-  worker:{label:'Quero trabalhar',title:'Escolha como quer trabalhar',icon:'◉',description:'Busque emprego com carteira assinada ou divulgue serviços avulsos e diárias.'},
-  agency:{label:'Sou agenciador',title:'Agencie empregos',icon:'▦',description:'Organize oportunidades e aproxime contratantes de profissionais.'}
+  contractor:{label:'Quero contratar',title:'Publique uma oportunidade',icon:'⌂',description:'Encontre profissionais ou divulgue uma oportunidade de trabalho.'},
+  worker:{label:'Quero divulgar meu serviço',title:'Escolha como quer trabalhar',icon:'◉',description:'Busque emprego com carteira assinada ou divulgue serviços avulsos e diárias.'},
+  agency:{label:'Quero agenciar empregos',title:'Agencie empregos',icon:'▦',description:'Organize oportunidades e aproxime contratantes de profissionais.'}
 };
 const workerGoals={
   jobseeker:'Quero ser contratado com carteira assinada',
@@ -18,7 +20,7 @@ const validRole=role=>ACCOUNT_ROLES.some(item=>item.id===role)?role:'';
 export function roleLandingMarkup(role) {
   const current=roles[validRole(role)]||roles.contractor;
   const content={
-    contractor:`<button class="btn primary" type="button" data-browse-mode="professionals">Encontrar profissionais</button><a class="btn secondary" href="#orcamento">Pedir um orçamento privado</a><a class="btn secondary" href="#publicar-vaga">Publicar vaga grátis</a>`,
+    contractor:`<a class="btn primary" href="#publicar-vaga">Publicar oportunidade · básico grátis</a><a class="btn secondary" href="#publicar-vaga-pro">Destacar minha oportunidade · PRO</a><button class="btn secondary" type="button" data-browse-mode="professionals">Encontrar profissionais sem publicar vaga</button><a class="btn secondary" href="#agenciar">Quero publicar como agenciador</a>`,
     worker:`<a class="btn primary" href="#cadastro"><span>Serviço avulso / diária<small>Divulgar meus serviços de forma avulsa (sem carteira assinada / na diária)</small></span></a><a class="btn secondary" href="#cadastro-emprego"><span>Emprego com carteira assinada<small>Divulgar meu perfil para ser contratado com carteira assinada</small></span></a><button class="btn secondary" type="button" data-browse-mode="jobs">Ver oportunidades de trabalho</button>`,
     agency:`<button class="btn primary" type="button" data-open-account="agency">Criar meu perfil de agenciador</button><a class="btn secondary" href="#agenciador">Preparar uma oportunidade</a><button class="btn secondary" type="button" data-browse-mode="jobseekers">Encontrar pessoas procurando emprego</button>`
   };
@@ -37,13 +39,15 @@ function premiumBenefitsMarkup(role,goal,config,{preview=false}={}) {
     service:{name:'PRO Serviços',items:['Carrossel de Antes/Depois e foto do cartão profissional.','Apresentação detalhada e regiões atendidas.','3 dias de destaque por mês em Recomendados.'],href:'#pro'},
     jobseeker:{name:'PRO Talento',items:['Apresentação organizada com experiência e habilidades.','Disponibilidade e serviços em um modelo de leitura fácil.','3 dias de destaque por mês em Recomendados.'],href:'#pro-emprego'},
     employer:{name:'PRO Contratante',items:['Oportunidade organizada por jornada, remuneração e benefícios.','Funções e requisitos com leitura fácil.','Modelo azul claro para identificar quem está contratando.'],href:'#publicar-vaga-pro'},
-    agency:{name:'Agenciador PRO',items:['Oportunidades organizadas com identificação do agenciador.','Modelo amarelo claro, preço transparente e contato direto.','Seis meses iniciais de destaque após aprovação do anunciante.'],href:'#agenciador'}
+    agency:{name:'Agenciador PRO',items:['Oportunidades organizadas com identificação do agenciador.','Modelo amarelo claro, preço transparente e contato direto.','Identificação diferenciada e prioridade PRO nas oportunidades recomendadas.'],href:'#agenciador'}
   }[kind];
-  return `<section class="profile-pro-benefits ad-tone-${kind}" data-pro-benefits="${kind}"><span class="eyebrow">VANTAGENS PARA O SEU PERFIL${preview?' · PRÉVIA':''}</span><h3>${details.name}</h3><p>${offer.launch?`Teste de ${offer.trialMonths} meses após aprovação, sem cobrança automática.`:`Assinatura opcional de ${money(offer.monthly)}/mês, mediante contratação.`}</p><ul>${details.items.map(item=>`<li>${item}</li>`).join('')}<li>Selo somente após conferência; assinatura não comprova identidade.</li></ul><a class="btn primary" href="${details.href}"${kind==='agency'?' data-account-premium-agency':''}>${preview?'Entrar para solicitar o PRO':'Preparar solicitação PRO'}</a><p class="micro">${offer.launch?`Ao fim do teste, o básico permanece gratuito. O PRO poderá custar ${money(offer.monthly)}/mês mediante adesão, sem renovação automática. `:''}${kind==='agency'?'Após os seis meses iniciais, manter destaque poderá exigir mensalidade ou contratação avulsa. ':''}O destaque avulso de R$ 99,90 por 72 horas é separado. Em Mais próximos, a distância continua em primeiro lugar.</p></section>`;
+  return `<section class="profile-pro-benefits ad-tone-${kind}" data-pro-benefits="${kind}"><span class="eyebrow">VANTAGENS PARA O SEU PERFIL${preview?' · PRÉVIA':''}</span><h3>${details.name}</h3><p>${offer.launch?`Teste de ${offer.trialMonths} meses após aprovação, sem cobrança automática.`:`Assinatura opcional de ${money(offer.monthly)}/mês, mediante contratação.`}</p><ul>${details.items.map(item=>`<li>${item}</li>`).join('')}<li>Selo somente após conferência; assinatura não comprova identidade.</li></ul><a class="btn primary" href="${details.href}"${kind==='agency'?' data-account-premium-agency':''}>${preview?'Entrar para solicitar o PRO':'Preparar solicitação PRO'}</a><p class="micro">${offer.launch?`Ao fim do teste, o básico permanece gratuito. O PRO poderá custar ${money(offer.monthly)}/mês mediante adesão, sem renovação automática. `:''}${kind==='agency'?'A intermediação tem preço separado, com 30% do líquido para a plataforma e 70% para o agenciador. ':''}O destaque avulso de R$ 99,90 por 72 horas é separado. Em Mais próximos, a distância continua em primeiro lugar.</p></section>`;
 }
 
-function roleFields(selected='',goal='service') {
-  return `<fieldset class="full"><legend>Como quer usar o Ajuda em Casa?</legend><div class="role-options">${Object.entries(roles).map(([id,r])=>`<label class="role-choice"><input type="radio" name="role" value="${id}" required ${id===selected?'checked':''}><span><strong>${r.icon} ${r.label}</strong><small>${r.description}</small></span></label>`).join('')}</div><div data-worker-goal ${selected==='worker'?'':'hidden'}><label for="account-worker-goal">Qual é o seu objetivo profissional?</label><select id="account-worker-goal" name="workerGoal"><option value="jobseeker" ${goal==='jobseeker'?'selected':''}>${workerGoals.jobseeker}</option><option value="service" ${goal==='service'?'selected':''}>${workerGoals.service}</option></select></div></fieldset>`;
+function roleFields(selected='',goal='service',saved={}) {
+  const selectedRoles=saved.roles||[selected];
+  const descriptions={contractor:'O que você procura contratar?',worker:'Quais serviços, experiências e disponibilidade você oferece?',agency:'Quais empregos e regiões você agencia?'};
+  return `<fieldset class="full"><legend>Como quer usar o Ajuda em Casa?</legend><p>Selecione pelo menos uma opção. Você pode participar das três.</p><div class="role-options">${Object.entries(roles).map(([id,r])=>`<label class="role-choice"><input type="checkbox" name="roles" value="${id}" ${selectedRoles.includes(id)?'checked':''}><span><strong>${r.icon} ${r.label}</strong><small>${r.description}</small></span></label>`).join('')}</div>${Object.keys(roles).map(id=>`<details data-role-detail="${id}" ${selectedRoles.includes(id)?'open':'hidden'}><summary>${roles[id].label}</summary><label for="objective-${id}">${descriptions[id]}</label><textarea id="objective-${id}" name="detail-${id}" maxlength="1000" rows="3" placeholder="Você pode completar agora ou depois; isto não publica anúncio.">${esc(saved.roleDetails?.[id]||'')}</textarea></details>`).join('')}<div data-worker-goal ${selectedRoles.includes('worker')?'':'hidden'}><label for="account-worker-goal">Qual é o seu objetivo profissional?</label><select id="account-worker-goal" name="workerGoal"><option value="jobseeker" ${goal==='jobseeker'?'selected':''}>${workerGoals.jobseeker}</option><option value="service" ${goal==='service'?'selected':''}>${workerGoals.service}</option></select></div><p class="micro">Essas informações ficam privadas na conta. Cada anúncio exige sua própria confirmação de publicação.</p></fieldset>`;
 }
 const consentField=()=>'<label class="check full"><input type="checkbox" name="consent" required><span>Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a>. Concordo com o uso dos dados para criar meu perfil. Isso não autoriza publicação do meu contato nem cobrança.</span></label>';
 
@@ -81,7 +85,7 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
   async function prepareAuth() {
     if(!configured) return;
     try {
-      await auth.ready();ready=true;
+      await withLoading(()=>auth.ready());ready=true;
       if(area()) {
         if(!busy)for(const el of area().querySelectorAll('[data-needs-auth]'))el.disabled=false;
         const button=area().querySelector('[data-account-google]');if(button)button.dataset.authReady='true';
@@ -99,7 +103,7 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
       checkedProfiles.add(user.uid);
       if(account?.status==='active') {
         persistedProfiles.add(user.uid);accountData.set(user.uid,account);
-        store.savePreferences(user.uid,{role:account.role,workerGoal:account.workerGoal});
+        store.savePreferences(user.uid,{role:account.role,workerGoal:account.workerGoal,...(account.roles?accountObjectives(account):{})});
         return account;
       }
       return null;
@@ -119,11 +123,11 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
     const user=auth.getUser();if(!user)return renderForm('login');
     const role=validRole(intentRole)||'contractor',goal=role==='worker'&&intentGoal==='jobseeker'?'jobseeker':'service';
     const objective=role==='worker'?workerGoals[goal]:(roles[role]||roles.contractor).label;
-    openDialog(`<section data-account-view="complete"><span class="eyebrow">PRIMEIRO ACESSO</span><h2 id="dialog-title">Só falta confirmar seu WhatsApp.</h2><p class="dialog-intro">O Google já informou seu nome e e-mail. Confirme seu número e aceite as políticas para concluir o cadastro.</p><div class="account-summary"><strong>${esc(user.name||user.email)}</strong><p>${esc(user.email)}</p><span class="account-status">Conta Google conectada</span></div><form class="form-grid account-form" data-account-form="complete"><input type="hidden" name="role" value="${esc(role)}"><input type="hidden" name="workerGoal" value="${esc(goal)}"><div class="field full"><label for="account-phone">Seu WhatsApp com DDD</label><input id="account-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+55 87 99999-9999" maxlength="26" required></div><p class="notice full"><strong>Objetivo inicial: ${esc(objective)}.</strong><br>Você poderá trocar essa opção no seu perfil. O WhatsApp fica privado na conta e só aparece em anúncio se você autorizar ao publicar.</p><label class="check full"><input type="checkbox" name="consent" required><span>Confirmo que o WhatsApp informado é meu ou está sob minha responsabilidade. Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a> e aceito criar meu cadastro no Ajuda em Casa.</span></label><p class="account-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">Concluir meu cadastro</button></form><button type="button" class="btn secondary" data-account-signout>Usar outra conta Google</button></section>`);
+    openDialog(`<section data-account-view="complete"><span class="eyebrow">PRIMEIRO ACESSO</span><h2 id="dialog-title">Confirme seus dados e objetivos.</h2><p class="dialog-intro">O Google já informou seu nome e e-mail. Confirme seu número e aceite as políticas para concluir o cadastro.</p><div class="account-summary"><strong>${esc(user.name||user.email)}</strong><p>${esc(user.email)}</p><span class="account-status">Conta Google conectada</span></div><form class="form-grid account-form" data-account-form="complete">${roleFields(role,goal)}<div class="field full"><label for="account-phone">Seu WhatsApp com DDD</label><input id="account-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+55 87 99999-9999" maxlength="26" required></div><p class="notice full"><strong>Objetivo inicial: ${esc(objective)}.</strong><br>Você pode mudar seus objetivos a qualquer momento. O WhatsApp fica privado na conta e só aparece em anúncio se você autorizar ao publicar.</p><label class="check full"><input type="checkbox" name="consent" required><span>Confirmo que o WhatsApp informado é meu ou está sob minha responsabilidade. Li <a href="#termos">como funciona</a> e a <a href="#privacidade">informação de privacidade</a> e aceito criar meu cadastro no Ajuda em Casa.</span></label><p class="account-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">Concluir meu cadastro</button></form><button type="button" class="btn secondary" data-account-signout>Usar outra conta Google</button></section>`);
   }
   function showRoleForm() {
     const user=auth.getUser(),pref=store.readPreferences(user?.uid);
-    openDialog(`<section data-account-view="role"><span class="eyebrow">CONTA CONECTADA</span><h2 id="dialog-title">Qual é seu objetivo agora?</h2><p class="dialog-intro">Olá, ${esc(user?.name||user?.email)}. Escolha como quer usar o app. Você pode trocar de objetivo depois; isso não altera a titularidade dos anúncios.</p><form class="form-grid account-form" data-account-form="role">${roleFields(intentRole||pref?.role||'',intentRole?intentGoal:pref?.workerGoal||'service')}${consentField()}<p class="account-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">Salvar</button></form><a class="btn secondary" href="#mensagens">Minhas mensagens</a><button type="button" class="btn secondary" data-account-signout>Sair da conta</button></section>`);
+    openDialog(`<section data-account-view="role"><span class="eyebrow">CONTA CONECTADA</span><h2 id="dialog-title">Qual é seu objetivo agora?</h2><p class="dialog-intro">Olá, ${esc(user?.name||user?.email)}. Escolha como quer usar o app. Você pode escolher mais de um objetivo e completar cada descrição separadamente. Isso não altera a titularidade dos anúncios.</p><form class="form-grid account-form" data-account-form="role">${roleFields(intentRole||pref?.role||'',intentRole?intentGoal:pref?.workerGoal||'service',pref||{})}${consentField()}<p class="account-status full" role="status" aria-live="polite"></p><button class="btn primary full" type="submit">Salvar</button></form><a class="btn secondary" href="#mensagens">Minhas mensagens</a><button type="button" class="btn secondary" data-account-signout>Sair da conta</button></section>`);
     refreshAdminAction();
   }
   function showVerification() {
@@ -148,7 +152,7 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
     const saved=user?accountData.get(user.uid):null;
     const r=roles[profile.role]||roles.worker;
     const objective=profile.role==='worker'?workerGoals[profile.workerGoal||'service']:r.label;
-    openDialog(`<section data-account-view="profile" class="profile-role-${esc(profile.role)}"><span class="eyebrow">${preview?'PRÉVIA · NÃO É CONTA AUTENTICADA':'MEU PERFIL'}</span><h2 id="dialog-title">${preview?'Prévia do seu perfil':`Olá, ${esc(profile.name||profile.email)}.`}</h2><div class="account-summary"><strong>${esc(profile.name||profile.email)}</strong><p>${esc(profile.email)}</p>${saved?.phone?`<p>${esc(formatPhone(saved.phone))}</p>`:''}<span class="account-status">${r.icon} ${esc(objective)}${preview?' · Pré-cadastro local':' · Conta conectada'}</span></div>${preview?'<p class="notice auth-unavailable">Estes dados estão apenas neste navegador, durante esta sessão. Nenhuma conta online ou anúncio foi criado. O login precisa ser configurado antes de solicitar PRO pela área autenticada.</p>':'<p class="notice">Conta básica. A identidade da conta não confirma titularidade de telefone, anúncio, assinatura ou selo. O cadastro básico é publicado automaticamente com sua autorização. PRO e selo seguem procedimentos próprios.</p>'}<div class="account-actions"><button class="btn secondary" type="button" data-account-edit>${preview?'Editar pré-cadastro':'Trocar meu objetivo'}</button>${preview?'<button class="btn secondary" type="button" data-account-clear>Apagar pré-cadastro local</button>':'<button class="btn secondary" type="button" data-account-signout>Sair da conta</button>'}</div>${!preview?'<a class="btn primary" href="#mensagens">Minhas mensagens</a>':''}${profileBenefitsMarkup(profile.role,profile.workerGoal,config,{preview})}<p class="micro">Seu objetivo fica associado à conta e pode ser alterado. O telefone permanece privado até você autorizar sua publicação em um anúncio.</p></section>`);
+    openDialog(`<section data-account-view="profile" class="profile-role-${esc(profile.role)}"><span class="eyebrow">${preview?'PRÉVIA · NÃO É CONTA AUTENTICADA':'MEU PERFIL'}</span><h2 id="dialog-title">${preview?'Prévia do seu perfil':`Olá, ${esc(profile.name||profile.email)}.`}</h2><div class="account-summary"><strong>${esc(profile.name||profile.email)}</strong><p>${esc(profile.email)}</p>${saved?.phone?`<p>${esc(formatPhone(saved.phone))}</p>`:''}<span class="account-status">${r.icon} ${esc(objective)}${preview?' · Pré-cadastro local':' · Conta conectada'}</span></div>${preview?'<p class="notice auth-unavailable">Estes dados estão apenas neste navegador, durante esta sessão. Nenhuma conta online ou anúncio foi criado. O login precisa ser configurado antes de solicitar PRO pela área autenticada.</p>':'<p class="notice">Conta básica. A identidade da conta não confirma titularidade de telefone, anúncio, assinatura ou selo. O cadastro básico é publicado automaticamente com sua autorização. PRO e selo seguem procedimentos próprios.</p>'}<div class="account-actions"><button class="btn secondary" type="button" data-account-edit>${preview?'Editar pré-cadastro':'Meus objetivos'}</button>${preview?'<button class="btn secondary" type="button" data-account-clear>Apagar pré-cadastro local</button>':'<button class="btn secondary" type="button" data-account-signout>Sair da conta</button>'}</div>${!preview?'<a class="btn primary" href="#mensagens">Minhas mensagens</a>':''}${(profile.roles||[profile.role]).map(id=>`<section class="profile-objective"><h3>${esc(roles[id]?.label)}</h3><p>${esc(profile.roleDetails?.[id]||'Complete os detalhes em Meus objetivos.')}</p><a class="btn secondary" href="${id==='worker'?'#ser-contratado':id==='agency'?'#agenciar':'#contratar'}">${id==='worker'?'Divulgar serviço ou currículo':id==='agency'?'Preparar oportunidade agenciada':'Encontrar ou contratar'}</a></section>`).join('')}${profileBenefitsMarkup(profile.role,profile.workerGoal,config,{preview})}<p class="micro">Seu objetivo fica associado à conta e pode ser alterado. O telefone permanece privado até você autorizar sua publicação em um anúncio.</p></section>`);
     refreshAdminAction();
   }
   function open({role='',workerGoal='service',mode='signup'}={}) {
@@ -165,7 +169,7 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
   async function startGoogle({role='',workerGoal='service'}={}) {
     if(role){intentRole=validRole(role);intentGoal=workerGoal==='jobseeker'?'jobseeker':'service';}
     if(!configured){open();googleStatus('Não é possível entrar com Google ainda: o administrador precisa ativar o Firebase.');return;}
-    toast('Abrindo o acesso seguro do Google…');
+    const finishLoading=beginLoading();
     try {
       const user=await auth.signInGoogle();
       if(user?.emailVerified) {
@@ -173,6 +177,7 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
         if(existing)onRegistrationComplete(user);else showRegistrationForm();
       } else if(user)showVerification();
     } catch(error) {open();googleStatus(authErrorMessage(error));}
+    finally {finishLoading();}
   }
   async function resolveAccount({role='',workerGoal='service'}={}) {
     if(role){intentRole=validRole(role);intentGoal=workerGoal==='jobseeker'?'jobseeker':'service';}
@@ -203,8 +208,10 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
     else onError?.(failure);
   }
   document.addEventListener('change',event=>{
-    if(event.target.matches('[data-account-form] [name=role]')) {
-      const field=area()?.querySelector('[data-worker-goal]');if(field)field.hidden=event.target.value!=='worker';
+    if(event.target.matches('[data-account-form] [name=roles]')) {
+      const form=event.target.form;
+      const field=area()?.querySelector('[data-worker-goal]');if(field)field.hidden=!form.querySelector('[name=roles][value=worker]').checked;
+      const detail=form.querySelector(`[data-role-detail="${event.target.value}"]`);if(detail){detail.hidden=!event.target.checked;detail.open=event.target.checked;}
     }
   });
   document.addEventListener('submit',event=>{
@@ -215,9 +222,11 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
       const phone=phoneDigits(raw.phone);
       if(!phone){status('Informe um WhatsApp brasileiro válido com DDD.');return;}
       if(raw.consent!=='on'){status('Aceite as políticas para concluir seu cadastro.');return;}
+      let objectives;
+      try {const fields=new FormData(form);objectives=accountObjectives({roles:fields.getAll('roles'),roleDetails:Object.fromEntries(Object.keys(roles).map(id=>[id,fields.get('detail-'+id)||'']))});}catch(error){status(error.message);return;}
       perform(async()=>{
         const user=auth.getUser();
-        const preferences={role:validRole(raw.role)||'contractor',workerGoal:raw.workerGoal==='jobseeker'?'jobseeker':'service',phone};
+        const preferences={...objectives,workerGoal:raw.workerGoal==='jobseeker'?'jobseeker':'service',phone};
         const saved=await onProfileSave(preferences);
         checkedProfiles.add(user.uid);persistedProfiles.add(user.uid);accountData.set(user.uid,saved||{...user,...preferences,status:'active'});
         store.savePreferences(user.uid,preferences);intentRole='';
@@ -225,9 +234,12 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
       return;
     }
     if(kind==='role') {
+      let objectives;
+      try {const fields=new FormData(form);objectives=accountObjectives({roles:fields.getAll('roles'),roleDetails:Object.fromEntries(Object.keys(roles).map(id=>[id,fields.get('detail-'+id)||'']))});}
+      catch(error){status(error.message);return;}
       perform(async()=>{
         const user=auth.getUser();if(!user?.emailVerified) return showVerification();
-        const preferences={role:raw.role,workerGoal:raw.workerGoal};
+        const preferences={...objectives,workerGoal:raw.workerGoal};
         const saved=await onProfileSave(preferences);
         persistedProfiles.add(user.uid);checkedProfiles.add(user.uid);accountData.set(user.uid,saved||{...accountData.get(user.uid),...preferences});
         store.savePreferences(user.uid,preferences);intentRole='';
@@ -236,7 +248,7 @@ export function createAccountUI({config,auth,store,openDialog,toast,onProfileLoa
     }
     if(kind==='signup') {
       let draft;
-      try {draft=validateAccountDraft({...raw,consent:raw.consent==='on'});}
+      try {draft=validateAccountDraft({...raw,...accountObjectives({roles:new FormData(form).getAll('roles')}),consent:raw.consent==='on'});}
       catch(error) {status(error.message);return;}
       if(!configured) {store.saveDraft(draft);intentRole='';showProfile();return;}
       perform(async()=>{await auth.signUpEmail({name:draft.name,email:draft.email,password:raw.password});const user=auth.getUser();if(user)store.savePreferences(user.uid,{role:draft.role,workerGoal:draft.workerGoal});store.clearDraft();},{clearPasswords:true,onError:error=>{

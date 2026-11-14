@@ -1,10 +1,10 @@
 // Valores em centavos. A taxa é do contratante; candidatura e contato do trabalhador são gratuitos.
 export const DEFAULT_INTERMEDIATION_CENTS=20000;
-export const PLATFORM_SHARE_PERCENT=25;
+export const PLATFORM_SHARE_PERCENT=30;
 export function intermediationSplit(totalCents=DEFAULT_INTERMEDIATION_CENTS) {
   if(!Number.isSafeInteger(totalCents) || totalCents<0 || totalCents>100000000)
     throw new Error('Informe uma taxa válida entre R$ 0,00 e R$ 1.000.000,00, em centavos.');
-  const platformCents=Math.round(totalCents/4);
+  const platformCents=Math.round(totalCents*PLATFORM_SHARE_PERCENT/100);
   return {totalCents,platformCents,agencyCents:totalCents-platformCents,
     platformPercent:PLATFORM_SHARE_PERCENT,agencyPercent:100-PLATFORM_SHARE_PERCENT,payer:'employer',currency:'BRL',basis:'before_processing_fees'};
 }

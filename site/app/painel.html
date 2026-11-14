@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="theme-color" content="#B0472F">
+  <meta name="theme-color" content="#315BCB">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://www.gstatic.com https://securetoken.googleapis.com; frame-src https://*.firebaseapp.com https://accounts.google.com; img-src 'self' data: https:; style-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'">
   <title>Painel administrativo · Ajuda em Casa</title>
-  <link rel="icon" href="icone.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=40b629349f7e">
-  <link rel="stylesheet" href="admin.css?v=40b629349f7e">
-  <script type="module" src="admin.mjs?v=40b629349f7e"></script>
+  <link rel="icon" href="icone-azul.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="carregamento.css">
+  <link rel="stylesheet" href="styles.css?v=d544c6e559df">
+  <link rel="stylesheet" href="admin.css?v=d544c6e559df">
+  <script type="module" src="admin.mjs?v=d544c6e559df"></script>
 </head>
-<body class="admin-page">
+<body class="admin-page" data-app-loading="true" aria-busy="true">
+  <div id="app-loading" role="status" aria-live="polite" aria-label="Ajuda em Casa. Carregando"><img src="icone-azul-192.png" width="86" height="86" alt=""><strong>Ajuda em Casa</strong><p>Carregando…</p><div class="loading-track" aria-hidden="true"></div></div>
   <a class="skip-link" href="#admin-main">Pular para o painel</a>
   <header class="admin-header"><a class="brand" href="index.html"><img src="icone.svg" width="36" height="36" alt=""><span>Ajuda em Casa<small>ADMINISTRAÇÃO</small></span></a><div class="admin-session"><span id="admin-account"></span><button id="admin-signout" class="btn secondary" type="button" hidden>Sair da conta</button></div></header>
   <main id="admin-main" class="admin-main" tabindex="-1"><p class="notice" role="status">Conectando…</p></main>
   <dialog id="admin-dialog" aria-labelledby="admin-dialog-title"><button class="dialog-close" type="button" aria-label="Fechar janela">×</button><div id="admin-dialog-content"></div></dialog>
-  <noscript>Ative o JavaScript para acessar o painel.</noscript>
+  <noscript><link rel="stylesheet" href="sem-javascript.css">Ative o JavaScript para acessar o painel.</noscript>
 </body>
 </html>

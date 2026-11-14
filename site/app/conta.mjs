@@ -1,4 +1,5 @@
 // Preferências de apresentação e rascunhos nunca comprovam identidade ou acesso PRO.
+import {accountObjectives} from './objetivos.mjs?v=d544c6e559df';
 export const ACCOUNT_ROLES = Object.freeze([
   Object.freeze({ id: 'contractor', label: 'Contratante', title: 'Quero contratar', description: 'Encontre profissionais e divulgue oportunidades de trabalho.' }),
   Object.freeze({ id: 'worker', label: 'Profissional', title: 'Quero trabalhar', description: 'Ofereça serviços ou procure uma oportunidade de emprego.' }),
@@ -22,7 +23,7 @@ function preferences(raw) {
   const workerGoal = own(raw, 'workerGoal') === undefined ? 'service' : own(raw, 'workerGoal');
   if (!ACCOUNT_ROLES.some(item => item.id === role)) invalid('Escolha um perfil de conta válido.', 'invalid-role');
   if (!['service', 'jobseeker'].includes(workerGoal)) invalid('Escolha oferecer serviços ou procurar emprego.', 'invalid-worker-goal');
-  return { role, workerGoal };
+  return { role, workerGoal, ...(own(raw,'roles')!==undefined?accountObjectives(raw):{}) };
 }
 
 /** Retorna apenas campos permitidos; erros de validação têm mensagem pública em português. */

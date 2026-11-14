@@ -11,18 +11,20 @@
   <meta property="og:title" content="Ajuda em Casa · Profissionais em Petrolina">
   <meta property="og:description" content="Encontre profissionais e oportunidades em Petrolina. Simples, perto e direto ao ponto.">
   <meta property="og:url" content="https://ajudaemcasa.github.io/app/">
-  <meta property="og:image" content="https://ajudaemcasa.github.io/app/icone-512.png">
+  <meta property="og:image" content="https://ajudaemcasa.github.io/app/icone-azul-512.png">
   <meta property="og:image:alt" content="Símbolo do aplicativo Ajuda em Casa">
   <link rel="canonical" href="https://ajudaemcasa.github.io/app/">
   <title>Ajuda em Casa · Profissionais em Petrolina</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icone.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icone-192.png">
-  <link rel="stylesheet" href="styles.css?v=40b629349f7e">
-  <link rel="stylesheet" href="conexao.css?v=40b629349f7e">
-  <script type="module" src="bootstrap.mjs?v=40b629349f7e"></script>
+  <link rel="icon" href="icone-azul.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icone-azul-192.png">
+  <link rel="stylesheet" href="carregamento.css">
+  <link rel="stylesheet" href="styles.css?v=d544c6e559df">
+  <link rel="stylesheet" href="conexao.css?v=d544c6e559df">
+  <script type="module" src="bootstrap.mjs?v=d544c6e559df"></script>
 </head>
-<body class="compact-home conexao-site">
+<body class="compact-home conexao-site" data-app-loading="true" aria-busy="true">
+  <div id="app-loading" role="status" aria-live="polite" aria-label="Ajuda em Casa. Carregando"><img src="icone-azul-192.png" width="86" height="86" alt=""><strong>Ajuda em Casa</strong><p>Carregando…</p><div class="loading-track" aria-hidden="true"></div></div>
   <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
   <header class="site-header container">
     <button id="menu-toggle" class="menu-toggle" type="button" aria-controls="side-menu" aria-expanded="false" aria-label="Abrir menu principal"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span class="menu-toggle-label">Menu</span></button>
@@ -41,11 +43,9 @@
       <nav aria-label="Menu principal">
         <a href="#inicio"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></svg><span>Início</span></a>
         <a href="#servicos"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Encontrar profissionais</span></a>
-        <a data-nav-role="worker" href="#ser-contratado"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V4h8v3M3 12l9 3 9-3"/></svg><span>Divulgue seu serviço</span></a>
-        <a data-nav-role="contractor" href="#contratar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9 10 10 0 0 1-4-.8L3 21l1.8-5a9 9 0 1 1 16.2-5Z"/><path d="M8 10h8M8 14h5"/></svg><span>Quero contratar</span></a>
-        <a href="#oportunidades"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 4 6 6-11 11-6-6L14 4Z"/><path d="m11 7 6 6M3 21l3-1-2-2-1 3Z"/></svg><span>Oportunidades de trabalho</span></a>
-        <a data-nav-role="agency" href="#agenciar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M17 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 5"/></svg><span>Para agenciadores</span></a>
-        <a class="nav-pro" href="#planos"><svg class="icon crown-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 4.5 4L12 3l4.5 7L21 6l-2 13H5L3 6Z"/><path d="M6 16h12"/></svg><span>Conheça o PRO</span></a>
+        <a data-nav-role="worker" href="#ser-contratado"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V4h8v3M3 12l9 3 9-3"/></svg><span>Quero trabalhar</span></a>
+        <a data-nav-role="contractor" href="#contratar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg><span>Publicar oportunidade</span></a>
+        <a class="nav-pro" href="#planos"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 4 4 5-7 5 7 4-4-2 13H5Z"/></svg><span>Planos e destaques</span></a>
         <a class="nav-account" href="#conta"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/></svg><span>Meu perfil / Entrar</span></a>
       </nav>
       <div class="sidebar-note"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21 3.5 12.5A6 6 0 0 1 12 4a6 6 0 0 1 8.5 8.5L12 21Z"/></svg><p>Uma rede de gente<br><strong>que faz acontecer.</strong></p></div>
@@ -96,6 +96,6 @@
   <dialog id="dialog" aria-labelledby="dialog-title"><button class="dialog-close" type="button" aria-label="Fechar janela">×</button><div id="dialog-content"></div></dialog>
   <dialog id="info-dialog" aria-labelledby="info-dialog-title"><button class="info-dialog-close" type="button" data-close-info aria-label="Voltar ao formulário">×</button><div id="info-dialog-content"></div></dialog>
   <div id="toast" class="toast" role="status" hidden></div>
-  <noscript><p class="container">Ative o JavaScript para consultar os contatos e usar os formulários.</p></noscript>
+  <noscript><link rel="stylesheet" href="sem-javascript.css"><p class="container">Ative o JavaScript para consultar os contatos e usar os formulários.</p></noscript>
 </body>
 </html>

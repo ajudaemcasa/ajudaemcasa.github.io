@@ -1,0 +1,13 @@
+body[data-app-loading] { overflow:hidden; }
+body[data-app-loading]>:not(#app-loading):not(script):not(noscript) { visibility:hidden!important; pointer-events:none!important; }
+body[data-app-loading] dialog::backdrop { visibility:hidden!important; }
+#app-loading { position:fixed; inset:0; z-index:2147483647; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; width:100%; height:100%; min-height:100dvh; max-width:none; max-height:none; box-sizing:border-box; margin:0; padding:24px; border:0; background:#f4f6fb; color:#21324c; font:16px/1.6 'Segoe UI',system-ui,sans-serif; text-align:center; }
+#app-loading[hidden] { display:none!important; }
+#app-loading img { width:86px; height:86px; border-radius:23px; box-shadow:0 10px 32px #315bcb26; animation:marca-respira 1.6s ease-in-out infinite; }
+#app-loading strong { margin-top:20px; font-size:26px; line-height:1.3; letter-spacing:-.7px; }
+#app-loading p { margin:9px 0 22px; font-size:16px; color:#50698e; }
+.loading-track { width:152px; height:4px; border-radius:8px; overflow:hidden; background:#dbe5f8; }
+.loading-track::after { content:''; display:block; width:45%; height:100%; border-radius:8px; background:#315bcb; animation:marca-progresso 1.3s ease-in-out infinite; }
+@keyframes marca-respira { 50% { transform:scale(1.045); box-shadow:0 13px 38px #315bcb38; } }
+@keyframes marca-progresso { from { transform:translateX(-110%); } to { transform:translateX(330%); } }
+@media(prefers-reduced-motion:reduce) { #app-loading img,.loading-track::after { animation:none; }.loading-track::after { width:100%; opacity:.65; } }

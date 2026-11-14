@@ -1,4 +1,4 @@
-import { validateEvent } from './domain.mjs?v=40b629349f7e';
+import { validateEvent } from './domain.mjs?v=d544c6e559df';
 
 export class DeliveryError extends Error {
   constructor(message, code) { super(message); this.code = code; }

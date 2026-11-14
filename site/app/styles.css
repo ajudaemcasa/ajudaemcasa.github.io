@@ -458,3 +458,9 @@ dialog :is(input,textarea,select) { font-size:16px; }
   .google-signin-panel { padding:12px; }
 }
 #dialog-title[tabindex="-1"]:focus,#info-dialog-title[tabindex="-1"]:focus { outline:none; }
+/* Objetivos independentes, com a mesma marca azul da área pública. */
+.profile-objective { padding:18px; margin:16px 0; border:1px solid #cbd8f3; border-radius:14px; background:#f7f9ff; }
+.profile-objective p { white-space:pre-wrap; overflow-wrap:anywhere; }
+[data-role-detail] { padding:14px 0; border-bottom:1px solid #dbe3f5; }
+[data-role-detail] summary { cursor:pointer; font-weight:700; margin-bottom:10px; }
+[data-role-detail] textarea { width:100%; box-sizing:border-box; }
