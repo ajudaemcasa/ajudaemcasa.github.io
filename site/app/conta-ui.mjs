@@ -1,9 +1,9 @@
-import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=563d09a12b14';
-import { authConfigured, authErrorMessage } from './auth-service.mjs?v=563d09a12b14';
-import { commercialOffer } from './comercial.mjs?v=563d09a12b14';
-import {formatPhone,phoneDigits} from './telefone.mjs?v=563d09a12b14';
-import {beginLoading,withLoading} from './carregamento.mjs?v=563d09a12b14';
-import {accountObjectives} from './objetivos.mjs?v=563d09a12b14';
+import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=b10f7360f103';
+import { authConfigured, authErrorMessage } from './auth-service.mjs?v=b10f7360f103';
+import { commercialOffer } from './comercial.mjs?v=b10f7360f103';
+import {formatPhone,phoneDigits} from './telefone.mjs?v=b10f7360f103';
+import {beginLoading,withLoading} from './carregamento.mjs?v=b10f7360f103';
+import {accountObjectives} from './objetivos.mjs?v=b10f7360f103';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const roles={

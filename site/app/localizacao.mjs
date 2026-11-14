@@ -1,7 +1,7 @@
-import {vacancyPresentation} from './anuncios.mjs?v=563d09a12b14';
-import {agencyFee} from './intermediacao.mjs?v=563d09a12b14';
-import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=563d09a12b14';
-import {phoneDigits} from './telefone.mjs?v=563d09a12b14';
+import {vacancyPresentation} from './anuncios.mjs?v=b10f7360f103';
+import {agencyFee} from './intermediacao.mjs?v=b10f7360f103';
+import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=b10f7360f103';
+import {phoneDigits} from './telefone.mjs?v=b10f7360f103';
 export function approximateLocation(value) {
   if (!value || typeof value.lat !== 'number' || typeof value.lng !== 'number' || !Number.isFinite(value.lat) || !Number.isFinite(value.lng) || Math.abs(value.lat)>85 || Math.abs(value.lng)>180) return null;
   // Grade de ~1,1 km de lado em Petrolina. Não é anonimização nem coordenada exata.
@@ -49,6 +49,7 @@ export function searchVacancies(jobs, filters={}, now=Date.now(), advertisers=[]
       const ad=vacancyPresentation(j,advertisers,now);
       const linked=account?.kind===(j.publisherType||'employer') && account.ownershipVerified===true && account.contactAuthorized===true;
       return {id:j.id,title:j.title,publicName:j.publicName,phone:j.phone,email:j.email,contactOptions:j.contactOptions,contactRef:j.contactRef,category:j.category,description:j.description,neighborhood:j.neighborhood,schedule:j.schedule,distanceKm:distanceKm(filters.origin,j.location),ad,intermediation:agencyFee(j),
+        ...(j.publicSource?{publicSource:j.publicSource,publisherType:j.publisherType,publicationFormat:j.publicationFormat,intermediationSource:j.intermediation}:{}),
         promotion:linked?{agencyTrialDays:agencyTrialDays(account,now),paidBoostDays:paidBoostDays(account,now)}:{}};
     });
 }

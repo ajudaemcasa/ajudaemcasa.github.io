@@ -10,7 +10,7 @@ if('serviceWorker' in navigator && location.protocol!=='file:') {
   navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{/* A vitrine funciona sem worker e offline usa o cache já instalado. */});
 }
 try {
-  await import('./app.mjs?v=563d09a12b14');
+  await import('./app.mjs?v=b10f7360f103');
 } catch {
   document.body.removeAttribute('data-app-loading');document.body.setAttribute('aria-busy','false');
   const overlay=document.getElementById('app-loading');if(overlay){if(overlay.matches(':popover-open'))overlay.hidePopover();overlay.hidden=true;}

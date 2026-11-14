@@ -1,32 +1,34 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=563d09a12b14';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=563d09a12b14';
-import { createN8nService } from './n8n-service.mjs?v=563d09a12b14';
-import { commercialOffer } from './comercial.mjs?v=563d09a12b14';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=563d09a12b14';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=563d09a12b14';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=563d09a12b14';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=563d09a12b14';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=563d09a12b14';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=563d09a12b14';
-import { createAccountStore } from './conta.mjs?v=563d09a12b14';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=563d09a12b14';
-import {profileHeading} from './perfil.mjs?v=563d09a12b14';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=563d09a12b14';
-import {createRequestService} from './request-service.mjs?v=563d09a12b14';
-import {hasContact,validEmail} from './canais.mjs?v=563d09a12b14';
-import {createPublicationService} from './autopublicacao.mjs?v=563d09a12b14';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=563d09a12b14';
-import {createMessagesService} from './mensagens.mjs?v=563d09a12b14';
-import {createMessagesUI} from './mensagens-ui.mjs?v=563d09a12b14';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=563d09a12b14';
-import {selectSpotlightProfiles} from './destaques-home.mjs?v=563d09a12b14';
-import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=563d09a12b14';
-import {setupInstallation} from './instalacao-ui.mjs?v=563d09a12b14';
-import {crownMarkup} from './layout-conexao.mjs?v=563d09a12b14';
-import {createNotificationService} from './avisos.mjs?v=563d09a12b14';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=563d09a12b14';
-import {createVotesService} from './votos.mjs?v=563d09a12b14';
-import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=563d09a12b14';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=b10f7360f103';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=b10f7360f103';
+import { createN8nService } from './n8n-service.mjs?v=b10f7360f103';
+import { commercialOffer } from './comercial.mjs?v=b10f7360f103';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=b10f7360f103';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=b10f7360f103';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=b10f7360f103';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=b10f7360f103';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=b10f7360f103';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=b10f7360f103';
+import { createAccountStore } from './conta.mjs?v=b10f7360f103';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=b10f7360f103';
+import {profileHeading} from './perfil.mjs?v=b10f7360f103';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=b10f7360f103';
+import {createRequestService} from './request-service.mjs?v=b10f7360f103';
+import {hasContact,validEmail} from './canais.mjs?v=b10f7360f103';
+import {createPublicationService} from './autopublicacao.mjs?v=b10f7360f103';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=b10f7360f103';
+import {createMessagesService} from './mensagens.mjs?v=b10f7360f103';
+import {createMessagesUI} from './mensagens-ui.mjs?v=b10f7360f103';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=b10f7360f103';
+import {selectSpotlightProfiles} from './destaques-home.mjs?v=b10f7360f103';
+import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=b10f7360f103';
+import {setupInstallation} from './instalacao-ui.mjs?v=b10f7360f103';
+import {crownMarkup} from './layout-conexao.mjs?v=b10f7360f103';
+import {createNotificationService} from './avisos.mjs?v=b10f7360f103';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=b10f7360f103';
+import {createVotesService} from './votos.mjs?v=b10f7360f103';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=b10f7360f103';
+import {PUBLIC_JOB_CATEGORY,isPublicAgencyVacancy} from './vagas-publicas.mjs?v=b10f7360f103';
+import {publicVacancyCard,publicVacancyDetails} from './vagas-publicas-ui.mjs?v=b10f7360f103';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -96,6 +98,7 @@ function registrationLocation() {
   return `<fieldset class="full"><legend>Endereço de referência · localização aproximada</legend><label for="registration-area">Bairro ou condomínio em Petrolina</label><input id="registration-area" name="area" list="locality-options" maxlength="220" placeholder="Digite para buscar na lista ou informe outro bairro"><label for="registration-street">Rua ou avenida (opcional, sem número)</label><input id="registration-street" maxlength="100" autocomplete="off" placeholder="Referência apenas nesta tela"><p class="micro">Rua não é enviada nem armazenada. O bairro e a região aproximada ajudam a encontrar oportunidades perto de você; não publique número ou apartamento.</p>${locationPicker()}<label class="check"><input type="checkbox" name="locationConsent"><span>Autorizo usar e divulgar somente minha região aproximada (~1 km), se eu definir um ponto. Sei que ela não garante anonimato.</span></label></fieldset>`;
 }
 function vacancyCard(job) {
+  if(isPublicAgencyVacancy(job))return publicVacancyCard(job);
   const number=phoneDigits(job.phone);
   const agency=job.ad.kind==='agency';
   const message=agency?'Olá! Vi a oportunidade '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e quero falar diretamente com o agenciador.':'Olá! Vi a vaga '+job.title+' no Ajuda em Casa (https://ajudaemcasa.github.io/app/) e tenho interesse em conversar sobre o trabalho.';
@@ -151,6 +154,11 @@ function card(profile) {
 function renderResults() {
   if (!catalog) return;
   const jobs=['jobs','agencies'].includes(filters.mode);
+  const publicCategory=$('#category option[value="'+PUBLIC_JOB_CATEGORY.id+'"]');
+  if(publicCategory){publicCategory.hidden=!jobs;publicCategory.disabled=!jobs;}
+  if(!jobs&&filters.category===PUBLIC_JOB_CATEGORY.id){filters.category='';$('#category').value='';}
+  $('label[for="query"]').textContent=jobs?'Pesquisar oportunidade de trabalho':'Pesquisar serviço ou profissional';
+  $('#query').placeholder=jobs?'Ex.: auxiliar, PCD, pedreiro ou jovem aprendiz':'Ex.: ar condicionado, eletricista ou nome';
   filters.adType=filters.mode==='jobseekers'?'jobseeker':'';
   filters.publisherType=filters.mode==='agencies'?'agency':'';
   const filterKey=JSON.stringify(filters);
@@ -249,7 +257,7 @@ function slideBy(carousel, direction) {
 function revokePreviews() { for (const url of mediaBlobs) URL.revokeObjectURL(url); mediaBlobs.clear(); }
 function closeDialog() {
   if (dialog.querySelector('form[data-busy="true"]')) return;
-  if (/^#(?:perfil\/|perfil-conta|conta|entrar|contratar|ser-contratado|agenciar|modelos|agenciador|pro-emprego|planos|cadastro|meu-cadastro|avaliar|pro$|orcamento|publicar-vaga|destaque|patrocinio|privacidade|termos)/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search+(location.hash.startsWith('#perfil/')?profileReturnHash:'#profissionais'));
+  if (/^#(?:vaga\/|perfil\/|perfil-conta|conta|entrar|contratar|ser-contratado|agenciar|modelos|agenciador|pro-emprego|planos|cadastro|meu-cadastro|avaliar|pro$|orcamento|publicar-vaga|destaque|patrocinio|privacidade|termos)/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search+(/^#(?:perfil|vaga)\//.test(location.hash)?profileReturnHash:'#profissionais'));
   revokePreviews();
   dialog.close();
   if(config&&catalog)route();
@@ -385,6 +393,10 @@ function route() {
     $('#directory-mode').value=filters.mode;renderResults();renderHome();return;
   }
   if(hash==='mensagens')return accountUI.guard(()=>messagesUI.open());
+  if(hash.startsWith('vaga/')) {
+    const job=vacancies.jobs.find(j=>j.id===hash.slice(5)&&j.status==='approved'&&Date.parse(j.expiresAt)>Date.now());
+    return openDialog(publicVacancyDetails(job));
+  }
   if(hash.startsWith('mensagem/'))return accountUI.guard(()=>{
     const id=hash.slice(9),profile=[...catalog.profiles,...vacancies.jobs].find(p=>p.id===id);
     if(!profile)return openDialog('<h2 id="dialog-title">Contato não encontrado</h2><p>Este anúncio pode ter sido retirado.</p>');
@@ -689,14 +701,14 @@ async function start() {
     $('#demo-notice').hidden = !availableProfiles().some(p => p.demo);
     $('#commercial-notice').textContent=config.directoryMessage||'Encontre e converse gratuitamente.';
     $('#year').textContent = new Date().getFullYear();
-    $('#category').insertAdjacentHTML('beforeend',options(CATEGORIES));
+    $('#category').insertAdjacentHTML('beforeend',options([...CATEGORIES,PUBLIC_JOB_CATEGORY]));
     $('#locality-options').innerHTML=[...NEIGHBORHOODS,...CONDOMINIUMS.map(c=>`${c.name} · ${c.neighborhood || 'Petrolina'}`)].map(n=>`<option value="${esc(n)}"></option>`).join('');
     $('#locality-count').textContent=`${CONDOMINIUMS.length} condomínios e ${NEIGHBORHOODS.length} bairros/regiões da base original. Você também pode informar outro bairro.`;
     $('#search-location').innerHTML=locationPicker();initLocationPickers($('#search-location'),config);
     $('#search-location').addEventListener('locationchange',event=>{filters.origin=event.detail;renderResults();});
     const params=new URLSearchParams(location.search);
     const requestedCategory = params.get('categoria');
-    filters.category=CATEGORIES.find(c => c.id === requestedCategory || c.name === requestedCategory)?.id || '';
+    filters.category=[...CATEGORIES,PUBLIC_JOB_CATEGORY].find(c => c.id === requestedCategory || c.name === requestedCategory)?.id || '';
     filters.neighborhood=(params.get('bairro') || '').slice(0,100);
     filters.sort=params.get('ordem')==='mais-proximos'?'distance':'recommended';$('#sort').value=filters.sort;
     filters.mode=({vagas:'jobs',agencias:'agencies',emprego:'jobseekers'})[params.get('modo')]||'professionals';$('#directory-mode').value=filters.mode;
