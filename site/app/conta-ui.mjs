@@ -1,7 +1,7 @@
-import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=db21b3690644';
-import { authConfigured, authErrorMessage } from './auth-service.mjs?v=db21b3690644';
-import { commercialOffer } from './comercial.mjs?v=db21b3690644';
-import {formatPhone,phoneDigits} from './telefone.mjs?v=db21b3690644';
+import { ACCOUNT_ROLES, validateAccountDraft } from './conta.mjs?v=40b629349f7e';
+import { authConfigured, authErrorMessage } from './auth-service.mjs?v=40b629349f7e';
+import { commercialOffer } from './comercial.mjs?v=40b629349f7e';
+import {formatPhone,phoneDigits} from './telefone.mjs?v=40b629349f7e';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const roles={

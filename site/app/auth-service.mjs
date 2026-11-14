@@ -178,6 +178,10 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
     if (!settings) return Promise.reject(authError({ code: 'auth/not-configured' }));
     if (initialized) return Promise.resolve(getUser());
     if (!readyPromise) {
+      // O roteador da busca pode limpar a query enquanto o SDK carrega.
+      // Capturar o pedido agora preserva o clique feito na origem GitHub.
+      const requestedGoogle=redirectMode && navigation?.location?.origin===accessOrigin &&
+        new URL(navigation.location.href).searchParams.get('entrarGoogle')==='1';
       readyPromise = (async () => {
         sdk = loadedSdk ?? await loadSdk();
         const name = `ajuda-em-casa-marketplace-auth:${settings.projectId}:${settings.appId}`;
@@ -192,7 +196,7 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
           const redirectResult=await sdk.getRedirectResult(auth);
           completedGoogleRedirect=!!redirectResult?.user && !!auth.currentUser;
           const url=new URL(navigation.location.href);
-          if(url.searchParams.get('entrarGoogle')==='1' && !auth.currentUser) {
+          if(requestedGoogle && !auth.currentUser) {
             url.searchParams.delete('entrarGoogle');
             navigation.history.replaceState(null,'',url.href);
             await redirectGoogle();

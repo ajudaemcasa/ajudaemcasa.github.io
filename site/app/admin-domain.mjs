@@ -1,7 +1,7 @@
-import {CATEGORIES,validateEvent} from './domain.mjs?v=db21b3690644';
-import {phoneDigits} from './telefone.mjs?v=db21b3690644';
-import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=db21b3690644';
-import {hasContact} from './canais.mjs?v=db21b3690644';
+import {CATEGORIES,validateEvent} from './domain.mjs?v=40b629349f7e';
+import {phoneDigits} from './telefone.mjs?v=40b629349f7e';
+import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=40b629349f7e';
+import {hasContact} from './canais.mjs?v=40b629349f7e';
 
 export const REQUEST_LABELS={novo_cadastro_gratuito:'Cadastro básico',solicitacao_upgrade_pro:'Solicitação PRO',ativacao_destaque_3dias:'Destaque',novo_orcamento_cliente:'Orçamento',interesse_patrocinio_loja:'Patrocínio',nova_vaga_empregador:'Vaga',solicitacao_titularidade:'Titularidade',nova_avaliacao:'Avaliação'};
 export function cleanText(raw,max,{required=false}={}) {

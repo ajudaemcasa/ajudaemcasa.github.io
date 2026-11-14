@@ -1,7 +1,7 @@
-import {vacancyPresentation} from './anuncios.mjs?v=db21b3690644';
-import {agencyFee} from './intermediacao.mjs?v=db21b3690644';
-import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=db21b3690644';
-import {phoneDigits} from './telefone.mjs?v=db21b3690644';
+import {vacancyPresentation} from './anuncios.mjs?v=40b629349f7e';
+import {agencyFee} from './intermediacao.mjs?v=40b629349f7e';
+import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=40b629349f7e';
+import {phoneDigits} from './telefone.mjs?v=40b629349f7e';
 export function approximateLocation(value) {
   if (!value || typeof value.lat !== 'number' || typeof value.lng !== 'number' || !Number.isFinite(value.lat) || !Number.isFinite(value.lng) || Math.abs(value.lat)>85 || Math.abs(value.lng)>180) return null;
   // Grade de ~1,1 km de lado em Petrolina. Não é anonimização nem coordenada exata.
