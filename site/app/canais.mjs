@@ -1,4 +1,4 @@
-import {phoneDigits} from './telefone.mjs?v=e03be0096255';
+import {phoneDigits} from './telefone.mjs?v=db21b3690644';
 export const validEmail=value=>typeof value==='string' && value.length<=180 && /^[^\s@<>/\\]+@[^\s@<>/\\]+\.[^\s@<>/\\]+$/.test(value) && !/[\p{Cc}\p{Cf}]/u.test(value);
 export function contactChoices(raw,email) {
   if(!raw || typeof raw.email!=='boolean' || typeof raw.whatsapp!=='boolean')throw new Error('Escolha os canais de contato.');

@@ -1,7 +1,7 @@
-import {vacancyPresentation} from './anuncios.mjs?v=e03be0096255';
-import {agencyFee} from './intermediacao.mjs?v=e03be0096255';
-import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=e03be0096255';
-import {phoneDigits} from './telefone.mjs?v=e03be0096255';
+import {vacancyPresentation} from './anuncios.mjs?v=db21b3690644';
+import {agencyFee} from './intermediacao.mjs?v=db21b3690644';
+import {promotionRank,agencyTrialDays,paidBoostDays} from './promocoes.mjs?v=db21b3690644';
+import {phoneDigits} from './telefone.mjs?v=db21b3690644';
 export function approximateLocation(value) {
   if (!value || typeof value.lat !== 'number' || typeof value.lng !== 'number' || !Number.isFinite(value.lat) || !Number.isFinite(value.lng) || Math.abs(value.lat)>85 || Math.abs(value.lng)>180) return null;
   // Grade de ~1,1 km de lado em Petrolina. Não é anonimização nem coordenada exata.
@@ -29,12 +29,15 @@ function linkedVacancyAdvertiser(job,advertisers) {
 }
 export function searchVacancies(jobs, filters={}, now=Date.now(), advertisers=[]) {
   const time=value=>typeof value==='number'?value:Date.parse(value);
-  const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
   return jobs.filter(j=>j.status==='approved' && time(j.expiresAt)>+new Date(now))
     .filter(j=>!filters.publisherType || (j.publisherType||'employer')===filters.publisherType)
     .filter(j=>!filters.category || j.category===filters.category)
     .filter(j=>!filters.neighborhood || clean(j.neighborhood).includes(clean(filters.neighborhood)))
-    .filter(j=>!filters.query || clean([j.title,j.description,j.neighborhood].join(' ')).includes(clean(filters.query)))
+    .filter(j=>{
+      const haystack=clean([j.title,j.category,j.description,j.neighborhood].join(' '));
+      return clean(filters.query).split(' ').filter(Boolean).every(term=>haystack.includes(term));
+    })
     .sort((a,b)=>{
       const advertiser=job=>linkedVacancyAdvertiser(job,advertisers);
       return (filters.sort==='recommended'?0:compareDistance(a,b,filters.origin)) ||

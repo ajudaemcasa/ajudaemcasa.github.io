@@ -457,3 +457,4 @@ dialog :is(input,textarea,select) { font-size:16px; }
   .compact-home .site-header>.google-entry { grid-column:1/-1; grid-row:2; width:100%; }
   .google-signin-panel { padding:12px; }
 }
+#dialog-title[tabindex="-1"]:focus,#info-dialog-title[tabindex="-1"]:focus { outline:none; }

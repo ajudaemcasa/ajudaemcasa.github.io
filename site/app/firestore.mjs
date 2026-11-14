@@ -1,4 +1,5 @@
-import {authConfigured} from './auth-service.mjs?v=e03be0096255';
+import {authConfigured} from './auth-service.mjs?v=db21b3690644';
+import {phoneDigits} from './telefone.mjs?v=db21b3690644';
 
 export const backendConfigured = config => authConfigured(config) && config?.data?.provider === 'firestore';
 export class DataError extends Error {
@@ -92,10 +93,17 @@ export function createDataClient(config,auth,{fetcher=globalThis.fetch}={}) {
       const [access,account]=await Promise.all([this.get('adminAccess/'+user.email),this.get('users/'+user.uid)]);
       return auth.getUser()?.uid===user.uid && access?.data.enabled===true && (!account || account.data.status==='active');
     },
+    async loadAccount(user) {
+      if(!enabled||!user?.uid)return null;
+      const current=await this.get('users/'+user.uid);
+      return current?.data||null;
+    },
     async saveAccount(user,preferences={}) {
       const path='users/'+user.uid,current=await this.get(path);
       if(current && current.data.status!=='active')throw new DataError('Esta conta não está habilitada para usar o app. Procure o atendimento.','SUSPENDED');
-      const data={...(current?.data||{}),uid:user.uid,email:user.email,name:user.name||user.email,role:preferences.role||current?.data.role||'contractor',workerGoal:preferences.workerGoal||current?.data.workerGoal||'service',status:current?.data.status||'active',consentVersion:'2026-11-07',revision:current?.data.revision||0};
+      const suppliedPhone=Object.hasOwn(preferences,'phone'),phone=suppliedPhone?phoneDigits(preferences.phone):(current?.data.phone||'');
+      if((suppliedPhone||!current)&&!phone)throw new DataError('Informe um WhatsApp brasileiro válido com DDD.','INVALID_PHONE');
+      const data={...(current?.data||{}),uid:user.uid,email:user.email,name:user.name||user.email,role:preferences.role||current?.data.role||'contractor',workerGoal:preferences.workerGoal||current?.data.workerGoal||'service',status:current?.data.status||'active',consentVersion:'2026-11-14',revision:current?.data.revision||0,...(phone?{phone}:{})};
       await this.commit([write(path,data,{version:current?.version,create:!current,timestamps:current?['updatedAt']:['createdAt','updatedAt']})]);
       return data;
     }

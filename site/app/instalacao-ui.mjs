@@ -5,26 +5,16 @@ let disposePrevious;
 
 const guides={
   ios:{title:'No iPhone ou iPad',steps:[
-    'Abra o Ajuda em Casa no Safari.',
-    'Toque em Compartilhar. Dependendo do Safari, essa opção fica no menu da página.',
-    'Escolha Adicionar à Tela de Início. Se aparecer Abrir como App, mantenha essa opção ativada.',
-    'Confirme em Adicionar. Depois, abra pelo ícone na tela inicial.'
+    'No menu do navegador, toque em Compartilhar → Adicionar à Tela de Início → Adicionar.'
   ]},
   android:{title:'No celular Android',steps:[
-    'Abra o Ajuda em Casa no Chrome e toque no menu de três pontos (⋮).',
-    'Escolha Instalar app ou Adicionar à tela inicial.',
-    'Confirme a opção oferecida pelo navegador. Depois, abra pelo ícone criado no celular.'
+    'Abra o menu do navegador (⋮), escolha Instalar app ou Adicionar à tela inicial e confirme.'
   ]},
-  desktop:{title:'No computador com Chrome ou Edge',steps:[
-    'Procure o ícone de instalação na barra de endereço e clique nele.',
-    'Se o ícone não aparecer no Chrome, abra o menu (⋮), depois Transmitir, salvar e compartilhar e Instalar página como app.',
-    'No Edge, abra o menu (…), Mais ferramentas, Aplicativos e Instalar este site como um aplicativo. Em algumas versões, Aplicativos aparece diretamente no menu.',
-    'Confirme a instalação. Abra o Ajuda em Casa pela lista de aplicativos do computador.'
+  desktop:{title:'Neste computador',steps:[
+    'No Chrome, use o ícone de instalação da barra de endereço. No Edge, abra Aplicativos → Instalar este site como aplicativo.'
   ]},
   mac:{title:'No Mac com Safari',steps:[
-    'Abra o Ajuda em Casa no Safari.',
-    'No menu Arquivo ou no botão Compartilhar, escolha Adicionar ao Dock.',
-    'Confirme em Adicionar. Depois, abra o Ajuda em Casa pelo ícone no Dock.'
+    'No Safari, escolha Arquivo → Adicionar ao Dock e confirme em Adicionar.'
   ]}
 };
 
@@ -36,10 +26,20 @@ function platformOf(navigator) {
   return 'desktop';
 }
 
+function browserOf(navigator) {
+  const ua=navigator.userAgent||'';
+  if(/Edg\//i.test(ua))return 'edge';
+  if(/SamsungBrowser\//i.test(ua))return 'samsung';
+  if(/Firefox|FxiOS/i.test(ua))return 'firefox';
+  if(/Chrome|CriOS|Chromium/i.test(ua))return 'chrome';
+  if(/Safari/i.test(ua))return 'safari';
+  return 'other';
+}
+
 const guideMarkup=key=>`<section class="installation-platform"><h3>${guides[key].title}</h3><ol>${guides[key].steps.map(step=>`<li>${step}</li>`).join('')}</ol></section>`;
 
 function instructionsMarkup(platform,intro='') {
-  return `<section class="installation-help"><span class="eyebrow">AJUDA EM CASA, SEMPRE POR PERTO</span><h2 id="dialog-title">Instale no seu celular ou computador.</h2><p class="dialog-intro">${intro||'Tenha um ícone do Ajuda em Casa para abrir o site como app. A instalação é feita pelo seu navegador.'}</p>${guideMarkup(platform)}<details class="installation-other"><summary>Como instalar em outro aparelho</summary>${Object.keys(guides).filter(key=>key!==platform).map(guideMarkup).join('')}</details><p class="installation-note">Se o navegador oferecer apenas um atalho, ele abrirá o site. Você pode continuar usando o Ajuda em Casa normalmente pelo navegador.</p></section>`;
+  return `<section class="installation-help"><span class="eyebrow">INSTALAÇÃO NESTE APARELHO</span><h2 id="dialog-title">${platform==='ios'?'Adicione à tela inicial.':'Instale pelo seu navegador.'}</h2><p class="dialog-intro">${intro||(platform==='ios'?'O iPhone e o iPad exigem esta confirmação no menu do navegador.':'O navegador ainda não disponibilizou o convite automático. Se o app já estiver instalado, abra pelo ícone no aparelho.')}</p>${guideMarkup(platform)}</section>`;
 }
 
 function labelElement(button,document) {
@@ -57,18 +57,18 @@ function labelElement(button,document) {
 }
 
 /** Conecta os atalhos existentes e retorna uma função para remover os listeners. */
-export function setupInstallation({showInfo}={}) {
+export function setupInstallation({showInfo,toast=()=>{}}={}) {
   const window=globalThis.window,document=globalThis.document,navigator=globalThis.navigator;
   if(!window||!document||!navigator)return ()=>{};
   if(typeof showInfo!=='function')throw new TypeError('setupInstallation precisa de showInfo(html).');
   disposePrevious?.();
-  let deferredPrompt=null,prompting=false,confirmedInstalled=false,disposed=false;
+  let deferredPrompt=window.__ajudaInstallPrompt||null,prompting=false,confirmedInstalled=false,disposed=false;
   const displayMode=window.matchMedia?.('(display-mode: standalone), (display-mode: minimal-ui), (display-mode: window-controls-overlay)');
   const appInUse=()=>navigator.standalone===true||displayMode?.matches===true;
-  const platform=platformOf(navigator);
+  const platform=platformOf(navigator),browser=browserOf(navigator);
 
   function refresh() {
-    const label=appInUse()?'App em uso':confirmedInstalled?'App instalado':prompting?'Abrindo instalação…':'Instalar app';
+    const label=appInUse()?'App em uso':confirmedInstalled?'App instalado':prompting?'Abrindo instalação…':platform==='ios'?'Adicionar à tela inicial':platform==='mac'&&browser==='safari'?'Adicionar ao Dock':'Instalar app';
     for(const button of document.querySelectorAll(buttonSelector)) {
       button.hidden=false;
       labelElement(button,document).textContent=label;
@@ -89,13 +89,13 @@ export function setupInstallation({showInfo}={}) {
     if(prompting)return;
     if(appInUse()||confirmedInstalled){showInstalled();return;}
     if(!deferredPrompt){showInfo(instructionsMarkup(platform));return;}
-    const promptEvent=deferredPrompt;deferredPrompt=null;prompting=true;refresh();
+    const promptEvent=deferredPrompt;deferredPrompt=null;window.__ajudaInstallPrompt=null;prompting=true;refresh();
     try {
       const result=await promptEvent.prompt();
       const choice=promptEvent.userChoice?await promptEvent.userChoice:result;
       if(disposed)return;
       if(appInUse()||confirmedInstalled)showInstalled();
-      else if(choice?.outcome==='accepted')showInfo(instructionsMarkup(platform,'Seu pedido foi aceito. Conclua as etapas que o navegador apresentar e procure o ícone do Ajuda em Casa no aparelho.'));
+      else if(choice?.outcome==='accepted')toast('Instalação aceita. Aguarde o navegador concluir e abra pelo ícone do Ajuda em Casa.');
       // Ao dispensar o convite nativo, a página permanece na tarefa anterior.
     } catch {
       if(!disposed)showInfo(instructionsMarkup(platform,'O convite automático não abriu. Você também pode instalar pelo menu do navegador, seguindo estas etapas.'));
@@ -107,9 +107,9 @@ export function setupInstallation({showInfo}={}) {
 
   function beforePrompt(event) {
     if(typeof event.prompt!=='function'||appInUse()||confirmedInstalled)return;
-    event.preventDefault();deferredPrompt=event;refresh();
+    event.preventDefault();deferredPrompt=event;window.__ajudaInstallPrompt=event;refresh();
   }
-  function installed() {confirmedInstalled=true;deferredPrompt=null;refresh();}
+  function installed() {confirmedInstalled=true;deferredPrompt=null;window.__ajudaInstallPrompt=null;refresh();toast('Ajuda em Casa instalado. Abra pelo ícone criado no aparelho.');}
   window.addEventListener('beforeinstallprompt',beforePrompt);
   window.addEventListener('appinstalled',installed);
   document.addEventListener('click',install);

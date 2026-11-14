@@ -1,15 +1,15 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=e03be0096255';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=e03be0096255';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=e03be0096255';
-import {contactChoices,hasContact} from './canais.mjs?v=e03be0096255';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=db21b3690644';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=db21b3690644';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=db21b3690644';
+import {contactChoices,hasContact} from './canais.mjs?v=db21b3690644';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { ratingSummary } from './avaliacoes.mjs?v=e03be0096255';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=e03be0096255';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=e03be0096255';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=e03be0096255';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=e03be0096255';
-import {paidBoostDays} from './promocoes.mjs?v=e03be0096255';
+import { ratingSummary } from './avaliacoes.mjs?v=db21b3690644';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=db21b3690644';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=db21b3690644';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=db21b3690644';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=db21b3690644';
+import {paidBoostDays} from './promocoes.mjs?v=db21b3690644';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },
@@ -43,7 +43,16 @@ export const CATEGORIES = [
 export const EVENTS = ['novo_cadastro_gratuito', 'solicitacao_upgrade_pro', 'ativacao_destaque_3dias', 'novo_orcamento_cliente', 'interesse_patrocinio_loja', 'nova_vaga_empregador', 'solicitacao_titularidade', 'nova_avaliacao'];
 export const MEDIA_LABELS = { antes: 'ANTES', depois: 'DEPOIS', cartao: 'CARTÃO PROFISSIONAL', certificado: 'CERTIFICADO', fachada: 'FACHADA' };
 export const DAY = 86400000;
-export const fold = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+// A busca trata acentos, hífens, barras e pontuação como separadores equivalentes.
+// Assim, "ar condicionado", "ar-condicionado" e "AR / CONDICIONADO" encontram
+// o mesmo serviço sem alterar os identificadores usados pelo catálogo.
+export const fold = value => String(value ?? '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim()
+  .replace(/\s+/g, ' ');
 export const shortText = value => Array.from(String(value ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()).slice(0, 140).join('');
 export const categoryName = id => CATEGORIES.find(c => c.id === id)?.name || id;
 
@@ -88,7 +97,9 @@ export function searchProfiles(profiles, filters = {}, now = Date.now()) {
     .filter(p => !filters.emergency || p.emergency === true)
     .filter(p => {
       const v = visibleProfile(p, now);
-      return fold([v.name,p.name,p.legalName,categoryName(v.category), v.note, v.description, ...(p.neighborhoods || [])].join(' ')).includes(fold(filters.query || ''));
+      const haystack=fold([v.name,p.name,p.legalName,v.category,categoryName(v.category),v.note,v.description,...(p.neighborhoods||[])].join(' '));
+      const terms=fold(filters.query||'').split(' ').filter(Boolean);
+      return terms.every(term=>haystack.includes(term));
     })
     .sort((a, b) => (filters.sort==='distance' ? compareDistance(a,b,filters.origin) : 0) || Number(featuredDays(b, now) > 0) - Number(featuredDays(a, now) > 0) || Number(isPro(b,now) && b.proAccessSource==='paid')-Number(isPro(a,now) && a.proAccessSource==='paid') || Number(isPro(b, now)) - Number(isPro(a, now)) || a.name.localeCompare(b.name, 'pt-BR'))
     .map(p => ({...visibleProfile(p, now), ...(filters.sort==='distance' ? {distanceKm:distanceKm(filters.origin,p.location)} : {})}));

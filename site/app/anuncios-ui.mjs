@@ -1,6 +1,6 @@
-import {AD_KINDS,adPresentation} from './anuncios.mjs?v=e03be0096255';
-import {intermediationMarkup,previewIntermediation} from './intermediacao-ui.mjs?v=e03be0096255';
-import {intermediationSplit} from './intermediacao.mjs?v=e03be0096255';
+import {AD_KINDS,adPresentation} from './anuncios.mjs?v=db21b3690644';
+import {intermediationMarkup,previewIntermediation} from './intermediacao-ui.mjs?v=db21b3690644';
+import {intermediationSplit} from './intermediacao.mjs?v=db21b3690644';
 const adEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function adHeader(ad) {
   return `<div class="ad-topline"><span class="ad-purpose"><span aria-hidden="true">${ad.symbol}</span> ${adEsc(ad.title)}</span><span class="ad-access">${adEsc(ad.accessLabel)}</span></div>`;
@@ -18,7 +18,7 @@ export function adDetailsMarkup(ad,location='') {
     ${d.availability?`<p class="ad-start"><strong>${work?'Disponibilidade':'Início'}:</strong> ${adEsc(d.availability)}</p>`:''}`;
 }
 export function purposeField() {
-  return '<div class="field full"><label for="ad-type">Como você quer se apresentar?</label><select id="ad-type" name="adType"><option value="service">Ofereço serviços · PRO Serviços</option><option value="jobseeker">Procuro emprego · PRO Talento</option></select></div>';
+  return '<div class="field full"><label for="ad-type">Como você quer trabalhar?</label><select id="ad-type" name="adType"><option value="service">Serviço avulso / diária (sem carteira assinada)</option><option value="jobseeker">Emprego com carteira assinada</option></select><small>Escolha a forma de trabalho que quer divulgar. O cadastro básico é gratuito nas duas opções.</small></div>';
 }
 export function adEditorFields({job=false}={}) {
   const field=(key,label,max,placeholder='')=>`<div class="field"><label for="ad-${key}">${label}</label><input id="ad-${key}" name="ad-${key}" maxlength="${max}" placeholder="${placeholder}"></div>`;

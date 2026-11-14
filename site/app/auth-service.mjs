@@ -259,7 +259,9 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
             navigation.location.assign(target.href);
             return new Promise(()=>{});
           }
-          await ready();return redirectGoogle();
+          await ready();
+          if(getUser())return getUser();
+          return redirectGoogle();
         });
       }
       // Sem await/then antes do SDK quando ready() já terminou: preserva o gesto do clique.
