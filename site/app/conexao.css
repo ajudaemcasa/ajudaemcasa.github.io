@@ -221,6 +221,11 @@
 .conexao-site .account-summary { padding:24px; }
 .conexao-site .account-summary p { font-size:15px; overflow-wrap:anywhere; }
 .conexao-site .account-summary .account-status { font-size:14px; }
+.conexao-site .onboarding-phone { padding:16px; border:1px solid #bfd2f5; border-radius:12px; background:#f2f6ff; }
+.conexao-site .onboarding-phone>label { color:#20449e; font-size:15px; }
+.conexao-site .onboarding-optional { margin-top:10px; padding:10px 12px; border:1px solid #e1e8f4; border-radius:10px; background:#fafcff; }
+.conexao-site .onboarding-optional>summary { cursor:pointer; font-size:13px; font-weight:650; color:#4b6285; }
+.conexao-site .onboarding-optional textarea { min-height:64px; margin-top:6px; font-size:14px; }
 .conexao-site .inbox-list { display:grid; gap:18px; margin-top:25px; max-width:840px; }
 .conexao-site .inbox-message { min-width:0; padding:25px; border:1px solid #d4e0f1; border-radius:15px; background:#fff; box-shadow:0 6px 22px #233e7105; }
 .conexao-site .inbox-message h3 { margin:12px 0 7px; font-size:22px; line-height:1.35; letter-spacing:-.4px; overflow-wrap:anywhere; }

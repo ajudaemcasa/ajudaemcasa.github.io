@@ -1,4 +1,4 @@
-import {CAREER_SOURCE_HOSTS,isAutomatedVacancy,isPublicAgencyVacancy} from './vagas-publicas.mjs?v=6b6e9811e9c8';
+import {CAREER_SOURCE_HOSTS,isAutomatedVacancy,isPublicAgencyVacancy} from './vagas-publicas.mjs?v=ab340c835a42';
 export const PUBLIC_JOBS_FEED_URL='https://sternplatypus-n8n.cloudfy.live/webhook/ajuda-em-casa-vagas-publicas';
 export const PUBLIC_JOBS_FEED_CACHE='ajuda-codex:vagas-publicas:v1';
 export function normalizeJobsFeed(feed,now=Date.now()) {

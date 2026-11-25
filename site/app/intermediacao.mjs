@@ -1,5 +1,5 @@
 // Valores em centavos. A taxa é do contratante; candidatura e contato do trabalhador são gratuitos.
-import {isRepublishedVacancy} from './vagas-publicas.mjs?v=6b6e9811e9c8';
+import {isRepublishedVacancy} from './vagas-publicas.mjs?v=ab340c835a42';
 export const DEFAULT_INTERMEDIATION_CENTS=20000;
 export const PLATFORM_SHARE_PERCENT=30;
 export function intermediationSplit(totalCents=DEFAULT_INTERMEDIATION_CENTS) {

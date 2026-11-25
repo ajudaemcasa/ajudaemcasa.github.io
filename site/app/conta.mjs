@@ -1,5 +1,5 @@
 // Preferências de apresentação e rascunhos nunca comprovam identidade ou acesso PRO.
-import {accountObjectives} from './objetivos.mjs?v=6b6e9811e9c8';
+import {accountObjectives} from './objetivos.mjs?v=ab340c835a42';
 export const ACCOUNT_ROLES = Object.freeze([
   Object.freeze({ id: 'contractor', label: 'Contratante', title: 'Quero contratar', description: 'Encontre profissionais e divulgue oportunidades de trabalho.' }),
   Object.freeze({ id: 'worker', label: 'Profissional', title: 'Quero trabalhar', description: 'Ofereça serviços ou procure uma oportunidade de emprego.' }),

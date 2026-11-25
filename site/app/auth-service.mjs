@@ -138,8 +138,11 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
   let readyPromise;
   let unsubscribeAuth;
   let completedGoogleRedirect = false;
-  const redirectMode=config?.auth?.flow==='redirect';
+  const flowMode = config?.auth?.flow || 'popup';
+  const redirectMode = flowMode === 'redirect' || flowMode === 'auto';
+  const preferPopupOnAuthOrigin = flowMode === 'auto';
   const accessOrigin=settings?'https://'+settings.authDomain:'';
+  const isMobileViewport = () => Boolean(navigation?.matchMedia?.('(pointer: coarse), (max-width: 760px)')?.matches);
   const googleProvider=()=>{
     const provider=new sdk.GoogleAuthProvider();
     provider.addScope('profile');provider.addScope('email');
@@ -189,7 +192,10 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
         if (existing && !PUBLIC_FIELDS.every(key => existing.options?.[key] === settings[key])) fail('auth/configuration-mismatch');
         const app = existing || sdk.initializeApp({ ...settings }, name);
         auth = sdk.getAuth(app);
-        await sdk.setPersistence(auth, sdk.browserSessionPersistence);
+        const persistence = config?.auth?.persistence === 'local' && sdk.browserLocalPersistence
+          ? sdk.browserLocalPersistence
+          : sdk.browserSessionPersistence;
+        await sdk.setPersistence(auth, persistence);
         auth.languageCode = 'pt-BR';
         await waitForInitialState(sdk, auth);
         if(redirectMode && navigation?.location?.origin===accessOrigin) {
@@ -254,15 +260,30 @@ export function createAuthService(config, { loadSdk = loadFirebaseSdk, loadedSdk
     },
     signInGoogle() {
       if(redirectMode && navigation?.location) {
-        return operation(async()=>{
-          if(navigation.location.origin!==accessOrigin) {
+        if(navigation.location.origin!==accessOrigin) {
+          return operation(async()=>{
             const url=new URL(navigation.location.href);
             // O destino deriva do authDomain validado; nenhum token acompanha a URL.
             const target=new URL('/app/'+(url.pathname.endsWith('/painel.html')?'painel.html':'index.html'),accessOrigin);
             target.hash=url.hash||'#entrar';target.searchParams.set('entrarGoogle','1');
             navigation.location.assign(target.href);
             return new Promise(()=>{});
-          }
+          });
+        }
+        if(preferPopupOnAuthOrigin && !isMobileViewport()) {
+          return operation(async()=>{
+            if(!initialized) await ready();
+            if(getUser()) return getUser();
+            try { return await popup(); }
+            catch(error) {
+              if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(error?.code)) {
+                return redirectGoogle();
+              }
+              throw error;
+            }
+          });
+        }
+        return operation(async()=>{
           await ready();
           if(getUser())return getUser();
           return redirectGoogle();

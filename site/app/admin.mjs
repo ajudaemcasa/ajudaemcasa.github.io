@@ -1,9 +1,9 @@
-import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=6b6e9811e9c8';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=6b6e9811e9c8';
-import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=6b6e9811e9c8';
-import {CATEGORIES,categoryName,isPro} from './domain.mjs?v=6b6e9811e9c8';
-import {formatPhone,phoneDigits} from './telefone.mjs?v=6b6e9811e9c8';
-import {beginLoading,finishStartup} from './carregamento.mjs?v=6b6e9811e9c8';
+import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=ab340c835a42';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=ab340c835a42';
+import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=ab340c835a42';
+import {CATEGORIES,categoryName,isPro} from './domain.mjs?v=ab340c835a42';
+import {formatPhone,phoneDigits} from './telefone.mjs?v=ab340c835a42';
+import {beginLoading,finishStartup} from './carregamento.mjs?v=ab340c835a42';
 
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const labels={active:'Ativo',suspended:'Suspenso',pending:'Pendente',in_progress:'Em atendimento',rejected:'Recusado',resolved:'Concluído',published:'Publicado',deleted:'Excluído'};
@@ -443,6 +443,6 @@ try {
   const response=await fetch('config.json',{cache:'no-store'});if(!response.ok)throw new Error('Não foi possível carregar a configuração.');
   const config=await response.json();
   if(!authConfigured(config)||!backendConfigured(config))signInView('O painel aguarda a conexão do projeto Firebase do responsável.',{unavailable:true});
-  else {auth=createAuthService(config);client=createDataClient(config,auth);service=createAdminService(client,auth);await auth.ready();auth.subscribe(sessionChanged);}
+  else {auth=createAuthService({...config,auth:{...config.auth,persistence:'session'}});client=createDataClient(config,auth);service=createAdminService(client,auth);await auth.ready();auth.subscribe(sessionChanged);}
 }catch(error){signInView(authErrorMessage(error),{unavailable:true});}
 finally {finishStartup();}

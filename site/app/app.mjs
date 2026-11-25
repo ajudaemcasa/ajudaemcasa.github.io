@@ -1,35 +1,35 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=6b6e9811e9c8';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=6b6e9811e9c8';
-import { createN8nService } from './n8n-service.mjs?v=6b6e9811e9c8';
-import { commercialOffer } from './comercial.mjs?v=6b6e9811e9c8';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=6b6e9811e9c8';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=6b6e9811e9c8';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=6b6e9811e9c8';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=6b6e9811e9c8';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=6b6e9811e9c8';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=6b6e9811e9c8';
-import { createAccountStore } from './conta.mjs?v=6b6e9811e9c8';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=6b6e9811e9c8';
-import {profileHeading} from './perfil.mjs?v=6b6e9811e9c8';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=6b6e9811e9c8';
-import {createRequestService} from './request-service.mjs?v=6b6e9811e9c8';
-import {hasContact,validEmail} from './canais.mjs?v=6b6e9811e9c8';
-import {createPublicationService} from './autopublicacao.mjs?v=6b6e9811e9c8';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=6b6e9811e9c8';
-import {createMessagesService} from './mensagens.mjs?v=6b6e9811e9c8';
-import {createMessagesUI} from './mensagens-ui.mjs?v=6b6e9811e9c8';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=6b6e9811e9c8';
-import {selectSpotlightProfiles} from './destaques-home.mjs?v=6b6e9811e9c8';
-import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=6b6e9811e9c8';
-import {setupInstallation} from './instalacao-ui.mjs?v=6b6e9811e9c8';
-import {crownMarkup} from './layout-conexao.mjs?v=6b6e9811e9c8';
-import {createNotificationService} from './avisos.mjs?v=6b6e9811e9c8';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=6b6e9811e9c8';
-import {createVotesService} from './votos.mjs?v=6b6e9811e9c8';
-import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=6b6e9811e9c8';
-import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=6b6e9811e9c8';
-import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=6b6e9811e9c8';
-import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=6b6e9811e9c8';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=ab340c835a42';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=ab340c835a42';
+import { createN8nService } from './n8n-service.mjs?v=ab340c835a42';
+import { commercialOffer } from './comercial.mjs?v=ab340c835a42';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=ab340c835a42';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=ab340c835a42';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=ab340c835a42';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=ab340c835a42';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=ab340c835a42';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=ab340c835a42';
+import { createAccountStore } from './conta.mjs?v=ab340c835a42';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=ab340c835a42';
+import {profileHeading} from './perfil.mjs?v=ab340c835a42';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=ab340c835a42';
+import {createRequestService} from './request-service.mjs?v=ab340c835a42';
+import {hasContact,validEmail} from './canais.mjs?v=ab340c835a42';
+import {createPublicationService} from './autopublicacao.mjs?v=ab340c835a42';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=ab340c835a42';
+import {createMessagesService} from './mensagens.mjs?v=ab340c835a42';
+import {createMessagesUI} from './mensagens-ui.mjs?v=ab340c835a42';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=ab340c835a42';
+import {selectSpotlightProfiles} from './destaques-home.mjs?v=ab340c835a42';
+import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=ab340c835a42';
+import {setupInstallation} from './instalacao-ui.mjs?v=ab340c835a42';
+import {crownMarkup} from './layout-conexao.mjs?v=ab340c835a42';
+import {createNotificationService} from './avisos.mjs?v=ab340c835a42';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=ab340c835a42';
+import {createVotesService} from './votos.mjs?v=ab340c835a42';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=ab340c835a42';
+import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=ab340c835a42';
+import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=ab340c835a42';
+import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=ab340c835a42';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -681,7 +681,7 @@ async function start() {
       }
     }
     let accountStorage;
-    try {accountStorage=window.sessionStorage;} catch { /* Rascunho funciona em memória se o armazenamento estiver bloqueado. */ }
+    try {accountStorage=window.localStorage;} catch { try {accountStorage=window.sessionStorage;} catch { /* Rascunho funciona em memória se o armazenamento estiver bloqueado. */ } }
     accountUI=createAccountUI({config,auth,store:createAccountStore(accountStorage),openDialog,toast,onAdminAccess:()=>dataClient.hasAdminAccess(),onProfileLoad:user=>withLoading(()=>dataClient.enabled?dataClient.loadAccount(user):Promise.resolve(null)),onProfileSave:preferences=>withLoading(()=>dataClient.enabled?dataClient.saveAccount(auth.getUser(),preferences):Promise.resolve()),onRegistrationComplete:()=>{history.replaceState(null,'',location.pathname+location.search+'#inicio');route();}});
     auth.subscribe(user=>{
       const entry=$('.google-entry');

@@ -14,13 +14,14 @@
   "auth": {
     "provider": "firebase",
     "googleOnly": true,
+    "persistence": "local",
     "firebase": {
       "apiKey": "AIzaSyDIawxHMinjBVMYCAE-okAzkmkPWiXsXSs",
       "authDomain": "ajuda-em-casa-pnz.firebaseapp.com",
       "projectId": "ajuda-em-casa-pnz",
       "appId": "1:326621706228:web:ec488d2ccab2b82aefeba1"
     },
-    "flow": "redirect"
+    "flow": "auto"
   },
   "proPriceMonthly": 19.9,
   "sponsorPriceMonthly": 49.9,
