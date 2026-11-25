@@ -10,14 +10,26 @@
   <title>Painel administrativo · Ajuda em Casa</title>
   <link rel="icon" href="icone-azul.svg" type="image/svg+xml">
   <link rel="stylesheet" href="carregamento.css">
-  <link rel="stylesheet" href="styles.css?v=30eafcf774dd">
-  <link rel="stylesheet" href="admin.css?v=30eafcf774dd">
-  <script type="module" src="admin.mjs?v=30eafcf774dd"></script>
+  <link rel="stylesheet" href="styles.css?v=6b6e9811e9c8">
+  <link rel="stylesheet" href="admin.css?v=6b6e9811e9c8">
+  <script type="module" src="admin.mjs?v=6b6e9811e9c8"></script>
 </head>
 <body class="admin-page" data-app-loading="true" aria-busy="true">
   <div id="app-loading" role="status" aria-live="polite" aria-label="Ajuda em Casa. Carregando"><img src="icone-azul-192.png" width="86" height="86" alt=""><strong>Ajuda em Casa</strong><p>Carregando…</p><div class="loading-track" aria-hidden="true"></div></div>
   <a class="skip-link" href="#admin-main">Pular para o painel</a>
-  <header class="admin-header"><a class="brand" href="index.html"><img src="icone.svg" width="36" height="36" alt=""><span>Ajuda em Casa<small>ADMINISTRAÇÃO</small></span></a><div class="admin-session"><span id="admin-account"></span><button id="admin-signout" class="btn secondary" type="button" hidden>Sair da conta</button></div></header>
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <a class="brand" href="index.html">
+        <img src="icone-azul.svg" width="38" height="38" alt="">
+        <span>Ajuda em Casa<small>PAINEL ADMINISTRATIVO</small></span>
+      </a>
+      <div class="admin-session">
+        <a class="btn secondary admin-back-link" href="index.html">← Ver vitrine</a>
+        <span id="admin-account" class="admin-account-pill"></span>
+        <button id="admin-signout" class="btn secondary" type="button" hidden>Sair da conta</button>
+      </div>
+    </div>
+  </header>
   <main id="admin-main" class="admin-main" tabindex="-1"><p class="notice" role="status">Conectando…</p></main>
   <dialog id="admin-dialog" aria-labelledby="admin-dialog-title"><button class="dialog-close" type="button" aria-label="Fechar janela">×</button><div id="admin-dialog-content"></div></dialog>
   <noscript><link rel="stylesheet" href="sem-javascript.css">Ative o JavaScript para acessar o painel.</noscript>

@@ -1,4 +1,4 @@
-import {intermediationSplit,parseMoneyCents} from './intermediacao.mjs?v=30eafcf774dd';
+import {intermediationSplit,parseMoneyCents} from './intermediacao.mjs?v=6b6e9811e9c8';
 const feeMoney=cents=>(cents/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 export function intermediationMarkup(fee) {
   if(!fee) return '';

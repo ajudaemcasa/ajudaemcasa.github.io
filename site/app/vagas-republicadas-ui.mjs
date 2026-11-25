@@ -1,5 +1,5 @@
-import {PETROLINA_AGENCY as agency,isRepublishedVacancy,isAutomatedVacancy} from './vagas-publicas.mjs?v=30eafcf774dd';
-import {publicVacancyCard as legacyCard,publicVacancyDetails as legacyDetails} from './vagas-publicas-ui.mjs?v=30eafcf774dd';
+import {PETROLINA_AGENCY as agency,isRepublishedVacancy,isAutomatedVacancy} from './vagas-publicas.mjs?v=6b6e9811e9c8';
+import {publicVacancyCard as legacyCard,publicVacancyDetails as legacyDetails} from './vagas-publicas-ui.mjs?v=6b6e9811e9c8';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const external='target="_blank" rel="noopener noreferrer"';
 const date=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short'}).format(new Date(value.length===10?value+'T12:00:00-03:00':value));

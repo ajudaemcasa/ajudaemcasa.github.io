@@ -1,15 +1,15 @@
 // Regras compartilhadas entre site, catálogo administrativo, testes e n8n.
-import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=30eafcf774dd';
-import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=30eafcf774dd';
-import { phoneDigits, formatPhone } from './telefone.mjs?v=30eafcf774dd';
-import {contactChoices,hasContact} from './canais.mjs?v=30eafcf774dd';
+import { NEIGHBORHOODS, CONDOMINIUMS } from './localidades.mjs?v=6b6e9811e9c8';
+import { approximateLocation, distanceKm, compareDistance } from './localizacao.mjs?v=6b6e9811e9c8';
+import { phoneDigits, formatPhone } from './telefone.mjs?v=6b6e9811e9c8';
+import {contactChoices,hasContact} from './canais.mjs?v=6b6e9811e9c8';
 export { NEIGHBORHOODS, CONDOMINIUMS, phoneDigits, formatPhone };
-import { communityRatingSummary as ratingSummary } from './votos.mjs?v=30eafcf774dd';
-import { publicPersonName, profileHeading } from './perfil.mjs?v=30eafcf774dd';
-import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=30eafcf774dd';
-import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=30eafcf774dd';
-import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=30eafcf774dd';
-import {paidBoostDays} from './promocoes.mjs?v=30eafcf774dd';
+import { communityRatingSummary as ratingSummary } from './votos.mjs?v=6b6e9811e9c8';
+import { publicPersonName, profileHeading } from './perfil.mjs?v=6b6e9811e9c8';
+import { EXTRA_CATEGORIES } from './servicos-extra.mjs?v=6b6e9811e9c8';
+import {hasPremiumAccess,adPresentation,sanitizeAdDetails} from './anuncios.mjs?v=6b6e9811e9c8';
+import {sanitizeIntermediation,DEFAULT_INTERMEDIATION_CENTS} from './intermediacao.mjs?v=6b6e9811e9c8';
+import {paidBoostDays} from './promocoes.mjs?v=6b6e9811e9c8';
 export const CATEGORIES = [
   { id: 'ar-condicionado', name: 'Ar-condicionado e refrigeração', short: 'Ar-condicionado', icon: 'snow' },
   { id: 'energia-solar', name: 'Energia solar · limpeza de placas', short: 'Energia solar', icon: 'sun' },
@@ -53,6 +53,48 @@ export const fold = value => String(value ?? '')
   .replace(/[^a-z0-9]+/g, ' ')
   .trim()
   .replace(/\s+/g, ' ');
+
+// Sinônimos populares para buscas cotidianas em Petrolina/PE (sem alterar IDs do catálogo).
+const CATEGORY_SYNONYMS = {
+  'diarista': ['faxineira', 'faxina', 'limpeza domestica', 'limpeza casa', 'diaria'],
+  'empregada-domestica': ['domestica', 'faxineira', 'mensalista', 'secretaria do lar'],
+  'encanador': ['bombeiro hidraulico', 'hidraulica', 'vazamento', 'cano', 'torneira'],
+  'eletricista': ['eletrica', 'fiacao', 'tomada', 'disjuntor', 'chuveiro eletrico', 'curto'],
+  'ar-condicionado': ['split', 'climatizacao', 'arcondicionado', 'geladeira', 'freezer'],
+  'pedreiro': ['alvenaria', 'reforma', 'obra', 'reboco', 'piso', 'ceramica'],
+  'pintor': ['pintura', 'parede', 'textura', 'grafiato'],
+  'marido-de-aluguel': ['faz tudo', 'pequenos reparos', 'conserto', 'instalacao'],
+  'jardineiro': ['jardim', 'poda', 'grama', 'quintal'],
+  'piscineiro': ['piscina', 'cloro', 'limpeza piscina'],
+  'baba': ['crianca', 'criancas', 'olhar crianca'],
+  'cuidador-idosos': ['idoso', 'idosos', 'acompanhante', 'cuidadora'],
+  'frete-mudancas': ['mudanca', 'carreto', 'frete'],
+  'chaveiro': ['chave', 'fechadura', 'cadeado'],
+  'dedetizacao': ['dedetizar', 'pragas', 'barata', 'cupim', 'formiga'],
+  'desentupidora': ['desentupir', 'esgoto', 'ralo', 'pia entupida'],
+  'montador-moveis': ['montar movel', 'montagem moveis', 'guarda roupa'],
+  'tecnico-informatica': ['computador', 'notebook', 'pc', 'formatacao', 'wifi']
+};
+
+function editDistanceAtMostOne(a, b) {
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++;
+    else if (b.length > a.length) j++;
+    else { i++; j++; }
+  }
+  return true;
+}
+
+function termMatchesHaystack(term, haystack, words) {
+  if (haystack.includes(term)) return true;
+  if (term.length < 5) return false;
+  return words.some(w => w.length >= 5 && Math.abs(w.length - term.length) <= 1 && editDistanceAtMostOne(term, w));
+}
 export const shortText = value => Array.from(String(value ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()).slice(0, 140).join('');
 export const categoryName = id => CATEGORIES.find(c => c.id === id)?.name || id;
 
@@ -96,10 +138,13 @@ export function searchProfiles(profiles, filters = {}, now = Date.now()) {
     .filter(p => !filters.neighborhood || (p.neighborhoods || []).some(n=>fold(n).includes(fold(filters.neighborhood))) || fold(p.neighborhood).includes(fold(filters.neighborhood)))
     .filter(p => !filters.emergency || p.emergency === true)
     .filter(p => {
-      const v = visibleProfile(p, now);
-      const haystack=fold([v.name,p.name,p.legalName,v.category,categoryName(v.category),v.note,v.description,...(p.neighborhoods||[])].join(' '));
       const terms=fold(filters.query||'').split(' ').filter(Boolean);
-      return terms.every(term=>haystack.includes(term));
+      if(!terms.length)return true;
+      const v = visibleProfile(p, now);
+      const synonyms = CATEGORY_SYNONYMS[v.category] || [];
+      const haystack=fold([v.name,p.name,p.legalName,v.category,categoryName(v.category),...synonyms,v.note,v.description,...(p.neighborhoods||[])].join(' '));
+      const words=haystack.split(' ').filter(Boolean);
+      return terms.every(term=>termMatchesHaystack(term,haystack,words));
     })
     .sort((a, b) => (filters.sort==='distance' ? compareDistance(a,b,filters.origin) : 0) || Number(featuredDays(b, now) > 0) - Number(featuredDays(a, now) > 0) || Number(isPro(b,now) && b.proAccessSource==='paid')-Number(isPro(a,now) && a.proAccessSource==='paid') || Number(isPro(b, now)) - Number(isPro(a, now)) || a.name.localeCompare(b.name, 'pt-BR'))
     .map(p => ({...visibleProfile(p, now), ...(filters.sort==='distance' ? {distanceKm:distanceKm(filters.origin,p.location)} : {})}));

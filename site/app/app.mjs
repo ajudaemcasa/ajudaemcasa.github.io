@@ -1,35 +1,35 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=30eafcf774dd';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=30eafcf774dd';
-import { createN8nService } from './n8n-service.mjs?v=30eafcf774dd';
-import { commercialOffer } from './comercial.mjs?v=30eafcf774dd';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=30eafcf774dd';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=30eafcf774dd';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=30eafcf774dd';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=30eafcf774dd';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=30eafcf774dd';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=30eafcf774dd';
-import { createAccountStore } from './conta.mjs?v=30eafcf774dd';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=30eafcf774dd';
-import {profileHeading} from './perfil.mjs?v=30eafcf774dd';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=30eafcf774dd';
-import {createRequestService} from './request-service.mjs?v=30eafcf774dd';
-import {hasContact,validEmail} from './canais.mjs?v=30eafcf774dd';
-import {createPublicationService} from './autopublicacao.mjs?v=30eafcf774dd';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=30eafcf774dd';
-import {createMessagesService} from './mensagens.mjs?v=30eafcf774dd';
-import {createMessagesUI} from './mensagens-ui.mjs?v=30eafcf774dd';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=30eafcf774dd';
-import {selectSpotlightProfiles} from './destaques-home.mjs?v=30eafcf774dd';
-import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=30eafcf774dd';
-import {setupInstallation} from './instalacao-ui.mjs?v=30eafcf774dd';
-import {crownMarkup} from './layout-conexao.mjs?v=30eafcf774dd';
-import {createNotificationService} from './avisos.mjs?v=30eafcf774dd';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=30eafcf774dd';
-import {createVotesService} from './votos.mjs?v=30eafcf774dd';
-import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=30eafcf774dd';
-import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=30eafcf774dd';
-import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=30eafcf774dd';
-import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=30eafcf774dd';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=6b6e9811e9c8';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=6b6e9811e9c8';
+import { createN8nService } from './n8n-service.mjs?v=6b6e9811e9c8';
+import { commercialOffer } from './comercial.mjs?v=6b6e9811e9c8';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=6b6e9811e9c8';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=6b6e9811e9c8';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=6b6e9811e9c8';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=6b6e9811e9c8';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=6b6e9811e9c8';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=6b6e9811e9c8';
+import { createAccountStore } from './conta.mjs?v=6b6e9811e9c8';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=6b6e9811e9c8';
+import {profileHeading} from './perfil.mjs?v=6b6e9811e9c8';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=6b6e9811e9c8';
+import {createRequestService} from './request-service.mjs?v=6b6e9811e9c8';
+import {hasContact,validEmail} from './canais.mjs?v=6b6e9811e9c8';
+import {createPublicationService} from './autopublicacao.mjs?v=6b6e9811e9c8';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=6b6e9811e9c8';
+import {createMessagesService} from './mensagens.mjs?v=6b6e9811e9c8';
+import {createMessagesUI} from './mensagens-ui.mjs?v=6b6e9811e9c8';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=6b6e9811e9c8';
+import {selectSpotlightProfiles} from './destaques-home.mjs?v=6b6e9811e9c8';
+import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=6b6e9811e9c8';
+import {setupInstallation} from './instalacao-ui.mjs?v=6b6e9811e9c8';
+import {crownMarkup} from './layout-conexao.mjs?v=6b6e9811e9c8';
+import {createNotificationService} from './avisos.mjs?v=6b6e9811e9c8';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=6b6e9811e9c8';
+import {createVotesService} from './votos.mjs?v=6b6e9811e9c8';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=6b6e9811e9c8';
+import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=6b6e9811e9c8';
+import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=6b6e9811e9c8';
+import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=6b6e9811e9c8';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -177,7 +177,7 @@ function renderResults() {
   $('#load-more').textContent='Mostrar mais '+Math.min(LISTING_PAGE_SIZE,Math.max(0,profiles.length-visibleLimit));
   $('#result-count').textContent = `Mostrando ${Math.min(visibleLimit,profiles.length)} de ${profiles.length} ${jobs?'vagas encontradas':config.showDemoProfiles?'perfis de demonstração / aprovados':'cadastros encontrados'}`;
   $('#directory-title').textContent=({professionals:'Profissionais em Petrolina',jobseekers:'Pessoas procurando emprego',jobs:'Vagas de emprego',agencies:'Oportunidades de agenciadores'})[filters.mode];
-  $('#sort-note').textContent=filters.sort==='distance'?'Do mais perto ao mais distante; sem localização fica no final.':'Destaques primeiro, depois assinantes / PRO e básicos. Agenciadores têm destaque inicial de seis meses.';
+  $('#sort-note').textContent=filters.sort==='distance'?'Do mais perto ao mais distante; sem localização fica no final.':commercialOffer(config).launch?'Destaques primeiro, depois assinantes / PRO e básicos. Agenciadores podem receber destaque inicial no lançamento.':'Destaques ativos primeiro, depois assinantes PRO e cadastros básicos.';
   $('#location-help').textContent=filters.origin?'Distâncias aproximadas em linha reta, não por ruas ou tempo de deslocamento.':'Defina sua região para calcular distâncias. Sem coordenadas, não inventamos proximidade.';
   $('#emergency').hidden=jobs;
   $('#sort').disabled=false; $('#sort').value=filters.sort;
@@ -325,7 +325,16 @@ function showQuoteForm() {
   openDialog(formShell('novo_orcamento_cliente', 'O que sua casa precisa?', 'Pedido privado de orçamento: não vira vaga pública. Para receber candidatos, use Publicar vaga grátis.', `${namePhone}<div class="field full"><label for="quote-neighborhood">Seu bairro ou região</label><input id="quote-neighborhood" name="neighborhood" list="locality-options" required maxlength="100" placeholder="Digite bairro ou condomínio"></div>${categoryField()}<div class="field full"><label for="urgency">Quando precisa?</label><select id="urgency" name="urgency" required><option value="">Selecione a urgência</option>${options(['Emergência · agora','Hoje','Nesta semana','Sem pressa'])}</select></div>`, 'Pedir orçamento gratuito'));
 }
 function showVacancyForm(kind='employer',premium=false) {
-  openDialog(formShell('nova_vaga_empregador','Sua oportunidade, fácil de entender.','O básico é gratuito. Para publicar o modelo didático, solicite PRO: seis meses de teste após aprovação, depois assinatura opcional. Escolher o modelo abaixo não ativa o plano.',`${publicationContactFields(auth.getUser())}<div class="field full"><label for="publisher-type">Quem está divulgando?</label><select id="publisher-type" name="publisherType"><option value="employer">Contratante direto · azul no PRO</option><option value="agency">Agenciador / agência · amarelo no PRO</option></select></div><div class="field full" data-agency-field hidden><label for="agency-name">Nome público da agência / agenciador</label><input id="agency-name" name="agencyName" maxlength="100"></div><div class="field full"><label for="requested-format">Modelo de divulgação</label><select id="requested-format" name="requestedFormat"><option value="standard">Básico gratuito · fundo neutro</option><option value="pro">Solicitar modelo PRO · 6 meses de teste no lançamento</option></select></div><div class="field full"><label for="advertiser-id">Código do anunciante PRO (se já aprovado)</label><input id="advertiser-id" name="advertiserId" maxlength="80" pattern="[a-z0-9-]+" placeholder="Opcional; a equipe confere o titular e o plano"><small>O código identifica a conta; não é senha nem prova de assinatura. Novos anunciantes solicitam o teste ao escolher o modelo PRO.</small></div>${categoryField()}<div class="field full"><label for="job-title">Título da vaga</label><input id="job-title" name="title" required maxlength="100" placeholder="Ex.: profissional para trabalho doméstico"></div><div class="field full"><label for="job-description">Resumo da oportunidade</label><textarea id="job-description" name="description" required maxlength="1500" rows="3" placeholder="Informe as atividades e condições principais; não inclua endereço exato."></textarea></div><div class="field full"><label for="schedule">Dias, horários e intervalo</label><input id="schedule" name="schedule" required maxlength="200" placeholder="Ex.: segunda a sexta, horário e intervalo a combinar"></div>${adEditorFields({job:true})}${agencyFeeEditor()}<p class="notice full">O teste pertence ao anunciante, não à vaga. Criar outra oportunidade não reinicia os seis meses. Sem adesão paga após o teste, o anúncio fica no modelo básico neutro.</p>`,'Publicar oportunidade grátis'));
+  const offer=commercialOffer(config);
+  const price=offer.monthly.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const intro=offer.launch
+    ?`O básico é gratuito. Para publicar o modelo didático, solicite PRO: até ${offer.trialMonths} meses de teste após aprovação, depois assinatura opcional (${price}/mês). Escolher o modelo abaixo não ativa o plano.`
+    :`O básico é gratuito. Para publicar o modelo didático organizado, solicite o plano PRO (${price}/mês, contratação opcional ou cortesia administrativa). Escolher o modelo abaixo não ativa cobrança nem libera o PRO automaticamente.`;
+  const proOption=offer.launch?`Solicitar modelo PRO · ${offer.trialMonths} meses de teste no lançamento`:`Solicitar modelo PRO · ${price}/mês (opcional)`;
+  const notice=offer.launch
+    ?'O teste pertence ao anunciante, não à vaga. Criar outra oportunidade não reinicia os seis meses. Sem adesão paga após o teste, o anúncio fica no modelo básico neutro.'
+    :'O acesso PRO pertence ao anunciante após aprovação/contratação. Sem PRO ativo, a oportunidade permanece visível no modelo básico gratuito.';
+  openDialog(formShell('nova_vaga_empregador','Sua oportunidade, fácil de entender.',intro,`${publicationContactFields(auth.getUser())}<div class="field full"><label for="publisher-type">Quem está divulgando?</label><select id="publisher-type" name="publisherType"><option value="employer">Contratante direto · azul no PRO</option><option value="agency">Agenciador / agência · amarelo no PRO</option></select></div><div class="field full" data-agency-field hidden><label for="agency-name">Nome público da agência / agenciador</label><input id="agency-name" name="agencyName" maxlength="100"></div><div class="field full"><label for="requested-format">Modelo de divulgação</label><select id="requested-format" name="requestedFormat"><option value="standard">Básico gratuito · fundo neutro</option><option value="pro">${proOption}</option></select></div><div class="field full"><label for="advertiser-id">Código do anunciante PRO (se já aprovado)</label><input id="advertiser-id" name="advertiserId" maxlength="80" pattern="[a-z0-9-]+" placeholder="Opcional; a equipe confere o titular e o plano"><small>O código identifica a conta; não é senha nem prova de assinatura.</small></div>${categoryField()}<div class="field full"><label for="job-title">Título da vaga</label><input id="job-title" name="title" required maxlength="100" placeholder="Ex.: profissional para trabalho doméstico"></div><div class="field full"><label for="job-description">Resumo da oportunidade</label><textarea id="job-description" name="description" required maxlength="1500" rows="3" placeholder="Informe as atividades e condições principais; não inclua endereço exato."></textarea></div><div class="field full"><label for="schedule">Dias, horários e intervalo</label><input id="schedule" name="schedule" required maxlength="200" placeholder="Ex.: segunda a sexta, horário e intervalo a combinar"></div>${adEditorFields({job:true})}${agencyFeeEditor()}<p class="notice full">${notice}</p>`,'Publicar oportunidade grátis'));
   $('#registration-area').required=true;
   $('#publisher-type').value=kind;
   if(kind==='agency' || premium) $('#requested-format').value='pro';
@@ -404,7 +413,7 @@ function route() {
     if(!profile)return openDialog('<h2 id="dialog-title">Contato não encontrado</h2><p>Este anúncio pode ter sido retirado.</p>');
     messagesUI.compose(profile);
   });
-  const routes = { contratar:()=>showRoleLanding('contractor'),'ser-contratado':()=>showRoleLanding('worker'),agenciar:()=>showRoleLanding('agency'),conta:()=>accountUI.open(),entrar:()=>accountUI.open({mode:'login'}),'perfil-conta':()=>accountUI.showProfile(),modelos:()=>openDialog(modelsMarkup()),agenciador:()=>showVacancyForm('agency'),'pro-emprego':()=>accountUI.guard(()=>showProForm('jobseeker'),{role:'worker',workerGoal:'jobseeker'}),planos:showPlans,cadastro:showFreeForm,pro:()=>accountUI.guard(()=>showProForm(),{role:'worker'}),orcamento:showQuoteForm,'publicar-vaga':()=>showVacancyForm(),'publicar-vaga-pro':()=>accountUI.guard(()=>showVacancyForm('employer',true),{role:'contractor'}),destaque:showFeatureForm,patrocinio:showSponsorForm,privacidade:()=>showInfo('privacidade'),termos:()=>showInfo('termos') };
+  const routes = { contratar:()=>showRoleLanding('contractor'),'ser-contratado':()=>showRoleLanding('worker'),agenciar:()=>showRoleLanding('agency'),conta:()=>accountUI.open(),entrar:()=>accountUI.open({mode:'login'}),'perfil-conta':()=>accountUI.showProfile(),modelos:()=>openDialog(modelsMarkup(config)),agenciador:()=>showVacancyForm('agency'),'pro-emprego':()=>accountUI.guard(()=>showProForm('jobseeker'),{role:'worker',workerGoal:'jobseeker'}),planos:showPlans,cadastro:showFreeForm,pro:()=>accountUI.guard(()=>showProForm(),{role:'worker'}),orcamento:showQuoteForm,'publicar-vaga':()=>showVacancyForm(),'publicar-vaga-pro':()=>accountUI.guard(()=>showVacancyForm('employer',true),{role:'contractor'}),destaque:showFeatureForm,patrocinio:showSponsorForm,privacidade:()=>showInfo('privacidade'),termos:()=>showInfo('termos') };
   routes['cadastro-emprego']=()=>showFreeForm('jobseeker');
   if(backendConfigured(config) && (!auth.getUser()?.emailVerified || !accountUI.hasPreferences()) && (['cadastro','cadastro-emprego','agenciador','pro-emprego','pro','orcamento','publicar-vaga','publicar-vaga-pro','destaque','patrocinio','meu-cadastro'].includes(hash)||hash.startsWith('avaliar/')||hash.startsWith('meu-cadastro/')))return accountUI.guard(route,accountIntent('#'+hash));
   if (hash.startsWith('perfil/')) showProfile(hash.slice(7));
@@ -600,16 +609,31 @@ window.addEventListener('offline', () => toast('Você está offline. A vitrine p
 setupInstallation({showInfo:html=>openDialog(html),toast});
 
 async function refreshLiveCatalog() {
-  const [live,settings,ratings]=await Promise.all([dataClient.get('publicCatalog/current',{publicRead:true}),dataClient.get('settings/site',{publicRead:true}),votesService.listPublic()]);
-  const d=live?.data;
+  const [liveRes,settingsRes,ratingsRes]=await Promise.allSettled([
+    dataClient.get('publicCatalog/current',{publicRead:true}),
+    dataClient.get('settings/site',{publicRead:true}),
+    votesService.listPublic()
+  ]);
+  if(liveRes.status!=='fulfilled')throw liveRes.reason;
+  const d=liveRes.value?.data;
   if(d?.schemaVersion!==1||![d.profiles,d.vacancies,d.advertisers].every(Array.isArray))throw new Error('Catálogo online indisponível.');
-  catalog={...catalog,profiles:d.profiles.map(p=>({...p,communityRating:ratings.get(p.id)}))};vacancies={...vacancies,jobs:mergeManagedPublicJobs(d.vacancies,managedJobsFeed)};advertisers={...advertisers,advertisers:d.advertisers};
-  config.directoryMessage=settings?.data.directoryMessage||'Encontre e converse gratuitamente.'; if(['paid','launch'].includes(settings?.data.commercialStage))config.commercialStage=settings.data.commercialStage;
+  const previousRatings=new Map((catalog?.profiles||[]).filter(p=>p.communityRating).map(p=>[p.id,p.communityRating]));
+  const ratings=ratingsRes.status==='fulfilled'?ratingsRes.value:null;
+  if(ratingsRes.status!=='fulfilled') {
+    console.warn('Avaliações públicas temporariamente indisponíveis; mantendo a vitrine ativa.',ratingsRes.reason?.message||ratingsRes.reason);
+  }
+  const settings=settingsRes.status==='fulfilled'?settingsRes.value:null;
+  catalog={...catalog,profiles:d.profiles.map(p=>({...p,communityRating:ratings?ratings.get(p.id):previousRatings.get(p.id)}))};vacancies={...vacancies,jobs:mergeManagedPublicJobs(d.vacancies,managedJobsFeed)};advertisers={...advertisers,advertisers:d.advertisers};
+  if(settings?.data) {
+    config.directoryMessage=settings.data.directoryMessage||'Encontre e converse gratuitamente.';
+    if(['paid','launch'].includes(settings.data.commercialStage))config.commercialStage=settings.data.commercialStage;
+  }
   try {
     const snapshot=JSON.stringify({schemaVersion:1,profiles:catalog.profiles,vacancies:d.vacancies,advertisers:d.advertisers,directoryMessage:config.directoryMessage,savedAt:Date.now()});
     if(snapshot.length<=4000000)localStorage.setItem(PUBLIC_CATALOG_CACHE,snapshot);
   } catch { /* A vitrine online continua funcionando sem armazenamento local. */ }
   if($('#commercial-notice'))$('#commercial-notice').textContent=config.directoryMessage;
+  return {ratingsAvailable:ratings!==null};
 }
 function restorePublicCatalog() {
   try {
@@ -723,6 +747,19 @@ async function start() {
       filters.query=event.target.value;
       $('#query-clear').hidden=!event.target.value;$('.directory-search').classList.toggle('has-query',!!event.target.value);
       renderResults();
+    });
+    $('#home-quick-search')?.addEventListener('submit', event => {
+      event.preventDefault();
+      const term=String($('#home-query')?.value||'').trim();
+      filters.mode='professionals';
+      filters.query=term;
+      $('#directory-mode').value='professionals';
+      $('#query').value=term;
+      $('#query-clear').hidden=!term;
+      $('.directory-search').classList.toggle('has-query',!!term);
+      history.replaceState(null,'',location.pathname+location.search+'#servicos');
+      route();
+      $('#profissionais').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
     });
     $('#query-clear').addEventListener('click',()=>{filters.query='';$('#query').value='';$('#query-clear').hidden=true;$('.directory-search').classList.remove('has-query');renderResults();$('#query').focus();});
     $('#category').addEventListener('change',event => { filters.category=event.target.value; renderResults(); });

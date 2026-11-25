@@ -1,6 +1,7 @@
-import {AD_KINDS,adPresentation} from './anuncios.mjs?v=30eafcf774dd';
-import {intermediationMarkup,previewIntermediation} from './intermediacao-ui.mjs?v=30eafcf774dd';
-import {intermediationSplit} from './intermediacao.mjs?v=30eafcf774dd';
+import {AD_KINDS,adPresentation} from './anuncios.mjs?v=6b6e9811e9c8';
+import {commercialOffer} from './comercial.mjs?v=6b6e9811e9c8';
+import {intermediationMarkup,previewIntermediation} from './intermediacao-ui.mjs?v=6b6e9811e9c8';
+import {intermediationSplit} from './intermediacao.mjs?v=6b6e9811e9c8';
 const adEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function adHeader(ad) {
   return `<div class="ad-topline"><span class="ad-purpose"><span aria-hidden="true">${ad.symbol}</span> ${adEsc(ad.title)}</span><span class="ad-access">${adEsc(ad.accessLabel)}</span></div>`;
@@ -73,13 +74,18 @@ export function updateAdPreview(form) {
   const agency=form.querySelector('[data-agency-field]');
   if(agency) {agency.hidden=kind!=='agency';agency.querySelector('input').required=kind==='agency';}
 }
-export function modelsMarkup() {
+export function modelsMarkup(config={}) {
+  const offer=commercialOffer(config);
+  const price=offer.monthly.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const details={schedule:'Segunda a sexta · horários a combinar',compensation:'R$ 2.400 / mês (exemplo)',benefits:'Transporte a combinar, informado separadamente',workContext:'Casa térrea · 3 quartos · ambiente residencial',duties:['Limpeza e organização','Cozinhar o básico','Cuidar das roupas'],requirements:['Experiência nas atividades da vaga','Referências apresentadas em conversa privada'],availability:'A combinar'};
   const models=Object.entries(AD_KINDS).map(([kind,model])=>{
     const work=kind==='service'||kind==='jobseeker';
     const d=work?{schedule:'Disponibilidade a combinar',compensation:'A combinar',duties:['Limpeza e organização','Cuidados com a casa'],experience:'Conte aqui sua experiência profissional.',availability:'A combinar'}:details;
-    const ad=adPresentation({status:'approved',plan:'pro',proAccessSource:'launch_trial',trialStartedAt:'2026-01-01',proUntil:'9999-01-01',adDetails:d},kind);
+    const ad=adPresentation({status:'approved',plan:'pro',proAccessSource:offer.launch?'launch_trial':'paid',...(offer.launch?{trialStartedAt:'2026-01-01'}:{}),proUntil:'9999-01-01',adDetails:d},kind);
     return `<article class="ad-poster ad-tone-${model.tone}" data-model="${kind}"><span class="ad-example">EXEMPLO FICTÍCIO · NÃO É VAGA REAL</span>${adHeader(ad)}<p class="ad-model-name">${model.name}</p><h3>${work?'Trabalho doméstico':'Vaga · trabalho doméstico'}</h3><p class="ad-byline">${kind==='agency'?'Agência Exemplo':work?'Maria Exemplo':'Contratante Exemplo'}</p>${adDetailsMarkup(ad,'Boa Esperança · Petrolina')}${kind==='agency'?intermediationMarkup({...intermediationSplit(),source:'agency'}):''}${!work?'<p class="micro">Remuneração e horários ilustrativos; condições reais precisam ser informadas e conferidas.</p>':''}<a class="btn primary" href="${kind==='agency'?'#agenciador':kind==='employer'?'#publicar-vaga-pro':kind==='jobseeker'?'#pro-emprego':'#pro'}">Preparar meu anúncio</a></article>`;
   }).join('');
-  return `<span class="eyebrow">UM MODELO PARA CADA OBJETIVO</span><h2 id="dialog-title">Anúncios claros. Oportunidades fáceis de entender.</h2><p class="dialog-intro">Cor + nome + informações organizadas. PRO e agenciadores têm seis meses de teste após aprovação. Depois, os recursos extras dependem de assinatura ativa. O básico continua gratuito.</p><div class="model-gallery">${models}</div><article class="ad-poster ad-tone-basic basic-model"><span class="ad-access">Básico gratuito</span><h3>Mesmo objetivo, apresentação simples</h3><p>Nome, contato e resumo em fundo neutro. Sem blocos didáticos, cores PRO ou selo de assinante. Os contatos básicos continuam acessíveis.</p></article><p class="notice">“PRO em teste” e “PRO assinante” identificam o acesso ao plano. Não significam identidade verificada, contratação garantida ou qualidade certificada. Estes exemplos não são inseridos na lista de vagas.</p>`;
+  const intro=offer.launch
+    ?`Cor + nome + informações organizadas. No lançamento, PRO e agenciadores podem receber ${offer.trialMonths} meses de teste após aprovação. Depois, os recursos extras dependem de assinatura opcional (${price}/mês). O básico continua gratuito.`
+    :`Cor + nome + informações organizadas. O modelo básico é gratuito para sempre; o modelo PRO é opcional (${price}/mês) mediante assinatura ou cortesia concedida pela administração.`;
+  return `<span class="eyebrow">UM MODELO PARA CADA OBJETIVO</span><h2 id="dialog-title">Anúncios claros. Oportunidades fáceis de entender.</h2><p class="dialog-intro">${intro}</p><div class="model-gallery">${models}</div><article class="ad-poster ad-tone-basic basic-model"><span class="ad-access">Básico gratuito</span><h3>Mesmo objetivo, apresentação simples</h3><p>Nome, contato e resumo em fundo neutro. Sem blocos didáticos, cores PRO ou selo de assinante. Os contatos básicos continuam acessíveis.</p></article><p class="notice">“PRO em teste” e “PRO assinante” identificam o acesso ao plano. Não significam identidade verificada, contratação garantida ou qualidade certificada. Estes exemplos não são inseridos na lista de vagas.</p>`;
 }
