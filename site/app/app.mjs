@@ -1,35 +1,35 @@
-import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=ab340c835a42';
-import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=ab340c835a42';
-import { createN8nService } from './n8n-service.mjs?v=ab340c835a42';
-import { commercialOffer } from './comercial.mjs?v=ab340c835a42';
-import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=ab340c835a42';
-import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=ab340c835a42';
-import { distanceLabel, searchVacancies } from './localizacao.mjs?v=ab340c835a42';
-import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=ab340c835a42';
-import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=ab340c835a42';
-import { createAuthService, authConfigured } from './auth-service.mjs?v=ab340c835a42';
-import { createAccountStore } from './conta.mjs?v=ab340c835a42';
-import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=ab340c835a42';
-import {profileHeading} from './perfil.mjs?v=ab340c835a42';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=ab340c835a42';
-import {createRequestService} from './request-service.mjs?v=ab340c835a42';
-import {hasContact,validEmail} from './canais.mjs?v=ab340c835a42';
-import {createPublicationService} from './autopublicacao.mjs?v=ab340c835a42';
-import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=ab340c835a42';
-import {createMessagesService} from './mensagens.mjs?v=ab340c835a42';
-import {createMessagesUI} from './mensagens-ui.mjs?v=ab340c835a42';
-import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=ab340c835a42';
-import {selectSpotlightProfiles} from './destaques-home.mjs?v=ab340c835a42';
-import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=ab340c835a42';
-import {setupInstallation} from './instalacao-ui.mjs?v=ab340c835a42';
-import {crownMarkup} from './layout-conexao.mjs?v=ab340c835a42';
-import {createNotificationService} from './avisos.mjs?v=ab340c835a42';
-import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=ab340c835a42';
-import {createVotesService} from './votos.mjs?v=ab340c835a42';
-import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=ab340c835a42';
-import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=ab340c835a42';
-import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=ab340c835a42';
-import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=ab340c835a42';
+import { CATEGORIES, NEIGHBORHOODS, CONDOMINIUMS, MEDIA_LABELS, categoryName, visibleProfile, searchProfiles, whatsappUrl, isPro, featuredDays, monthKey, validateEvent } from './domain.mjs?v=149f22201751';
+import { formatPhone, phoneDigits, duplicateProfiles } from './telefone.mjs?v=149f22201751';
+import { createN8nService } from './n8n-service.mjs?v=149f22201751';
+import { commercialOffer } from './comercial.mjs?v=149f22201751';
+import { plansMarkup, proPaymentMarkup } from './comercial-ui.mjs?v=149f22201751';
+import { locationPicker, getLocation, initLocationPickers } from './localizacao-ui.mjs?v=149f22201751';
+import { distanceLabel, searchVacancies } from './localizacao.mjs?v=149f22201751';
+import {agencyFeeEditor,intermediationMarkup,readIntermediation} from './intermediacao-ui.mjs?v=149f22201751';
+import {adHeader,adDetailsMarkup,purposeField,adEditorFields,readAdDetails,updateAdPreview,modelsMarkup} from './anuncios-ui.mjs?v=149f22201751';
+import { createAuthService, authConfigured } from './auth-service.mjs?v=149f22201751';
+import { createAccountStore } from './conta.mjs?v=149f22201751';
+import { createAccountUI, roleLandingMarkup } from './conta-ui.mjs?v=149f22201751';
+import {profileHeading} from './perfil.mjs?v=149f22201751';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=149f22201751';
+import {createRequestService} from './request-service.mjs?v=149f22201751';
+import {hasContact,validEmail} from './canais.mjs?v=149f22201751';
+import {createPublicationService} from './autopublicacao.mjs?v=149f22201751';
+import {publicationContactFields,initPublicationContacts,readPublicationContacts} from './publicacao-ui.mjs?v=149f22201751';
+import {createMessagesService} from './mensagens.mjs?v=149f22201751';
+import {createMessagesUI} from './mensagens-ui.mjs?v=149f22201751';
+import {selectHomeProfiles,selectHomeJobs} from './vitrine-home.mjs?v=149f22201751';
+import {selectSpotlightProfiles} from './destaques-home.mjs?v=149f22201751';
+import {spotlightCardMarkup,professionalProfileMarkup,initSpotlightMedia} from './destaques-ui.mjs?v=149f22201751';
+import {setupInstallation} from './instalacao-ui.mjs?v=149f22201751';
+import {crownMarkup} from './layout-conexao.mjs?v=149f22201751';
+import {createNotificationService} from './avisos.mjs?v=149f22201751';
+import {beginLoading,withLoading,finishStartup} from './carregamento.mjs?v=149f22201751';
+import {createVotesService} from './votos.mjs?v=149f22201751';
+import {createVotesUI,communityRatingMarkup} from './votos-ui.mjs?v=149f22201751';
+import {PUBLIC_JOB_CATEGORY,isRepublishedVacancy} from './vagas-publicas.mjs?v=149f22201751';
+import {publicVacancyCard,publicVacancyDetails} from './vagas-republicadas-ui.mjs?v=149f22201751';
+import {fetchPublicJobsFeed,mergeManagedPublicJobs,normalizeJobsFeed,PUBLIC_JOBS_FEED_CACHE} from './vagas-feed.mjs?v=149f22201751';
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -167,7 +167,13 @@ function renderResults() {
   const reset=filterKey!==lastFiltersKey, previousLeft=$('#results').scrollLeft;
   if(reset) {visibleLimit=LISTING_PAGE_SIZE;lastFiltersKey=filterKey;}
   const profiles = jobs?searchVacancies(vacancies.jobs,filters,Date.now(),advertisers.advertisers):searchProfiles(availableProfiles(), filters);
-  const markup = profiles.length ? profiles.slice(0,visibleLimit).map(p=>jobs?vacancyCard(p):card(p).replace('<h3>',distanceMarkup(p)+'<h3>').replace(/<h3>([\s\S]*?)<\/h3>/,(_,title)=>`<h3><a class="profile-title-link" href="#perfil/${encodeURIComponent(p.id)}">${title}</a></h3>`)).join('') : `<div class="empty"><h3>${jobs?'Nenhuma vaga aprovada nesta busca':'Nossa rede está começando'}</h3><p>${jobs?'As vagas aparecerão após a publicação autorizada pelo empregador. Não exibimos empregadores fictícios.':'Ainda não há profissionais confirmados nesta busca. Faça parte dos primeiros cadastros gratuitos.'}</p><button class="btn secondary" type="button" data-clear>Limpar filtros</button> <a class="btn primary" href="${jobs?'#publicar-vaga':'#cadastro'}">${jobs?'Publicar vaga grátis':'Cadastrar meu serviço grátis'}</a></div>`;
+  const cityFallbackCount = (!profiles.length && !jobs && filters.neighborhood)
+    ? searchProfiles(availableProfiles(), { ...filters, neighborhood: '' }).length
+    : 0;
+  const emptyMarkup = cityFallbackCount
+    ? `<div class="empty"><h3>Nenhum profissional informou "${esc(filters.neighborhood)}" ainda</h3><p>Existem <strong>${cityFallbackCount}</strong> ${cityFallbackCount === 1 ? 'profissional cadastrado' : 'profissionais cadastrados'} em Petrolina para esta busca (muitos ainda sem bairro informado no perfil).</p><button class="btn primary" type="button" data-clear-neighborhood>Ver todos em Petrolina</button> <button class="btn secondary" type="button" data-clear>Limpar filtros</button></div>`
+    : `<div class="empty"><h3>${jobs?'Nenhuma vaga aprovada nesta busca':'Nossa rede está começando'}</h3><p>${jobs?'As vagas aparecerão após a publicação autorizada pelo empregador. Não exibimos empregadores fictícios.':'Ainda não há profissionais confirmados nesta busca. Faça parte dos primeiros cadastros gratuitos.'}</p><button class="btn secondary" type="button" data-clear>Limpar filtros</button> <a class="btn primary" href="${jobs?'#publicar-vaga':'#cadastro'}">${jobs?'Publicar vaga grátis':'Cadastrar meu serviço grátis'}</a></div>`;
+  const markup = profiles.length ? profiles.slice(0,visibleLimit).map(p=>jobs?vacancyCard(p):card(p).replace('<h3>',distanceMarkup(p)+'<h3>').replace(/<h3>([\s\S]*?)<\/h3>/,(_,title)=>`<h3><a class="profile-title-link" href="#perfil/${encodeURIComponent(p.id)}">${title}</a></h3>`)).join('') : emptyMarkup;
   const changed=markup!==lastResultMarkup;
   if(changed) {
     $('#results').innerHTML=markup;lastResultMarkup=markup;
@@ -264,6 +270,48 @@ function closeDialog() {
   dialog.close();
   if(config&&catalog)route();
 }
+const FORM_DRAFT_PREFIX = 'ajuda-codex:form-rascunho:v1:';
+const DRAFT_FIELDS = ['category', 'note', 'title', 'description', 'schedule', 'area', 'neighborhood'];
+function saveFormDraft(form) {
+  const type = form?.dataset.event;
+  if (!type || form.dataset.delivered === 'true') return;
+  try {
+    const data = {};
+    for (const key of DRAFT_FIELDS) {
+      const el = form.elements[key];
+      if (el && typeof el.value === 'string' && el.value.trim()) data[key] = el.value.slice(0, 6000);
+    }
+    if (Object.keys(data).length) sessionStorage.setItem(FORM_DRAFT_PREFIX + type, JSON.stringify(data));
+    else sessionStorage.removeItem(FORM_DRAFT_PREFIX + type);
+  } catch { /* Rascunho é opcional. */ }
+}
+function clearFormDraft(type) {
+  if (!type) return;
+  try { sessionStorage.removeItem(FORM_DRAFT_PREFIX + type); } catch {}
+}
+function restoreFormDraft(form) {
+  const type = form?.dataset.event;
+  if (!type) return;
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(FORM_DRAFT_PREFIX + type) || 'null');
+    if (!raw || typeof raw !== 'object') return;
+    let restored = 0;
+    for (const key of DRAFT_FIELDS) {
+      const el = form.elements[key];
+      if (el && typeof raw[key] === 'string' && !el.value) { el.value = raw[key]; restored++; }
+    }
+    if (restored && form.elements.note && $('#note-counter')) {
+      $('#note-counter').textContent = `${Array.from(form.elements.note.value).length} / 140 caracteres · somente texto`;
+    }
+    if (restored) {
+      const bar = document.createElement('p');
+      bar.className = 'micro full';
+      bar.innerHTML = 'Rascunho anterior restaurado neste aparelho. <button type="button" class="btn secondary small" data-clear-draft>Limpar rascunho</button>';
+      form.prepend(bar);
+    }
+  } catch { /* Ignora rascunho corrompido. */ }
+}
+
 function openDialog(html) {
   closeFilters();
   const central=/^#(?:contratar|ser-contratado|agenciar|conta|entrar|perfil-conta|planos|modelos|termos|privacidade|mensagens|mensagem\/|avaliar\/)/.test(location.hash);
@@ -277,6 +325,12 @@ function openDialog(html) {
   if (!dialog.open) lastFocus = document.activeElement;
   view.innerHTML = html;
   initPublicationContacts(view);
+  const eventForm = view.querySelector('form[data-event]');
+  if (eventForm) {
+    const u = auth?.getUser();
+    if (u?.name && eventForm.elements.name && !eventForm.elements.name.value) eventForm.elements.name.value = u.name;
+    restoreFormDraft(eventForm);
+  }
   const professionalForm=view.querySelector('form[data-event="novo_cadastro_gratuito"],form[data-event="solicitacao_upgrade_pro"]');
   if(professionalForm) {
     professionalForm.insertAdjacentHTML('afterbegin',`<div class="field full"><label for="entity-type">Quem vai divulgar o serviço?</label><select id="entity-type" name="entityType"><option value="person">Pessoa física</option><option value="company">Empresa · razão social</option></select></div><div class="field full" data-company-name hidden><label for="legal-name">Razão social da empresa</label><input id="legal-name" name="legalName" autocomplete="organization" maxlength="160" disabled></div>`);
@@ -365,8 +419,9 @@ function showReviewForm(id) {
 }
 function showProfile(id) {
   const raw = availableProfiles().find(p => p.id === id && ['approved','unverified'].includes(p.status));
-  if (!raw) { openDialog('<h2 id="dialog-title">Perfil não encontrado</h2><p>Este perfil pode ter sido removido ou ainda estar em análise.</p><button class="btn secondary" type="button" data-close>Voltar para a busca</button>'); return; }
+  if (!raw) { document.title = 'Perfil não encontrado · Ajuda em Casa'; openDialog('<h2 id="dialog-title">Perfil não encontrado</h2><p>Este perfil pode ter sido removido ou ainda estar em análise.</p><button class="btn secondary" type="button" data-close>Voltar para a busca</button>'); return; }
   const p = visibleProfile(raw);
+  document.title = `${p.heading || p.name} · Ajuda em Casa`;
   openDialog(professionalProfileMarkup(p,{galleryMarkup:gallery(p),contactMarkup:contactButton(p),managementMarkup:managementLinks(p)}));
 }
 function showInfo(type,overForm=false) {
@@ -382,6 +437,22 @@ function showInfo(type,overForm=false) {
   infoDialog.scrollTop=0;
   $('#info-dialog-title').tabIndex=-1;$('#info-dialog-title').focus();
 }
+const ROUTE_TITLES = {
+  inicio: 'Ajuda em Casa · Profissionais em Petrolina',
+  servicos: 'Profissionais em Petrolina · Ajuda em Casa',
+  profissionais: 'Profissionais em Petrolina · Ajuda em Casa',
+  oportunidades: 'Oportunidades de Trabalho · Ajuda em Casa',
+  contratar: 'Quero Contratar · Ajuda em Casa',
+  'ser-contratado': 'Quero Trabalhar · Ajuda em Casa',
+  agenciar: 'Agenciar Empregos · Ajuda em Casa',
+  planos: 'Planos e Destaques · Ajuda em Casa',
+  modelos: 'Modelos PRO · Ajuda em Casa',
+  conta: 'Meu Perfil · Ajuda em Casa',
+  entrar: 'Entrar · Ajuda em Casa',
+  mensagens: 'Minhas Mensagens · Ajuda em Casa',
+  termos: 'Como Funciona · Ajuda em Casa',
+  privacidade: 'Privacidade · Ajuda em Casa'
+};
 function route() {
   if (!config || !catalog || document.querySelector('form[data-busy="true"]')) return;
   closeFilters();
@@ -389,6 +460,7 @@ function route() {
   if($('#side-menu').classList.contains('is-open'))setMenuOpen(false);
   let hash;
   try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
+  document.title = ROUTE_TITLES[hash || 'inicio'] || 'Ajuda em Casa · Profissionais em Petrolina';
   for(const link of document.querySelectorAll('#side-menu nav a')) {
     const current=link.hash.slice(1)===(hash||'inicio') || (link.hash==='#conta' && ['entrar','perfil-conta'].includes(hash));
     if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
@@ -420,7 +492,12 @@ function route() {
   else if(hash==='meu-cadastro' || hash.startsWith('meu-cadastro/')) showOwnershipForm(hash.slice(13));
   else if(hash.startsWith('avaliar/')) showReviewForm(hash.slice(8));
   else if (routes[hash]) routes[hash]();
-  else if (dialog.open) dialog.close();
+  else {
+    if (dialog.open) dialog.close();
+    $('#central-view').hidden = true; $('#central-view-content').replaceChildren();
+    $('#home-showcase').hidden = false; $('#profissionais').hidden = true;
+    renderHome();
+  }
 }
 async function readFile(file, type) {
   if (file.size > 524288 || !['image/jpeg','image/png','image/webp'].includes(file.type)) throw new Error('Use JPG, PNG ou WebP de até 512 KB por imagem.');
@@ -479,6 +556,7 @@ async function submitForm(form) {
     status.className = 'form-status full success';
     status.textContent=receipt.published?`Anúncio publicado! Protocolo: ${receipt.eventId}. Já está disponível na vitrine com os canais que você autorizou.`:`Pedido registrado. Protocolo: ${receipt.eventId}. Acompanhe pelo atendimento.`;
     form.dataset.delivered = 'true'; button.textContent=receipt.published?'Anúncio publicado':'Pedido registrado';
+    clearFormDraft(form.dataset.event);
     for (const input of form.querySelectorAll('input,textarea,select,button')) input.disabled = true;
     const notice=document.createElement('p');notice.className='micro full';notice.setAttribute('role','status');status.after(notice);
     const notify=async()=>{
@@ -497,6 +575,7 @@ document.addEventListener('input', event => {
   const form = event.target.closest('form');
   updateIdentityPreview(form);
   updateAdPreview(form);
+  if (form?.matches('form[data-event]')) saveFormDraft(form);
   if (form && form.dataset.busy !== 'true') { delete form.dataset.eventId; delete form.dataset.createdAt; }
   if (event.target.id === 'note') $('#note-counter').textContent = `${Array.from(event.target.value).length} / 140 caracteres · somente texto`;
   if (event.target.id === 'profileId' && $('#feature-status')) {
@@ -561,6 +640,11 @@ document.addEventListener('click', async event => {
     if(firstNew) {firstNew.tabIndex=-1;firstNew.focus({preventScroll:true});firstNew.scrollIntoView({block:'nearest',inline:'start',behavior:'instant'});}
   }
   if (target.matches('[data-clear]')) clearFilters();
+  if (target.matches('[data-clear-neighborhood]')) { filters.neighborhood = ''; $('#neighborhood').value = ''; renderResults(); }
+  if (target.matches('[data-clear-draft]')) {
+    const f = target.closest('form[data-event]');
+    if (f) { clearFormDraft(f.dataset.event); for (const key of DRAFT_FIELDS) if (f.elements[key]) f.elements[key].value = ''; target.closest('p')?.remove(); updateIdentityPreview(f); updateAdPreview(f); }
+  }
   if (target.matches('.dialog-close,[data-close]')) closeDialog();
   if (target.matches('[data-demo-contact]')) toast('Perfil de demonstração. Não há número real para contatar.');
   if (target.matches('[data-category]')) { filters.category = target.dataset.category; $('#category').value = filters.category; renderResults(); }
@@ -673,7 +757,10 @@ async function start() {
           toast('Conexão instável: exibindo a última cópia pública disponível.');
         });
       } else {
-        try { await refreshLiveCatalog(); }
+        try {
+          const res = await refreshLiveCatalog();
+          if (res && !res.ratingsAvailable) toast('Avaliações temporariamente indisponíveis; os contatos continuam ativos.');
+        }
         catch(error) {
           catalogFallback='empty';
           console.warn('Catálogo online indisponível e sem cópia local.',error.message);

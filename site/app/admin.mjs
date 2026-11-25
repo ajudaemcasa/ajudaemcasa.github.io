@@ -1,9 +1,9 @@
-import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=ab340c835a42';
-import {createDataClient,backendConfigured} from './firestore.mjs?v=ab340c835a42';
-import {createAdminService,editProfessional,REQUEST_LABELS} from './admin-domain.mjs?v=ab340c835a42';
-import {CATEGORIES,categoryName,isPro} from './domain.mjs?v=ab340c835a42';
-import {formatPhone,phoneDigits} from './telefone.mjs?v=ab340c835a42';
-import {beginLoading,finishStartup} from './carregamento.mjs?v=ab340c835a42';
+import {createAuthService,authConfigured,authErrorMessage} from './auth-service.mjs?v=149f22201751';
+import {createDataClient,backendConfigured} from './firestore.mjs?v=149f22201751';
+import {createAdminService,editProfessional,recordsToCsv,REQUEST_LABELS} from './admin-domain.mjs?v=149f22201751';
+import {CATEGORIES,categoryName,isPro} from './domain.mjs?v=149f22201751';
+import {formatPhone,phoneDigits} from './telefone.mjs?v=149f22201751';
+import {beginLoading,finishStartup} from './carregamento.mjs?v=149f22201751';
 
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const labels={active:'Ativo',suspended:'Suspenso',pending:'Pendente',in_progress:'Em atendimento',rejected:'Recusado',resolved:'Concluído',published:'Publicado',deleted:'Excluído'};
@@ -192,7 +192,8 @@ function renderListShell() {
   const planSelect=tab==='records'
     ?`<label class="sr-only" for="admin-plan-filter">Plano ou verificação</label><select id="admin-plan-filter"><option value="">Todos os planos</option><option value="pro" ${planFilter==='pro'?'selected':''}>Somente PRO ativo</option><option value="free" ${planFilter==='free'?'selected':''}>Somente Básico</option><option value="unverified" ${planFilter==='unverified'?'selected':''}>Não verificados</option></select>`
     :'';
-  $('#admin-content').innerHTML=`<section class="admin-panel">${kindChips}<div class="admin-toolbar"><label class="sr-only" for="admin-search">Buscar nos resultados carregados</label><input id="admin-search" type="search" placeholder="Buscar por nome, telefone, serviço ou e-mail" value="${esc(query)}">${tab==='audit'?'':`<label class="sr-only" for="admin-filter">Situação</label><select id="admin-filter"><option value="">Todas as situações</option>${statuses.map(s=>`<option value="${s}" ${s===filter?'selected':''}>${labels[s]}</option>`).join('')}</select>`}${planSelect}</div><div id="admin-list-body"></div></section>`;
+  const exportBtn=tab==='records'?'<button type="button" class="btn secondary" data-export-csv>Exportar CSV (Excel)</button>':'';
+  $('#admin-content').innerHTML=`<section class="admin-panel">${kindChips}<div class="admin-toolbar"><label class="sr-only" for="admin-search">Buscar nos resultados carregados</label><input id="admin-search" type="search" placeholder="Buscar por nome, telefone, serviço ou e-mail" value="${esc(query)}">${tab==='audit'?'':`<label class="sr-only" for="admin-filter">Situação</label><select id="admin-filter"><option value="">Todas as situações</option>${statuses.map(s=>`<option value="${s}" ${s===filter?'selected':''}>${labels[s]}</option>`).join('')}</select>`}${planSelect}${exportBtn}</div><div id="admin-list-body"></div></section>`;
   renderListBody();
 }
 
@@ -379,6 +380,15 @@ document.addEventListener('click',event=>{
     kindFilter=button.dataset.kindFilter;
     for(const chip of main.querySelectorAll('[data-kind-filter]'))chip.setAttribute('aria-pressed',chip.dataset.kindFilter===kindFilter?'true':'false');
     renderListBody();
+    return;
+  }
+  if(button.hasAttribute('data-export-csv')) {
+    const csv=recordsToCsv(filteredRows());
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`ajuda-em-casa-cadastros-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
     return;
   }
   if(button.dataset.tab){tab=button.dataset.tab;query='';filter='';kindFilter='';planFilter='';generation++;load();return;}

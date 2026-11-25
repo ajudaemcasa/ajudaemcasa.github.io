@@ -1,4 +1,4 @@
-import {beginLoading} from './carregamento.mjs?v=ab340c835a42';
+import {beginLoading} from './carregamento.mjs?v=149f22201751';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function createMessagesUI({service,auth,showView}) {
   let generation=0,rows=[];

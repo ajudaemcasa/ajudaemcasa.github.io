@@ -1,10 +1,24 @@
-import {CATEGORIES,validateEvent} from './domain.mjs?v=ab340c835a42';
-import {phoneDigits} from './telefone.mjs?v=ab340c835a42';
-import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=ab340c835a42';
-import {hasContact} from './canais.mjs?v=ab340c835a42';
-import {grantAdminTrial} from './comercial.mjs?v=ab340c835a42';
+import {CATEGORIES,validateEvent} from './domain.mjs?v=149f22201751';
+import {phoneDigits} from './telefone.mjs?v=149f22201751';
+import {normalizeIdentity,identityKey} from './bloqueios.mjs?v=149f22201751';
+import {hasContact} from './canais.mjs?v=149f22201751';
+import {grantAdminTrial} from './comercial.mjs?v=149f22201751';
 
 export const REQUEST_LABELS={novo_cadastro_gratuito:'Cadastro básico',solicitacao_upgrade_pro:'Solicitação PRO',ativacao_destaque_3dias:'Destaque',novo_orcamento_cliente:'Orçamento',interesse_patrocinio_loja:'Patrocínio',nova_vaga_empregador:'Vaga',solicitacao_titularidade:'Titularidade',nova_avaliacao:'Avaliação'};
+const csvCell=raw=>{
+  let s=String(raw??'').replace(/\r?\n/g,' ').trim();
+  if(/^[=+\-@\t\r]/.test(s))s="'"+s;
+  return '"'+s.replaceAll('"','""')+'"';
+};
+export function recordsToCsv(items) {
+  const header=['ID','Tipo','Nome','Serviço','Telefone','Plano','Situação','Verificação','Regiões','Observação'];
+  const lines=[header.map(csvCell).join(';')];
+  for(const {id,data:d} of items||[]) {
+    const p=d?.payload||{};
+    lines.push([id,d?.kind||'',p.name||p.title||'',p.category||'',p.phone||'',p.plan||'free',d?.status||'',p.status||'',Array.isArray(p.neighborhoods)?p.neighborhoods.join(', '):(p.neighborhood||''),p.note||p.description||''].map(csvCell).join(';'));
+  }
+  return '\uFEFF'+lines.join('\r\n')+'\r\n';
+}
 export function cleanText(raw,max,{required=false}={}) {
   const value=typeof raw==='string'?raw.normalize('NFC').trim():'';
   if((required&&!value)||Array.from(value).length>max||/[<>\p{Cc}\p{Cf}]/u.test(value))throw new Error('Use texto simples dentro do limite indicado.');

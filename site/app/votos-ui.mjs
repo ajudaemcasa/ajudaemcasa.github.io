@@ -1,5 +1,5 @@
-import {VOTE_REASONS,communityRatingSummary,updateVoteTotals} from './votos.mjs?v=ab340c835a42';
-import {withLoading} from './carregamento.mjs?v=ab340c835a42';
+import {VOTE_REASONS,communityRatingSummary,updateVoteTotals} from './votos.mjs?v=149f22201751';
+import {withLoading} from './carregamento.mjs?v=149f22201751';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export function communityRatingMarkup(profile,compact=false,{actions=true}={}) {
   const r=profile.rating||communityRatingSummary(profile);
